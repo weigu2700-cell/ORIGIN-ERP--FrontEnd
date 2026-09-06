@@ -22,6 +22,7 @@ export interface CreateProductionOrderRequest {
 
 export interface ProductionOrderVo {
   id: string
+  productionOrderNo: string
   productionDemandId: string
   productionDemandNo: string
   materialId: string
@@ -33,6 +34,7 @@ export interface ProductionOrderVo {
   plannedEndTime: string
   actualStartTime: string
   actualEndTime: string
+  status: string
   remark?: string
 }
 

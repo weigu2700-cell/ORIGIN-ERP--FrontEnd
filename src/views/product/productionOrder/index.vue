@@ -1,53 +1,60 @@
 <script setup lang="ts">
 import ProTable, { type ProColumn } from '@/components/ProTable.vue';
 import { onMounted, ref, reactive } from 'vue';
-import { getPageSalesOrder, postSalesOrder, changeSalesorder, removeSalesOrder } from '@/api/sales/salesOrder';
-import type { PageSalesOrder, SalesOrderVo, GetPageSalesOrderQuery, PostOrPutSalesOrder } from '@/types/sales/salesOrder';
+import { getPageProductionOrder, createProductionOrder, cancelProductionOrder } from '@/api/product/productionOrder';
+import type { PageProductionOrderResponse, ProductionOrderVo, GetPageProductionOrderRequest, CreateProductionOrderRequest } from '@/types/product/productionOrder';
 import ProToolbar from '@/components/ProToolbar.vue';
 import Selector from './components/selector.vue'
 import SaveDialog from './components/saveDialog.vue'
 import DetailDialog from './components/detailDialog.vue'
-import { ElMessage } from 'element-plus';
-import { formatDecimal } from '@/composables/useFormat';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import { formatDate, formatDecimal } from '@/composables/useFormat';
 
-const queryData = reactive<GetPageSalesOrderQuery>({
+const queryData = reactive<GetPageProductionOrderRequest>({
   pageNum: 1,
   pageSize: 10,
-  orderNo: '',
-  customerId: '',
-  status: null
+  productionOrderNo: '',
+  productionDemandNo: '',
+  materialId: '',
+  status: '',
+  plannedStartTime: '',
+  plannedEndTime: ''
 });
 
-const tableData = ref<PageSalesOrder>();
-const tableRef = ref<{ clearSelection: () => void }>();
+const tableData = ref<PageProductionOrderResponse>();
 const selectedRowId = ref<string>();
 const visible = ref<boolean>(false)
 const detailVisible = ref<boolean>(false)
 const currentDetailId = ref<string>()
 const model = ref<'add' | 'edit'>('add')
 
-const handleSelectionChange = (rows: SalesOrderVo[]) => {
+const handleSelectionChange = (rows: ProductionOrderVo[]) => {
   selectedRowId.value = rows[0] ? String(rows[0].id) : undefined;
 };
 
 const loadData = async () => {
-  tableData.value = await getPageSalesOrder(queryData);
+  tableData.value = await getPageProductionOrder(queryData);
 };
 
 const columns = ref<ProColumn[]>([
-  { label: '订单号', prop: 'orderNo', width: 200 },
-  { label: '客户名称', prop: 'customerName', width: 200 },
-  { label: '订单日期', prop: 'orderDate', width: 150 },
-  { label: '交货日期', prop: 'deliveryDate', width: 150 },
-  { label: '总金额', prop: 'totalAmount', width: 120, slot: 'totalAmount' },
+  { label: '生产订单号', prop: 'productionOrderNo', width: 180 },
+  { label: '需求单号', prop: 'productionDemandNo', width: 180 },
+  { label: '物料编码', prop: 'materialCode', width: 140 },
+  { label: '物料名称', prop: 'materialName', width: 160 },
+  { label: '计划数量', prop: 'plannedQuantity', width: 100, slot: 'plannedQuantity' },
+  { label: '实际数量', prop: 'actualQuantity', width: 100, slot: 'actualQuantity' },
+  { label: '计划开始时间', prop: 'plannedStartTime', width: 160, slot: 'plannedStartTime' },
+  { label: '计划结束时间', prop: 'plannedEndTime', width: 160, slot: 'plannedEndTime' },
+  { label: '实际开始时间', prop: 'actualStartTime', width: 160, slot: 'actualStartTime' },
+  { label: '实际结束时间', prop: 'actualEndTime', width: 160, slot: 'actualEndTime' },
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '备注', prop: 'remark', minWidth: 150 }
 ]);
 
 const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
-  DRAFT: { label: '草稿', type: 'info' },
-  CONFIRMED: { label: '已确认', type: 'success' },
-  IN_PROGRESS: { label: '执行中', type: 'warning' },
+  PENDING: { label: '待下达', type: 'info' },
+  RELEASED: { label: '已下达', type: 'success' },
+  IN_PROGRESS: { label: '生产中', type: 'warning' },
   COMPLETED: { label: '已完成', type: 'success' },
   CANCELLED: { label: '已取消', type: 'danger' }
 }
@@ -58,9 +65,12 @@ const handleQuery = () => {
 }
 
 const handleReset = () => {
-  queryData.orderNo = '';
-  queryData.customerId = '';
-  queryData.status = null;
+  queryData.productionOrderNo = '';
+  queryData.productionDemandNo = '';
+  queryData.materialId = '';
+  queryData.status = '';
+  queryData.plannedStartTime = '';
+  queryData.plannedEndTime = '';
   queryData.pageNum = 1;
   loadData();
 }
@@ -86,11 +96,12 @@ const handleDelete = async () => {
   }
 
   try {
-    await removeSalesOrder(selectedRowId.value)
-    ElMessage.success('删除成功')
+    await ElMessageBox.confirm('确定取消该生产订单吗？', '取消订单', { type: 'warning' })
+    await cancelProductionOrder(selectedRowId.value)
+    ElMessage.success('取消成功')
     loadData()
   } catch {
-    ElMessage.error('删除失败')
+    // 用户取消或请求失败
   }
 }
 
@@ -98,20 +109,15 @@ const handleRefresh = () => {
   loadData()
 }
 
-const handleRowDblclick = (row: SalesOrderVo) => {
+const handleRowDblclick = (row: ProductionOrderVo) => {
   currentDetailId.value = String(row.id)
   detailVisible.value = true
 }
 
-const handleSubmit = async (data: PostOrPutSalesOrder) => {
+const handleSubmit = async (data: CreateProductionOrderRequest) => {
   try {
-    if (model.value === 'edit') {
-      await changeSalesorder(selectedRowId.value!, data)
-      ElMessage.success('修改成功')
-    } else {
-      await postSalesOrder(data)
-      ElMessage.success('新增成功')
-    }
+    await createProductionOrder(data)
+    ElMessage.success(model.value === 'edit' ? '修改成功' : '新增成功')
     visible.value = false
     loadData()
   } catch {
@@ -138,13 +144,28 @@ onMounted(() => {
       <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
     </section>
     <section class="table">
-      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
+      <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.pageNum" :page-size="queryData.pageSize"
         @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
         @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
-        <template #totalAmount="{ row }">
-          {{ formatDecimal.thousand(row.totalAmount) }}
+        <template #plannedQuantity="{ row }">
+          {{ formatDecimal.default(row.plannedQuantity, 0) }}
+        </template>
+        <template #actualQuantity="{ row }">
+          {{ formatDecimal.default(row.actualQuantity, 0) }}
+        </template>
+        <template #plannedStartTime="{ row }">
+          {{ formatDate.DateTime(row.plannedStartTime) }}
+        </template>
+        <template #plannedEndTime="{ row }">
+          {{ formatDate.DateTime(row.plannedEndTime) }}
+        </template>
+        <template #actualStartTime="{ row }">
+          {{ row.actualStartTime ? formatDate.DateTime(row.actualStartTime) : '-' }}
+        </template>
+        <template #actualEndTime="{ row }">
+          {{ row.actualEndTime ? formatDate.DateTime(row.actualEndTime) : '-' }}
         </template>
         <template #status="{ row }">
           <el-tag :type="statusMap[row.status]?.type ?? 'info'">

@@ -1,5 +1,8 @@
-import type { GetPageProductionDemandRequest, PageProductionDemandVo, ProductionDemandVo } from '@/types/product/productionDemand';
 import service from '@/utils/request'
+import type { 
+  GetPageProductionDemandRequest,
+  PageProductionDemandVo, 
+  ProductionDemandVo } from '@/types/product/productionDemand';
 
 export function getPageProductionDemand (data:GetPageProductionDemandRequest) {
   return service.get<PageProductionDemandVo>(

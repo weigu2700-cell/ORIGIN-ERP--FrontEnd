@@ -1,5 +1,9 @@
 import service from '@/utils/request'
-import type { CreateProductionOrderRequest, GetPageProductionOrderRequest, PageProductionOrderResponse, ProductionOrderVo } from '../../types/product/productionOrder';
+import type {
+  CreateProductionOrderRequest, 
+  GetPageProductionOrderRequest,
+  PageProductionOrderResponse, 
+  ProductionOrderVo } from '../../types/product/productionOrder';
 
 export function getPageProductionOrder (data:GetPageProductionOrderRequest) {
   return service.get<PageProductionOrderResponse>(
