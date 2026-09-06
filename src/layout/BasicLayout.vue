@@ -14,10 +14,10 @@ const appStore = useAppStore()
     </el-header>
     <el-aside class="aside">
       <div class="brand" :class="{ 'brand--collapsed': appStore.isFold }">
-        <img class="brand-mark" src="/origin-logo.svg" alt="原点 ERP" />
+        <img class="brand-mark" src="/origin-manufacturing-logo.svg" alt="原点智造 ERP" />
         <div v-if="!appStore.isFold" class="brand-copy">
-          <strong>原点 ERP</strong>
-          <span>ORIGIN · 企业资源管理平台</span>
+          <strong>原点智造 ERP</strong>
+          <span>ORIGIN · 制造运营管理平台</span>
         </div>
       </div>
       <Aside />
@@ -113,11 +113,7 @@ const appStore = useAppStore()
   flex: 0 0 31px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
-  background: #e8f0fe;
-  color: #1a73e8;
-  font-size: 18px;
-  font-weight: 800;
+  border-radius: 7px;
   box-shadow: none;
 }
 

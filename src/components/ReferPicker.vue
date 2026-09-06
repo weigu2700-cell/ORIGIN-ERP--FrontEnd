@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, watch, computed } from "vue";
 import { ElMessage } from "element-plus";
 import { OfficeBuilding, CircleClose } from '@element-plus/icons-vue';
 
@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<{
   title?: string
   placeholder?: string
   columns: ReferColumn[]
-  fetcher: (params: Record<string, any>) => Promise<{ records: ReferRow[] }>
+  fetcher: (params: Record<string, any>) => Promise<{ records: ReferRow[]; total: number }>
   valueKey?: string
   labelKey?: string
   searchField?: string
@@ -44,14 +44,21 @@ const emit = defineEmits<{
 const dialogVisible = ref(false)
 const loading = ref(false)
 const list = ref<ReferRow[]>([])
+const total = ref(0)
 // 输入框只读显示选中项的 label 文本
-const displayText = ref('')
+const inputDisplayText = ref('')
 
 const query = reactive<Record<string, any>>({
-  page: 1,
+  pageNum: 1,
   pageSize: 10,
 })
-query[props.searchField] = ''
+
+// 动态搜索字段
+const searchKey = computed(() => props.searchField)
+const searchValue = computed({
+  get: () => query[searchKey.value] ?? '',
+  set: (val: string) => { query[searchKey.value] = val }
+})
 
 // 从行对象中取值，valueKey 取不到时兜底常见 id 字段名
 // 注意：code 不作为兜底，避免工厂场景把业务编码（FT...）当成主键 id 传给后端导致 404
@@ -74,12 +81,11 @@ const loadData = async () => {
   try {
     const res = await props.fetcher({ ...query, ...props.extraParams })
     list.value = res?.records ?? []
-    console.log('[ReferPicker] loadData res =', res)
-    console.log('[ReferPicker] record keys =', Object.keys(list.value[0] ?? {}), 'first =', JSON.stringify(list.value[0] ?? null))
+    total.value = res?.total ?? 0
     // 若已有选中值，回填显示文本
-    if (props.modelValue != null && !displayText.value) {
+    if (props.modelValue != null && !inputDisplayText.value) {
       const hit = list.value.find(r => String(getRowValue(r)) === String(props.modelValue))
-      if (hit) displayText.value = hit[props.labelKey]
+      if (hit) inputDisplayText.value = hit[props.labelKey]
     }
   } catch {
     ElMessage.error('加载数据失败')
@@ -89,43 +95,57 @@ const loadData = async () => {
 }
 
 const search = () => {
-  query.page = 1
+  query.pageNum = 1
+  loadData()
+}
+
+const handlePageChange = (page: number) => {
+  query.pageNum = page
+  loadData()
+}
+
+const handleSizeChange = (size: number) => {
+  query.pageSize = size
+  query.pageNum = 1
   loadData()
 }
 
 const selectRow = (row: ReferRow) => {
   const value = getRowValue(row)
-  console.log('[ReferPicker] selectRow keys =', Object.keys(row))
-  console.log('[ReferPicker] selectRow row =', JSON.stringify(row), 'value =', value)
-  displayText.value = row[props.labelKey] ?? ''
+  inputDisplayText.value = row[props.labelKey] ?? ''
   emit('update:modelValue', value)
   emit('change', row)
   dialogVisible.value = false
 }
 
 const clearValue = () => {
-  displayText.value = ''
+  inputDisplayText.value = ''
   emit('update:modelValue', null)
   emit('change', null)
-  dialogVisible.value = false
 }
 
 // 外部传入 displayText 时直接显示
 watch(() => props.displayText, (val) => {
-  if (val) displayText.value = val
+  if (val) inputDisplayText.value = val
 }, { immediate: true })
 
 // 外部清空 modelValue 时同步显示
 watch(() => props.modelValue, (val) => {
-  if (val == null) displayText.value = ''
+  if (val == null) inputDisplayText.value = ''
+})
+
+// 对话框关闭时重置分页
+watch(dialogVisible, (val) => {
+  if (!val) {
+    query.pageNum = 1
+  }
 })
 </script>
 
 <template>
-  <el-input :model-value="displayText" :placeholder="placeholder" readonly @click="openDialog">
+  <el-input :model-value="inputDisplayText" :placeholder="placeholder" readonly @click="openDialog">
     <template #suffix>
-      <!-- 自定义图标，click.stop 防止冒泡干扰；清除与打开分离，避免 clearable 图标冒泡冲突 -->
-      <el-icon v-if="displayText" class="refer-suffix-icon" @click.stop="clearValue">
+      <el-icon v-if="inputDisplayText" class="refer-suffix-icon" @click.stop="clearValue">
         <CircleClose />
       </el-icon>
       <el-icon class="refer-suffix-icon" @click.stop="openDialog">
@@ -136,14 +156,17 @@ watch(() => props.modelValue, (val) => {
 
   <el-dialog v-model="dialogVisible" :title="title" width="640px" append-to-body>
     <div class="refer-search">
-      <el-input :model-value="query[searchField]" :placeholder="searchPlaceholder" clearable
-        @update:model-value="(v: string) => { query[searchField] = v }" @keyup.enter="search" @clear="search" />
+      <el-input v-model="searchValue" :placeholder="searchPlaceholder" clearable @keyup.enter="search"
+        @clear="search" />
       <el-button type="primary" @click="search">查询</el-button>
     </div>
     <el-table :data="list" v-loading="loading" height="360" highlight-current-row @row-click="selectRow">
       <el-table-column v-for="col in columns" :key="col.prop" :prop="col.prop" :label="col.label" :width="col.width"
         :min-width="col.minWidth" />
     </el-table>
+    <el-pagination v-if="total > 0" class="refer-pagination" :current-page="query.pageNum" :page-size="query.pageSize"
+      :total="total" :page-sizes="[10, 20, 50]" layout="total, sizes, prev, pager, next"
+      @current-change="handlePageChange" @size-change="handleSizeChange" />
     <template #footer>
       <el-button @click="dialogVisible = false">取消</el-button>
       <el-button type="primary" @click="clearValue">清空</el-button>
@@ -160,5 +183,10 @@ watch(() => props.modelValue, (val) => {
 
 .refer-suffix-icon {
   cursor: pointer;
+}
+
+.refer-pagination {
+  margin-top: 12px;
+  justify-content: flex-end;
 }
 </style>

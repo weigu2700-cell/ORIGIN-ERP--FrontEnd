@@ -43,7 +43,7 @@ const queryData = reactive<MenuListRequest>({
 const columns: ProColumn[] = [
   { label: '菜单名称', prop: 'title', width: 160, fixed: 'left' },
   { label: '菜单编码', prop: 'name', width: 140 },
-  { label: '路由路径', prop: 'path', width: 160 },
+  { label: '路由路径', prop: 'path', width: 200 },
   { label: '父级菜单', prop: 'parentName', width: 140 },
   { label: '图标', prop: 'icon', width: 140, slot: 'icon' },
   { label: '可见性', prop: 'visible', width: 100, slot: 'visible' },

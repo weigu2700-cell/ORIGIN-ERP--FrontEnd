@@ -19,13 +19,16 @@ const columns = [
   { prop: 'status', label: '状态', width: 80 },
 ]
 
-const fetcher = (params: Record<string, unknown>) => getPageBom({
-  pageNum: Number(params.pageNum ?? 1),
-  pageSize: Number(params.pageSize ?? 10),
-  bomNo: (params.bomNo as string | undefined) ?? null,
-  materialId: null,
-  status: 'ACTIVE',
-} as GetPageBomRequest)
+const fetcher = async (params: Record<string, unknown>) => {
+  const result = await getPageBom({
+    pageNum: Number(params.pageNum ?? 1),
+    pageSize: Number(params.pageSize ?? 10),
+    bomNo: (params.bomNo as string | undefined) ?? null,
+    materialId: null,
+    status: 'ACTIVE',
+  } as GetPageBomRequest)
+  return { ...result, total: Number(result.total ?? 0) }
+}
 </script>
 
 <template>

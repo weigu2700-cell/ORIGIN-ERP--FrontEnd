@@ -1,10 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
-  <title id="title">原点 ERP ORIGIN 标志</title>
-  <desc id="desc">由四色轨道和中心原点组成的圆形标志</desc>
-  <path d="M32 8a24 24 0 0 1 24 24" fill="none" stroke="#4285F4" stroke-linecap="round" stroke-width="8"/>
-  <path d="M56 32a24 24 0 0 1-24 24" fill="none" stroke="#34A853" stroke-linecap="round" stroke-width="8"/>
-  <path d="M32 56A24 24 0 0 1 8 32" fill="none" stroke="#FBBC04" stroke-linecap="round" stroke-width="8"/>
-  <path d="M8 32A24 24 0 0 1 32 8" fill="none" stroke="#EA4335" stroke-linecap="round" stroke-width="8"/>
-  <circle cx="32" cy="32" r="8" fill="#fff"/>
-  <circle cx="32" cy="32" r="5" fill="#1A73E8"/>
+  <title id="title">原点智造 ERP</title>
+  <desc id="desc">简洁的工厂与生产节点标志</desc>
+  <path d="M8 49V24l15 10V22l15 10V16h13v33Z" fill="none" stroke="#D99116" stroke-linecap="round" stroke-linejoin="round" stroke-width="5"/>
+  <circle cx="19" cy="48" r="4" fill="#D99116"/>
+  <circle cx="32" cy="48" r="4" fill="#D99116"/>
+  <circle cx="45" cy="48" r="4" fill="#D99116"/>
 </svg>
