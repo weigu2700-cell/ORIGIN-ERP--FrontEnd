@@ -1,4 +1,4 @@
-import type { BomVo, CreateBomRequest, GetPageBomRequest, GetPageBomResponse } from "@/types/product/Bom";
+import type { BomExplosionVo, BomVo, CreateBomRequest, GetPageBomRequest, GetPageBomResponse, MaterialRequirementVo } from "@/types/product/Bom";
 import service from "@/utils/request";
 
 export function getPageBom (data:GetPageBomRequest) {
@@ -18,5 +18,19 @@ export function createBom (data:CreateBomRequest) {
   return service.post<void>(
     '/prd/bom',
     data
+  )
+}
+
+export function getBomExplosion (materialId:string, quantity:number) {
+  return service.get<BomExplosionVo[]>(
+    `/prd/bom/${materialId}/explosion`,
+    { params: { quantity } }
+  )
+}
+
+export function getMaterialRequirement (id:string, quantity:number) {
+  return service.get<MaterialRequirementVo>(
+    `/prd/bom/${id}/requirement`,
+    {params:quantity}
   )
 }

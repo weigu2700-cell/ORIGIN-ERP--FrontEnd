@@ -62,6 +62,7 @@ export interface BomExplosionVo {
   materialName: string;
   quantity: number;
   level: number;
+  children: BomExplosionVo[];
 }
 
 export interface MaterialRequirementVo {

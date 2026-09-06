@@ -3,7 +3,7 @@ import type { ProColumn } from '@/components/ProTable.vue';
 import ProTable from '@/components/ProTable.vue';
 import type { CreateBomItemRequest, CreateBomRequest, GetPageBomRequest, GetPageBomResponse } from '@/types/product/Bom';
 import { onMounted, ref } from 'vue'
-import { createBom, getDetailBom, getPageBom } from '../../../api/product/Bom';
+import { createBom, getDetailBom, getPageBom } from '../../../../api/product/Bom.ts';
 import Selector from './components/selector.vue';
 import ProToolbar from '@/components/ProToolbar.vue';
 import detailDialog from './components/detail.vue';
@@ -53,7 +53,6 @@ const columns = ref<ProColumn[]>([
   { label: '物料编码', prop: 'materialCode', width: 200 },
   { label: '物料名称', prop: 'materialName', minWidth: 200 },
   { label: '状态', prop: 'status', width: 100 },
-  { label: '版本', prop: 'version', width: 80 },
   { label: '备注', prop: 'remark', minWidth: 150 },
   { label: '创建时间', prop: 'createTime', width: 180 },
   { label: '更新时间', prop: 'updateTime', width: 180 },
