@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import type { SalesOrderVo } from '@/types/sales/salesOrder';
 import { getSalesOrderDetail } from '@/api/sales/salesOrder';
 import { ElMessage } from 'element-plus';
+import { formatDecimal } from '@/composables/useFormat';
 
 const props = defineProps<{
   visible: boolean
@@ -55,7 +56,7 @@ const handleCancel = () => {
         <el-descriptions-item label="客户名称">{{ detail.customerName }}</el-descriptions-item>
         <el-descriptions-item label="订单日期">{{ detail.orderDate }}</el-descriptions-item>
         <el-descriptions-item label="交货日期">{{ detail.deliveryDate }}</el-descriptions-item>
-        <el-descriptions-item label="总金额">{{ detail.totalAmount?.toFixed(2) }}</el-descriptions-item>
+        <el-descriptions-item label="总金额">{{ formatDecimal.thousand(detail.totalAmount) }}</el-descriptions-item>
         <el-descriptions-item label="状态">
           <el-tag :type="statusMap[detail.status]?.type ?? 'info'">
             {{ statusMap[detail.status]?.label ?? '未知' }}
@@ -71,15 +72,19 @@ const handleCancel = () => {
         <el-table-column label="物料编码" prop="materialCode" width="120" />
         <el-table-column label="物料名称" prop="materialName" min-width="140" />
         <el-table-column label="仓库" prop="warehouseName" min-width="120" />
-        <el-table-column label="数量" prop="quantity" width="100" align="right" />
+        <el-table-column label="数量" prop="quantity" width="100" align="right">
+          <template #default="{ row }">
+            {{ formatDecimal.default(row.quantity, 0) }}
+          </template>
+        </el-table-column>
         <el-table-column label="单价" prop="unitPrice" width="100" align="right">
           <template #default="{ row }">
-            {{ row.unitPrice?.toFixed(2) }}
+            {{ formatDecimal.default(row.unitPrice) }}
           </template>
         </el-table-column>
         <el-table-column label="金额" prop="amount" width="100" align="right">
           <template #default="{ row }">
-            {{ row.amount?.toFixed(2) }}
+            {{ formatDecimal.thousand(row.amount) }}
           </template>
         </el-table-column>
       </el-table>

@@ -14,6 +14,7 @@ import type {
 import SaveDialog from "@/views/master/material-supplier/components/saveDialog.vue";
 import DetailDialog from "@/views/master/material-supplier/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { formatDecimal } from "@/composables/useFormat";
 
 const queryData = reactive<MaterialSupplierListRequest>({
   page: 1,
@@ -43,7 +44,7 @@ const columns = ref<ProColumn[]>([
   { label: '关联编码', prop: 'materialSupplierCode', minWidth: 140 },
   { label: '物料名称', prop: 'materialName', minWidth: 140 },
   { label: '供应商', prop: 'supplierName', minWidth: 140 },
-  { label: '采购价', prop: 'purchasePrice', width: 100 },
+  { label: '采购价', prop: 'purchasePrice', width: 100, slot: 'purchasePrice' },
   { label: '交期(天)', prop: 'leadTimeDays', width: 90 },
   { label: '优选', prop: 'preferred', width: 80, slot: 'preferred' },
   { label: '状态', prop: 'status', width: 90, slot: 'status' },
@@ -152,7 +153,8 @@ const handleCancel = () => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>
     <div class="toolbar round">
-      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus" @refresh="handleRefresh" />
+      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+        @refresh="handleRefresh" />
     </div>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
@@ -160,6 +162,9 @@ const handleCancel = () => {
         @update:page="(p: number) => { queryData.page = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
         @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
+        <template #purchasePrice="{ row }">
+          {{ formatDecimal.default(row.purchasePrice, 2) }}
+        </template>
         <template #preferred="{ row }">
           <el-tag :type="row.preferred === 1 ? 'warning' : 'info'" size="small">
             {{ row.preferred === 1 ? '优选' : '普通' }}

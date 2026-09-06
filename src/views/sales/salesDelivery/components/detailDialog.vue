@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import type { SalesDeliveryVo } from '@/types/sales/salesDelivery';
 import { getSalesDeliveryDetail } from '@/api/sales/salesDelivery';
 import { ElMessage } from 'element-plus';
+import { formatDecimal } from '@/composables/useFormat';
 
 const props = defineProps<{
   visible: boolean
@@ -70,7 +71,11 @@ const handleCancel = () => {
         <el-table-column label="物料编码" prop="materialCode" width="120" />
         <el-table-column label="物料名称" prop="materialName" min-width="140" />
         <el-table-column label="仓库" prop="warehouseName" min-width="120" />
-        <el-table-column label="数量" prop="quantity" width="100" align="right" />
+        <el-table-column label="数量" prop="quantity" width="100" align="right">
+          <template #default="{ row }">
+            {{ formatDecimal.default(row.quantity, 0) }}
+          </template>
+        </el-table-column>
       </el-table>
     </template>
 

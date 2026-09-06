@@ -8,6 +8,7 @@ import type { MaterialStockCreateRequest, MaterialStockListRequest, MaterialStoc
 import SaveDialog from "@/views/inventory/material-stock/components/saveDialog.vue";
 import DetailDialog from "@/views/inventory/material-stock/components/detailDialog.vue";
 import { ElMessage } from "element-plus";
+import { formatDecimal } from "@/composables/useFormat";
 
 // 注意：库存接口分页参数是 pageNum
 const queryData = reactive<MaterialStockListRequest>({
@@ -96,13 +97,13 @@ const handleCancel = () => {
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
         @rowDblclick="handleRowDblclick">
         <template #onHand="{ row }">
-          <span>{{ row.onHand ?? 0 }}</span>
+          <span>{{ formatDecimal.default(row.onHand, 0) }}</span>
         </template>
         <template #reserved="{ row }">
-          <span>{{ row.reserved ?? 0 }}</span>
+          <span>{{ formatDecimal.default(row.reserved, 0) }}</span>
         </template>
         <template #available="{ row }">
-          <span>{{ row.available ?? 0 }}</span>
+          <span>{{ formatDecimal.default(row.available, 0) }}</span>
         </template>
       </ProTable>
     </div>

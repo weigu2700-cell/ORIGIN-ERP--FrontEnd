@@ -55,3 +55,23 @@ export interface GetPageBomResponse {
   optimizeCountSql?: string;
   searchCount?: string;
 }
+
+export interface BomExplosionVo {
+  materialId: string;
+  materialCode: string;
+  materialName: string;
+  quantity: number;
+  level: number;
+}
+
+export interface MaterialRequirementVo {
+  materialId: string;
+  materialCode: string;
+  materialName: string;
+  // 毛需求量
+  grossQuantity: number;
+  // 可用量
+  stockUsedAvailableQuantity: number;
+  // 缺口量
+  shortageQuantity: number;
+}

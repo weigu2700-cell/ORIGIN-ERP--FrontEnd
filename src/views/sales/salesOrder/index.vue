@@ -8,6 +8,7 @@ import Selector from './components/selector.vue'
 import SaveDialog from './components/saveDialog.vue'
 import DetailDialog from './components/detailDialog.vue'
 import { ElMessage } from 'element-plus';
+import { formatDecimal } from '@/composables/useFormat';
 
 const queryData = reactive<GetPageSalesOrderQuery>({
   pageNum: 1,
@@ -38,7 +39,7 @@ const columns = ref<ProColumn[]>([
   { label: '客户名称', prop: 'customerName', width: 200 },
   { label: '订单日期', prop: 'orderDate', width: 150 },
   { label: '交货日期', prop: 'deliveryDate', width: 150 },
-  { label: '总金额', prop: 'totalAmount', width: 120 },
+  { label: '总金额', prop: 'totalAmount', width: 120, slot: 'totalAmount' },
   { label: '状态', prop: 'status', width: 100 },
   { label: '备注', prop: 'remark', minWidth: 150 }
 ]);
@@ -134,6 +135,9 @@ onMounted(() => {
         @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
         @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
         @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
+        <template #totalAmount="{ row }">
+          {{ formatDecimal.thousand(row.totalAmount) }}
+        </template>
       </ProTable>
     </section>
   </div>
