@@ -1,5 +1,7 @@
 import type {PageResult} from '../common'
 
+export type UserStatus = 1 | 2 | 3
+
 export interface UserInfo {
   id: string
   username: string
@@ -12,8 +14,9 @@ export interface getUserListRequest {
   page: number
   pageSize: number
   username?: string | null
+  realName?: string | null
   deptId?: string | null
-  status?: number | null
+  status?: UserStatus | null
   phone?: string | null
 }
 
@@ -24,10 +27,12 @@ export interface UserListRecord {
   realName: string
   phone?: string
   deptName?: string
-  roles: {
+  status: UserStatus
+  roles: Array<{
+    roleId: string
     roleName: string
     roleKey: string
-  }
+  }>
 }
 
 export interface getUserListResponse extends PageResult<UserListRecord> {
@@ -44,7 +49,7 @@ export interface getUserDetailResponse {
   deptId?: string
   deptName?: string
   roleIds?: string[]
-  status?: number
+  status?: UserStatus
 }
 
 export interface createUserRequest {
@@ -58,15 +63,21 @@ export interface createUserRequest {
 export interface updateUserRequest {
   id: string
   username: string
+  realName?: string | null
   password?: string | null
   phone?: string | null
   deptId?: string | null
   roleIds?: string[] | null
-  status?: number | null
+  status?: UserStatus | null
 }
 
 // 分配角色参数（UserRoleAssignDTO，roleIds 为雪花 ID 字符串）
 export interface UserRoleAssignRequest {
   userId: string
   roleIds: string[]
+}
+
+export interface UserStatusUpdateRequest {
+  id: string
+  status: UserStatus
 }

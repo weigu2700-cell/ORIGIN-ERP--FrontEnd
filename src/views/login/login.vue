@@ -42,7 +42,7 @@ const handleLogin = useTrigger.throttle(() => {
   <main class="login-page">
     <section class="intro">
       <p class="intro-eyebrow">制造企业一体化管理平台</p>
-      <h1>生产有序<br />经营有数</h1>
+      <h1>从订单到交付<br />全程清晰可控</h1>
       <p class="intro-description">围绕物料、库存、生产与交付，连接制造企业每一个关键环节。</p>
       <p class="intro-tags">计划 · 执行 · 协同 · 追溯</p>
     </section>
@@ -65,13 +65,17 @@ const handleLogin = useTrigger.throttle(() => {
         <el-form ref="formRef" :model="form" :rules="rules" @submit.prevent="handleLogin">
           <el-form-item prop="username">
             <el-input v-model="form.username" placeholder="用户名" autocomplete="username">
-              <template #prefix><el-icon><User /></el-icon></template>
+              <template #prefix><el-icon>
+                  <User />
+                </el-icon></template>
             </el-input>
           </el-form-item>
           <el-form-item prop="password">
             <el-input v-model="form.password" type="password" placeholder="密码" show-password
               autocomplete="current-password" @keyup.enter="handleLogin">
-              <template #prefix><el-icon><Lock /></el-icon></template>
+              <template #prefix><el-icon>
+                  <Lock />
+                </el-icon></template>
             </el-input>
           </el-form-item>
           <el-button class="submit-button" type="primary" native-type="submit" :loading="loading">
@@ -186,6 +190,7 @@ const handleLogin = useTrigger.throttle(() => {
   position: relative;
   z-index: 1;
   width: 420px;
+  margin-bottom: 20px;
   margin-right: clamp(48px, 8vw, 140px);
 }
 

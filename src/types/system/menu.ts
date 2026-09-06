@@ -1,7 +1,7 @@
 import type {PageResult} from '../common'
 
 export interface MenuItem {
-  title: any
+  title: string
   id: string
   name: string
   path: string
@@ -9,6 +9,14 @@ export interface MenuItem {
   icon?: string
   parentId?: string | null
   children?: MenuItem[]
+}
+
+export interface MenuSearchItem {
+  id: string
+  title: string
+  path: string
+  icon?: string
+  parentTitle?: string | null
 }
 
 export type MenuStatus = 'ENABLE' | 'DISABLE'
@@ -39,7 +47,7 @@ export interface MenuListVO {
 }
 
 // 菜单分页响应（PageMenuListVO）
-export interface MenuListResponse extends PageResult<MenuListVO> {}
+export type MenuListResponse = PageResult<MenuListVO>
 
 // 菜单新增/更新 DTO（MenuCreateDTO）
 export interface MenuCreateRequest {

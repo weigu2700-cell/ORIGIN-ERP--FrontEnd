@@ -2,8 +2,10 @@
   import {reactive, ref} from "vue";
   import ParentDeptSelector from "@/views/system/dept/components/parentDeptSelector.vue";
   import {CircleClose, Search} from "@element-plus/icons-vue";
-  import type {getUserListRequest} from "@/types/system/user.ts";
+  import type {getUserListRequest, UserStatus} from "@/types/system/user.ts";
   import ProSearch from "@/components/ProSearch.vue";
+
+  defineOptions({name: 'UserQuerySelector'})
 
   const emit = defineEmits<{
     (e: 'query', params: Omit<getUserListRequest, 'page' | 'pageSize'>): void
@@ -12,12 +14,14 @@
 
   const queryData = reactive<{
     username: string | null
+    realName: string | null
     phone: string | null
     deptId: string | null
     deptName: string | null
-    status: number | null
+    status: UserStatus | null
   }>({
     username: null,
+    realName: null,
     phone: null,
     deptId: null,
     deptName: null,
@@ -42,14 +46,16 @@
   }
 
   const statusOptions = [
-    {label: '启用', value: 1},
-    {label: '禁用', value: 0}
+    {label: '正常', value: 1},
+    {label: '锁定', value: 2},
+    {label: '注销', value: 3}
   ]
 
   const handleQuery = () => {
     // 后端只接收 id，deptName 仅用于展示，不发出去
     emit('query', {
       username: queryData.username || null,
+      realName: queryData.realName || null,
       phone: queryData.phone || null,
       deptId: queryData.deptId,
       status: queryData.status,
@@ -58,6 +64,7 @@
 
   const handleReset = () => {
     queryData.username = null
+    queryData.realName = null
     queryData.phone = null
     queryData.deptId = null
     queryData.deptName = null
@@ -69,6 +76,7 @@
 <template>
   <ProSearch class="user-selector" @search="handleQuery" @reset="handleReset">
     <el-input v-model="queryData.username" placeholder="用户名" clearable style="width: 160px; flex: 0 0 160px" />
+    <el-input v-model="queryData.realName" placeholder="真实姓名" clearable style="width: 160px; flex: 0 0 160px" />
     <el-input v-model="queryData.phone" placeholder="手机号" clearable style="width: 160px; flex: 0 0 160px" />
     <el-input
       :model-value="queryData.deptName"

@@ -1,19 +1,27 @@
 <script setup lang="ts">
   import {onMounted, reactive, ref} from "vue";
-  import {ElMessage} from "element-plus";
+  import {ElMessage, ElMessageBox} from "element-plus";
   import ProTable, {type ProColumn} from "@/components/ProTable.vue";
   import type {getUserListRequest, getUserListResponse} from "@/types/system/user.ts";
   import {
     getUserList,
     createUser,
     updateUser,
-    getUserDetail
+    getUserDetail,
+    updateUserStatus
   } from "@/api/system/user.ts";
   import ProToolbar from "@/components/ProToolbar.vue";
   import SaveDialog from "@/views/system/user/components/saveDialog.vue";
   import AssignDialog from "@/views/system/user/assignDialog.vue";
   import Selector from "@/views/system/user/components/selector.vue";
-  import type {createUserRequest, updateUserRequest} from "@/types/system/user.ts";
+  import type {
+    createUserRequest,
+    updateUserRequest,
+    UserListRecord,
+    UserStatus
+  } from "@/types/system/user.ts";
+
+  defineOptions({name: 'SystemUserPage'})
 
   const tableData = ref<getUserListResponse>()
   const dialogMode = ref<'add' | 'edit'>('add')
@@ -27,13 +35,15 @@
     page: number
     pageSize: number
     username: string | null
+    realName: string | null
     deptId: string | null
-    status: number | null
+    status: UserStatus | null
     phone: string | null
   }>({
     page: 1,
     pageSize: 10,
     username: null,
+    realName: null,
     deptId: null,
     status: null,
     phone: null,
@@ -45,8 +55,21 @@
     { label: '手机号', prop: 'phone', width: 220 },
     { label: '所属部门', prop: 'deptName', width: 200 },
     { label: '角色', prop: 'roles', width: 200, slot: 'roles' },
+    { label: '状态', prop: 'status', width: 100, slot: 'status' },
     { label: '操作', prop: 'actions', fixed: 'right', slot: 'actions', minWidth: 240 },
   ]
+
+  const statusLabel: Record<UserStatus, string> = {
+    1: '正常',
+    2: '锁定',
+    3: '注销',
+  }
+
+  const statusTagType: Record<UserStatus, 'success' | 'warning' | 'info'> = {
+    1: 'success',
+    2: 'warning',
+    3: 'info',
+  }
 
   const handleQuery = async (queryData : getUserListRequest) => {
     try {
@@ -67,6 +90,7 @@
 
   const handleSelectorReset = () => {
     queryData.username = null
+    queryData.realName = null
     queryData.phone = null
     queryData.deptId = null
     queryData.status = null
@@ -107,6 +131,26 @@
 
   const handleCancel = () => {
     dialogVisible.value = false
+  }
+
+  const handleStatusChange = async (row: UserListRecord, status: UserStatus) => {
+    if (row.status === status) return
+    try {
+      await ElMessageBox.confirm(
+        `确定将用户“${row.realName || row.username}”修改为${statusLabel[status]}状态吗？`,
+        '修改状态',
+        {type: 'warning', confirmButtonText: '确定', cancelButtonText: '取消'}
+      )
+    } catch {
+      return
+    }
+    try {
+      await updateUserStatus({id: row.id, status})
+      ElMessage.success('状态修改成功')
+      await handleQuery(queryData)
+    } catch {
+      // 错误信息已由请求拦截器统一提示
+    }
   }
 
   const handleSubmit = async (form: createUserRequest & {id?: string}) => {
@@ -165,6 +209,20 @@
             size="small"
           >{{ role.roleName }}</el-tag>
         </template>
+        <template #status="{row}">
+          <el-dropdown trigger="click" @command="(status: UserStatus) => handleStatusChange(row, status)">
+            <el-tag :type="statusTagType[row.status as UserStatus]" class="status-tag" size="small">
+              {{ statusLabel[row.status as UserStatus] ?? row.status }}
+            </el-tag>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item :command="1" :disabled="row.status === 1">正常</el-dropdown-item>
+                <el-dropdown-item :command="2" :disabled="row.status === 2">锁定</el-dropdown-item>
+                <el-dropdown-item :command="3" :disabled="row.status === 3">注销</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </template>
         <template #actions="{row}">
           <el-button type="text" @click="openAssignDialog(row, 'role')">分配角色</el-button>
           <el-button type="text" @click="openAssignDialog(row, 'dept')">分配部门</el-button>
@@ -212,6 +270,10 @@
 
     .role-tag {
       margin-right: 6px;
+    }
+
+    .status-tag {
+      cursor: pointer;
     }
   }
 </style>

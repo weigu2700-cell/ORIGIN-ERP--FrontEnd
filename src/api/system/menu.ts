@@ -1,8 +1,12 @@
 import service from "@/utils/request.ts"
-import type {MenuItem, MenuCreateRequest, MenuListRequest, MenuListResponse, MenuListVO, MenuSaveRequest} from '@/types/system/menu.ts'
+import type {MenuItem, MenuCreateRequest, MenuListRequest, MenuListResponse, MenuListVO, MenuSaveRequest, MenuSearchItem} from '@/types/system/menu.ts'
 
 export function getCurrentUserMenu() {
   return service.get<MenuItem[]>('system/menu/current')
+}
+
+export function searchCurrentUserMenu(keyword: string) {
+  return service.get<MenuSearchItem[]>('system/menu/search', {params: {keyword}})
 }
 
 // 菜单树（传 roleId 时返回该角色已分配的菜单树，用于分配回显）

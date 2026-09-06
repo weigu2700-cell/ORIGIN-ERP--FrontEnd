@@ -14,7 +14,7 @@ const appStore = useAppStore()
     </el-header>
     <el-aside class="aside">
       <div class="brand" :class="{ 'brand--collapsed': appStore.isFold }">
-        <img class="brand-mark" src="/origin-manufacturing-logo.svg" alt="原点智造 ERP" />
+        <img class="brand-mark" src="/origin-manufacturing-logo-light.svg" alt="原点智造 ERP" />
         <div v-if="!appStore.isFold" class="brand-copy">
           <strong>原点智造 ERP</strong>
           <span>ORIGIN · 制造运营管理平台</span>

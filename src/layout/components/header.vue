@@ -1,16 +1,30 @@
 <script setup lang="ts">
-  import {ref, computed} from 'vue'
+  import {ref, computed, onBeforeUnmount} from 'vue'
   import {ArrowDown, Bell, Check, FullScreen, Moon, Refresh, Search, Setting, Sunny} from "@element-plus/icons-vue";
+  import {ClickOutside as vClickOutside} from 'element-plus'
+  import {useRouter} from 'vue-router'
   import {useUserStore} from "@/stores/user.ts";
   import useAppStore, {type ColorScheme} from "@/stores/app.ts";
   import Breadcrumb from "@/layout/components/breadcrumb.vue";
+  import {searchCurrentUserMenu} from '@/api/system/menu.ts'
+  import type {MenuSearchItem} from '@/types/system/menu.ts'
+
+  defineOptions({ name: 'AppHeader' })
 
   const userStore = useUserStore()
   const appStore = useAppStore()
+  const router = useRouter()
 
   const userInfo = computed(() => userStore.userInfo)
+  const displayName = computed(() => userInfo.value.realName?.trim() || '用户')
   const searchKey = ref('')
+  const searchResults = ref<MenuSearchItem[]>([])
+  const searchVisible = ref(false)
+  const searchLoading = ref(false)
+  const searchFinished = ref(false)
   const settingsVisible = ref(false)
+  let searchTimer: ReturnType<typeof setTimeout> | undefined
+  let searchRequestId = 0
   const colorOptions: { key: ColorScheme; label: string; color: string }[] = [
     { key: 'office', label: 'Office 蓝', color: '#0078d4' },
     { key: 'blue', label: '湖水蓝', color: '#1a73e8' },
@@ -19,8 +33,63 @@
     { key: 'orange', label: '活力橙', color: '#c2410c' },
   ]
 
+  const loadSearchResults = async (keyword: string) => {
+    const normalizedKeyword = keyword.trim()
+    if (!normalizedKeyword) return
+    const requestId = ++searchRequestId
+    searchLoading.value = true
+    searchVisible.value = true
+    try {
+      const results = await searchCurrentUserMenu(normalizedKeyword)
+      if (requestId === searchRequestId) {
+        searchResults.value = results
+        searchFinished.value = true
+      }
+    } catch {
+      if (requestId === searchRequestId) {
+        searchResults.value = []
+        searchFinished.value = true
+      }
+    } finally {
+      if (requestId === searchRequestId) searchLoading.value = false
+    }
+  }
+
+  const handleSearchInput = (value: string) => {
+    if (searchTimer) clearTimeout(searchTimer)
+    searchRequestId += 1
+    searchFinished.value = false
+    if (!value.trim()) {
+      searchResults.value = []
+      searchVisible.value = false
+      searchLoading.value = false
+      return
+    }
+    searchVisible.value = true
+    searchTimer = setTimeout(() => loadSearchResults(value), 250)
+  }
+
   const handleSearch = () => {
-    console.log(searchKey.value)
+    if (searchResults.value[0]) {
+      handleMenuSelect(searchResults.value[0])
+      return
+    }
+    if (searchTimer) clearTimeout(searchTimer)
+    loadSearchResults(searchKey.value)
+  }
+
+  const handleMenuSelect = (menu: MenuSearchItem) => {
+    if (searchTimer) clearTimeout(searchTimer)
+    searchRequestId += 1
+    searchVisible.value = false
+    searchKey.value = ''
+    searchResults.value = []
+    router.push(menu.path)
+  }
+
+  const closeSearch = () => {
+    if (searchTimer) clearTimeout(searchTimer)
+    searchVisible.value = false
   }
 
   const handleRefresh = () => {
@@ -34,6 +103,10 @@
       document.documentElement.requestFullscreen()
     }
   }
+
+  onBeforeUnmount(() => {
+    if (searchTimer) clearTimeout(searchTimer)
+  })
 </script>
 
 <template>
@@ -42,14 +115,47 @@
       <Breadcrumb/>
     </div>
     <div class="right">
-      <div class="header-search">
-        <el-input v-model="searchKey" placeholder="搜索菜单或功能" clearable @keyup.enter="handleSearch">
-          <template #suffix>
-            <el-icon class="el-icon-search" @click="handleSearch">
-              <Search />
-            </el-icon>
+      <div v-click-outside="closeSearch" class="header-search">
+        <el-popover
+          v-model:visible="searchVisible"
+          placement="bottom-end"
+          :width="320"
+          trigger="manual"
+          :teleported="false"
+          popper-class="menu-search-popper"
+        >
+          <template #reference>
+            <el-input
+              v-model="searchKey"
+              placeholder="搜索菜单或功能"
+              clearable
+              @input="handleSearchInput"
+              @focus="searchVisible = !!searchKey.trim()"
+              @keyup.enter="handleSearch"
+            >
+              <template #suffix>
+                <el-icon class="el-icon-search" @click="handleSearch">
+                  <Search />
+                </el-icon>
+              </template>
+            </el-input>
           </template>
-        </el-input>
+          <div v-loading="searchLoading" class="menu-search-results">
+            <button
+              v-for="item in searchResults"
+              :key="item.id"
+              type="button"
+              class="menu-search-item"
+              @click="handleMenuSelect(item)"
+            >
+              <span class="menu-search-title">{{ item.title }}</span>
+              <span v-if="item.parentTitle" class="menu-search-parent">{{ item.parentTitle }}</span>
+            </button>
+            <div v-if="searchFinished && !searchLoading && searchResults.length === 0" class="menu-search-empty">
+              未找到相关菜单
+            </div>
+          </div>
+        </el-popover>
       </div>
       <el-tooltip :content="appStore.themeMode === 'light' ? '切换深色' : '切换浅色'" placement="bottom">
         <el-button class="header-icon-button theme-toggle" text circle aria-label="切换主题" @click="appStore.toggleTheme">
@@ -80,8 +186,8 @@
       </div>
       <el-dropdown>
         <span class="user-menu">
-          <el-avatar :size="32" class="user-avatar">{{ (userInfo.username || 'U').slice(0, 1).toUpperCase() }}</el-avatar>
-          <span class="name">{{userInfo.username || '用户'}}</span>
+          <el-avatar :size="32" class="user-avatar">{{ displayName.slice(0, 1) }}</el-avatar>
+          <span class="name">{{ displayName }}</span>
           <el-icon class="el-icon--right"><ArrowDown /></el-icon>
         </span>
         <template #dropdown>
@@ -189,6 +295,54 @@
 
   .theme-settings {
     color: var(--text-primary);
+  }
+
+  .menu-search-results {
+    min-height: 40px;
+    max-height: 360px;
+    overflow-y: auto;
+  }
+
+  .menu-search-item {
+    width: 100%;
+    min-height: 42px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .menu-search-item:hover,
+  .menu-search-item:focus-visible {
+    background: var(--color-primary-soft);
+    outline: none;
+  }
+
+  .menu-search-title {
+    overflow: hidden;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .menu-search-parent {
+    flex: 0 0 auto;
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  .menu-search-empty {
+    padding: 18px 10px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    text-align: center;
   }
 
   .settings-section {
