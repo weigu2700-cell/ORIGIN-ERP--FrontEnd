@@ -13,7 +13,7 @@ import {
   deleteRole
 } from "@/api/system/role.ts";
 import type { RoleListRequest, RoleListResponse, RoleInfo, RoleSaveRequest } from "@/types/system/role.ts";
-import ProPageTitle from '@/components/ProPageTitle.vue'
+import PageHeader from '@/components/PageHeader.vue'
 
 const tableData = ref<RoleListResponse>()
 const dialogMode = ref<'add' | 'edit'>('add')
@@ -140,14 +140,11 @@ onMounted(() => {
 
 <template>
   <div class="role-container round">
-    <ProPageTitle title="角色管理" description="维护角色资料并分配菜单权限" />
-    <div class="selector round">
-      <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
-    </div>
-    <div class="toolbar round">
-      <ProToolbar :show-export="false" @add="handleAdd" @edit="handleEdit" @delete="handleDelete"
-        @refresh="handleQuery(queryData)" />
-    </div>
+    <PageHeader title="角色管理" description="维护角色资料并分配菜单权限">
+      <template #search><Selector @query="handleSelectorQuery" @reset="handleSelectorReset" /></template>
+      <template #toolbar><ProToolbar :show-export="false" @add="handleAdd" @edit="handleEdit"
+        @delete="handleDelete" @refresh="handleQuery(queryData)" /></template>
+    </PageHeader>
     <div class="table round">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.page" :page-size="queryData.pageSize"

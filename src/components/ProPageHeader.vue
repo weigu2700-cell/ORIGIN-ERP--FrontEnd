@@ -233,7 +233,7 @@ p {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
   padding-top: 10px;
   border-top: 1px solid var(--page-header-border);
 }
@@ -244,7 +244,7 @@ p {
 
 .toolbar-section {
   flex: 0 0 auto;
-  padding-left: 12px;
+  padding-left: 20px;
   border-left: 1px solid #94a3b8;
 }
 

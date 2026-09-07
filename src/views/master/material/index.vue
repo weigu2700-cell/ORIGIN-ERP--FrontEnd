@@ -19,8 +19,7 @@ import type {
 import SaveDialog from "@/views/master/material/components/saveDialog.vue";
 import DetailDialog from "@/views/master/material/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
-import ProPageTitle from '@/components/ProPageTitle.vue'
+import PageHeader from '@/components/PageHeader.vue'
 
 const queryData = reactive<MaterialListRequest>({
   page: 1,
@@ -66,19 +65,9 @@ const typeLabel: Record<string, string> = {
   OTHER: '其他',
 }
 
-const quickStatusOptions = [
-  { label: '启用', value: 'ENABLE', tone: 'success' },
-  { label: '停用', value: 'DISABLE' },
-]
-
 const handleQuery = (params: MaterialListRequest) => {
   Object.assign(queryData, params, { page: 1 })
   loadData()
-}
-
-const handleQuickStatus = (status: string | number | null) => {
-  queryData.status = status as MaterialListRequest['status']
-  handleQuery(queryData)
 }
 
 const handleReset = () => {
@@ -176,17 +165,13 @@ const handleCancel = () => {
 
 <template>
   <div class="material-container round">
-    <ProPageTitle title="物料管理" description="维护物料编码、规格与基础属性" />
-    <div class="selector round">
-      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
-    </div>
-    <div class="toolbar round">
-      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
-        @refresh="handleRefresh">
-        <BusinessStatusFilter :model-value="queryData.status ?? null" business-type="master"
-          :options="quickStatusOptions" @change="handleQuickStatus" />
-      </ProToolbar>
-    </div>
+    <PageHeader title="物料管理" description="维护物料编码、规格与基础属性">
+      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+          @refresh="handleRefresh" />
+      </template>
+    </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.page" :page-size="queryData.pageSize"

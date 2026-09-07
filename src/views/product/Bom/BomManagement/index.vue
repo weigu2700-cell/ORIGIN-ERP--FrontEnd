@@ -9,8 +9,7 @@ import ProToolbar from '@/components/ProToolbar.vue';
 import detailDialog from './components/detail.vue';
 import saveDialog from './components/save.vue'
 import type { BomVo } from '@/types/product/Bom';
-import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
-import ProPageTitle from '@/components/ProPageTitle.vue'
+import PageHeader from '@/components/PageHeader.vue'
 
 const SelectionId = ref<string>()
 const tableRef = ref<Element>()
@@ -59,12 +58,6 @@ const columns = ref<ProColumn[]>([
   { label: '创建时间', prop: 'createTime', width: 180 },
   { label: '更新时间', prop: 'updateTime', width: 180 },
 ])
-
-const quickStatusOptions = [
-  { label: '草稿', value: 'DRAFT' },
-  { label: '使用中', value: 'ACTIVE', tone: 'success' },
-  { label: '已停用', value: 'INACTIVE' },
-]
 
 const loadData = async (): Promise<void> => {
   try {
@@ -119,11 +112,6 @@ const handleQuery = () => {
   loadData()
 }
 
-const handleQuickStatus = (status: string | number | null) => {
-  queryData.value.status = typeof status === 'string' ? status : null
-  handleQuery()
-}
-
 const handleReset = () => {
   queryData.value = {
     pageNum: 1,
@@ -176,17 +164,13 @@ onMounted(() => {
 
 <template>
   <div class="container">
-    <ProPageTitle title="BOM 管理" description="维护产品物料清单与版本状态" />
-    <section class="query">
-      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
-    </section>
-    <section class="toolbar">
-      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @export="handleExport"
-        @refresh="handleRefresh">
-        <BusinessStatusFilter :model-value="queryData.status ?? null" business-type="production"
-          :options="quickStatusOptions" @change="handleQuickStatus" />
-      </ProToolbar>
-    </section>
+    <PageHeader title="BOM 管理" description="维护产品物料清单与版本状态">
+      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
+      <template #toolbar>
+        <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @export="handleExport"
+          @refresh="handleRefresh" />
+      </template>
+    </PageHeader>
     <section class="table">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns"
         :total="Number(tableData?.total ?? 0)" :page="Number(queryData.pageNum)" :page-size="Number(queryData.pageSize)"

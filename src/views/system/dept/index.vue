@@ -8,7 +8,7 @@ import Selector from "@/views/system/dept/components/selector.vue";
 import ProTable from "@/components/ProTable.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTree from "@/components/ProTree.vue";
-import ProPageTitle from '@/components/ProPageTitle.vue'
+import PageHeader from '@/components/PageHeader.vue'
 
 const tableData = ref<deptResponse>()
 const selectedData = ref<deptResponse['records']>([])
@@ -126,18 +126,16 @@ onMounted(() => {
 
 <template>
   <div class="dept-container round">
-    <ProPageTitle title="部门管理" description="维护组织部门与层级关系" />
+    <PageHeader title="部门管理" description="维护组织部门与层级关系">
+      <template #search><Selector @query="handleSelectorQuery" @reset="handleSelectorReset" /></template>
+      <template #toolbar><ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete"
+        @refresh="handleQuery(queryData)" /></template>
+    </PageHeader>
     <div class="page-body">
       <div class="tree round">
         <ProTree :data="treeData" show-root @node-click="handleTreeClick" />
       </div>
       <div class="content">
-        <div class="selector round">
-          <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
-        </div>
-        <div class="toolbar round">
-          <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleQuery(queryData)" />
-        </div>
         <div class="table round">
           <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
             :page="queryData.page" :page-size="queryData.pageSize"

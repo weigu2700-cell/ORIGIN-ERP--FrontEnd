@@ -51,7 +51,7 @@ const columns: ProColumn[] = [
 const loadData = async () => { selectedRow.value = null; tableData.value = await getPagePurchaseOrder(queryData) }
 const query = () => { queryData.pageNum = 1; loadData() }
 const reset = () => { Object.assign(queryData, { pageNum: 1, purchaseOrderNo: '', materialId: '', supplierId: '', status: '' }); loadData() }
-const changeStatusFilter = (status: string) => { queryData.status = status; query() }
+const changeStatusFilter = (status: string | number) => { queryData.status = String(status); query() }
 const openAdd = () => { saveMode.value = 'add'; saveVisible.value = true }
 const openEdit = () => {
   if (!selectedRow.value) return void ElMessage.warning('请选择一条采购订单')

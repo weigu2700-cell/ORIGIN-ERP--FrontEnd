@@ -50,7 +50,7 @@ const sourceMap: Record<string, string> = { PRODUCTION_ORDER: '生产订单', OT
 const loadData = async () => { selectedRow.value = null; tableData.value = await getPagePurchaseDemand(queryData) }
 const query = () => { queryData.pageNum = 1; loadData() }
 const reset = () => { Object.assign(queryData, { pageNum: 1, materialId: '', sourceType: '', sourceNo: '', status: '' }); loadData() }
-const changeStatusFilter = (status: string) => { queryData.status = status; query() }
+const changeStatusFilter = (status: string | number) => { queryData.status = String(status); query() }
 const openDetail = (row: PurchaseDemandVo) => { detailId.value = String(row.id); detailVisible.value = true }
 
 const submit = async (data: CreatePurchaseDemandRequest) => {

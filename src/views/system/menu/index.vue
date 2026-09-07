@@ -21,7 +21,7 @@ import type {
   MenuSaveRequest,
   MenuTreeNode
 } from "@/types/system/menu.ts";
-import ProPageTitle from '@/components/ProPageTitle.vue'
+import PageHeader from '@/components/PageHeader.vue'
 
 type EditRow = MenuSaveRequest & { parentName?: string }
 
@@ -192,20 +192,17 @@ onMounted(() => {
 
 <template>
   <div class="menu-container round">
-    <ProPageTitle title="菜单管理" description="维护系统菜单、路由与显示顺序" />
+    <PageHeader title="菜单管理" description="维护系统菜单、路由与显示顺序">
+      <template #search><Selector @query="handleSelectorQuery" @reset="handleSelectorReset" /></template>
+      <template #toolbar><ProToolbar :show-export="false" @add="handleAdd" @edit="handleEdit"
+        @delete="handleDelete" @refresh="handleQuery(queryData)" /></template>
+    </PageHeader>
     <div class="page-body">
       <div class="tree round">
         <ProTree :data="treeData" :tree-props="{ label: 'title', children: 'children' }" show-root
           @node-click="handleTreeClick" />
       </div>
       <div class="content">
-        <div class="selector round">
-          <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
-        </div>
-        <div class="toolbar round">
-          <ProToolbar :show-export="false" @add="handleAdd" @edit="handleEdit" @delete="handleDelete"
-            @refresh="handleQuery(queryData)" />
-        </div>
         <div class="table round">
           <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
             :page="queryData.page" :page-size="queryData.pageSize"

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import ProPageTitle from '@/components/ProPageTitle.vue'
+import PageHeader from '@/components/PageHeader.vue'
 </script>
 
 <template>
   <div class="purchase-in-stock-container">
-    <ProPageTitle title="采购入库" description="登记采购到货与仓库入库信息" />
+    <PageHeader title="采购入库" description="登记采购到货与仓库入库信息" />
     <div class="empty-panel">
       <el-empty description="暂无采购入库记录" />
     </div>

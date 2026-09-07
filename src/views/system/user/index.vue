@@ -20,7 +20,7 @@ import type {
   UserListRecord,
   UserStatus
 } from "@/types/system/user.ts";
-import ProPageTitle from '@/components/ProPageTitle.vue'
+import PageHeader from '@/components/PageHeader.vue'
 
 defineOptions({ name: 'SystemUserPage' })
 
@@ -178,15 +178,11 @@ onMounted(() => {
 
 <template>
   <div class="user-container round">
-    <ProPageTitle title="用户管理" description="维护系统用户、角色与账号状态" />
-    <div class="selector round">
-      <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
-    </div>
-    <div class="toolbar round">
-      <ProToolbar :show-delete="false" :show-export="false" @add="handleAdd" @edit="handleEdit"
-        @refresh="handleQuery(queryData)" />
-
-    </div>
+    <PageHeader title="用户管理" description="维护系统用户、角色与账号状态">
+      <template #search><Selector @query="handleSelectorQuery" @reset="handleSelectorReset" /></template>
+      <template #toolbar><ProToolbar :show-delete="false" :show-export="false" @add="handleAdd"
+        @edit="handleEdit" @refresh="handleQuery(queryData)" /></template>
+    </PageHeader>
     <div class="table round">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.page" :page-size="queryData.pageSize"

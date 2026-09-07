@@ -18,7 +18,7 @@ import type {
   PermissionNode,
   PermissionSaveRequest
 } from "@/types/system/permission.ts";
-import ProPageTitle from '@/components/ProPageTitle.vue'
+import PageHeader from '@/components/PageHeader.vue'
 
 type EditRow = PermissionSaveRequest & { parentName?: string }
 
@@ -158,19 +158,16 @@ onMounted(() => {
 
 <template>
   <div class="permission-container round">
-    <ProPageTitle title="权限管理" description="维护权限节点与访问标识" />
+    <PageHeader title="权限管理" description="维护权限节点与访问标识">
+      <template #search><Selector @query="handleSelectorQuery" @reset="handleSelectorReset" /></template>
+      <template #toolbar><ProToolbar :show-delete="false" :show-export="false" @add="handleAdd"
+        @edit="handleEdit" @refresh="handleQuery(queryData)" /></template>
+    </PageHeader>
     <div class="page-body">
       <div class="tree round">
         <ProTree :data="treeData" show-root @node-click="handleTreeClick" />
       </div>
       <div class="content">
-        <div class="selector round">
-          <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
-        </div>
-        <div class="toolbar round">
-          <ProToolbar :show-delete="false" :show-export="false" @add="handleAdd" @edit="handleEdit"
-            @refresh="handleQuery(queryData)" />
-        </div>
         <div class="table round">
           <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
             :page="queryData.page" :page-size="queryData.pageSize"

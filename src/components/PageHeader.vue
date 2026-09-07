@@ -41,7 +41,7 @@ defineProps<{
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
 }
 
 .list-page-header__heading > div { flex: 1; min-width: 0; }
@@ -55,7 +55,7 @@ defineProps<{
 }
 
 .list-page-header__search { flex: 0 1 auto; min-width: 0; }
-.list-page-header__toolbar { flex: 0 0 auto; padding-left: 12px; border-left: 1px solid var(--border-color); }
+.list-page-header__toolbar { flex: 0 0 auto; padding-left: 20px; border-left: 1px solid var(--border-color); }
 
 .list-page-header__search :deep(.pro-search),
 .list-page-header__toolbar :deep(.pro-toolbar-container) {

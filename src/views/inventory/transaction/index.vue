@@ -8,7 +8,7 @@ import { exportTransaction, getTransactionList, importTransaction } from "@/api/
 import DetailDialog from "@/views/inventory/transaction/components/detailDialog.vue";
 import type { TransactionListRequest, TransactionListResponse } from "@/types/inventory/transaction.ts";
 import { formatDate, formatDecimal } from "@/composables/useFormat.ts";
-import ProPageHeader from "@/components/ProPageHeader.vue";
+import PageHeader from "@/components/PageHeader.vue";
 
 // 注意：库存流水分页参数是 pageNum
 const queryData = reactive<TransactionListRequest>({
@@ -113,7 +113,7 @@ const handleRowDblclick = (row: TransactionListResponse['records'][number]) => {
 
 <template>
   <div class="transaction-container round">
-    <ProPageHeader title="库存流水" description="查询物料出入库记录与库存变动轨迹"
+    <PageHeader title="库存流水" description="查询物料出入库记录与库存变动轨迹"
       :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`">
       <template #search>
         <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
@@ -122,7 +122,7 @@ const handleRowDblclick = (row: TransactionListResponse['records'][number]) => {
         <ProToolbar :show-add="false" :show-edit="false" :show-delete="false" show-import
           @import="handleImport" @export="handleExport" @refresh="handleRefresh" />
       </template>
-    </ProPageHeader>
+    </PageHeader>
     <input ref="fileInput" class="file-input" type="file" accept=".xlsx" @change="handleFileChange" />
     <div class="table round">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
