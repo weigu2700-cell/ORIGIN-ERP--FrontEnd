@@ -50,11 +50,11 @@ const loadData = async () => {
 };
 
 const columns = ref<ProColumn[]>([
+  { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '交货单号', prop: 'deliveryNo', width: 200 },
   { label: '销售订单号', prop: 'salesOrderNo', width: 200 },
   { label: '客户名称', prop: 'customerName', width: 200 },
   { label: '交货日期', prop: 'deliveryDate', width: 200 },
-  { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '备注', prop: 'remark', minWidth: 150 }
 ]);
 

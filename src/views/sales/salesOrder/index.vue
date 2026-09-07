@@ -36,12 +36,12 @@ const loadData = async () => {
 };
 
 const columns = ref<ProColumn[]>([
+  { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '订单号', prop: 'orderNo', width: 200 },
   { label: '客户名称', prop: 'customerName', width: 200 },
-  { label: '订单日期', prop: 'orderDate', width: 150 },
-  { label: '交货日期', prop: 'deliveryDate', width: 150 },
+  { label: '订单日期', prop: 'orderDate', width: 180 },
+  { label: '交货日期', prop: 'deliveryDate', width: 180 },
   { label: '总金额', prop: 'totalAmount', width: 120, slot: 'totalAmount' },
-  { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '备注', prop: 'remark', minWidth: 150 }
 ]);
 

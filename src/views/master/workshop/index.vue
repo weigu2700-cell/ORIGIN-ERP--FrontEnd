@@ -32,10 +32,10 @@ const selectedRowId = ref<string>('')
 const tableRef = ref<{ clearSelection: () => void }>()
 
 const columns = ref<ProColumn[]>([
+  { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '车间名称', prop: 'name', minWidth: 140 },
   { label: '简称', prop: 'shortName', width: 120 },
   { label: '所属工厂', prop: 'factoryName', minWidth: 140 },
-  { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '备注', prop: 'remark', minWidth: 160 },
 ])
 
@@ -157,7 +157,8 @@ onMounted(() => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset"></Selector>
     </div>
     <div class="toolbar round">
-      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus" @refresh="handleRefresh" />
+      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+        @refresh="handleRefresh" />
     </div>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

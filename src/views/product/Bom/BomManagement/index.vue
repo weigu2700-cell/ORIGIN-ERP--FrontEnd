@@ -50,10 +50,10 @@ const tableDataDetail = ref<BomVo>({
 })
 
 const columns = ref<ProColumn[]>([
+  { label: '状态', prop: 'status', width: 100 },
   { label: 'BOM编号', prop: 'bomNo', width: 200 },
   { label: '物料编码', prop: 'materialCode', width: 200 },
   { label: '物料名称', prop: 'materialName', minWidth: 200 },
-  { label: '状态', prop: 'status', width: 100 },
   { label: '备注', prop: 'remark', minWidth: 150 },
   { label: '创建时间', prop: 'createTime', width: 180 },
   { label: '更新时间', prop: 'updateTime', width: 180 },

@@ -38,6 +38,7 @@ const loadData = async () => {
 };
 
 const columns = ref<ProColumn[]>([
+  { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '生产订单号', prop: 'productionOrderNo', width: 180 },
   { label: '需求单号', prop: 'productionDemandNo', width: 180 },
   { label: '物料编码', prop: 'materialCode', width: 140 },
@@ -48,7 +49,6 @@ const columns = ref<ProColumn[]>([
   { label: '计划结束时间', prop: 'plannedEndTime', width: 160, slot: 'plannedEndTime' },
   { label: '实际开始时间', prop: 'actualStartTime', width: 160, slot: 'actualStartTime' },
   { label: '实际结束时间', prop: 'actualEndTime', width: 160, slot: 'actualEndTime' },
-  { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '备注', prop: 'remark', minWidth: 150 }
 ]);
 

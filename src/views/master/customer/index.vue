@@ -39,13 +39,13 @@ const loadData = async () => {
 }
 
 const columns = ref<ProColumn[]>([
+  { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '客户名称', prop: 'name', minWidth: 160 },
   { label: '客户编码', prop: 'code', width: 240 },
   { label: '简称', prop: 'shortName', width: 110 },
   { label: '联系人', prop: 'contactName', width: 100 },
   { label: '联系电话', prop: 'phone', width: 130 },
   { label: '邮箱', prop: 'email', minWidth: 160 },
-  { label: '状态', prop: 'status', width: 90, slot: 'status' },
 ])
 
 const handleQuery = (params: CustomerListRequest) => {
@@ -150,7 +150,8 @@ const handleCancel = () => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>
     <div class="toolbar round">
-      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus" @refresh="handleRefresh" />
+      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+        @refresh="handleRefresh" />
     </div>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

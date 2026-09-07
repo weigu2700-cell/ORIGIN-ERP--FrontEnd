@@ -47,13 +47,13 @@ const loadData = async () => {
 }
 
 const columns = ref<ProColumn[]>([
+  { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '物料编码', prop: 'code', width: 240 },
-  { label: '物料名称', prop: 'name', minWidth: 140 },
+  { label: '物料名称', prop: 'name', width: 220 },
   { label: '规格', prop: 'spec', width: 160 },
   { label: '类型', prop: 'type', width: 110, slot: 'type' },
   { label: '单位', prop: 'unit', width: 80 },
   { label: '安全库存', prop: 'safetyStock', width: 100 },
-  { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '备注', prop: 'remark', minWidth: 140 },
 ])
 
