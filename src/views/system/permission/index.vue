@@ -18,6 +18,7 @@ import type {
   PermissionNode,
   PermissionSaveRequest
 } from "@/types/system/permission.ts";
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 type EditRow = PermissionSaveRequest & { parentName?: string }
 
@@ -157,6 +158,7 @@ onMounted(() => {
 
 <template>
   <div class="permission-container round">
+    <ProPageTitle title="权限管理" description="维护权限节点与访问标识" />
     <div class="page-body">
       <div class="tree round">
         <ProTree :data="treeData" show-root @node-click="handleTreeClick" />

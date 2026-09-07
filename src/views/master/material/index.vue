@@ -20,6 +20,7 @@ import SaveDialog from "@/views/master/material/components/saveDialog.vue";
 import DetailDialog from "@/views/master/material/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 const queryData = reactive<MaterialListRequest>({
   page: 1,
@@ -175,6 +176,7 @@ const handleCancel = () => {
 
 <template>
   <div class="material-container round">
+    <ProPageTitle title="物料管理" description="维护物料编码、规格与基础属性" />
     <div class="selector round">
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>

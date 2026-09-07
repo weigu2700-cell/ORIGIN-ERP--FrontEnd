@@ -13,6 +13,7 @@ import type {
 import SaveDialog from "@/views/master/factory/components/saveDialog.vue";
 import DetailDialog from "@/views/master/factory/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import PageHeader from '@/components/PageHeader.vue'
 
 const queryData = reactive<FactoryListRequest>({
   page: 1,
@@ -147,13 +148,11 @@ const handleCancel = () => {
 
 <template>
   <div class="factory-container round">
-    <div class="selector round">
-      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
-    </div>
-    <div class="toolbar round">
-      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
-        @refresh="handleRefresh" />
-    </div>
+    <PageHeader title="工厂管理" description="维护工厂基础资料与启用状态">
+      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
+      <template #toolbar><ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit"
+        @status="handleStatus" @refresh="handleRefresh" /></template>
+    </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.page" :page-size="queryData.pageSize"

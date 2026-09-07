@@ -4,7 +4,7 @@ export interface GetPageProductionOrderRequest {
   productionOrderNo?: string
   productionDemandNo?: string
   materialId?: string
-  status?: string
+  status?: number
   plannedStartTime?: string
   plannedEndTime?: string
   actualStartTime?: string
@@ -34,7 +34,7 @@ export interface ProductionOrderVo {
   plannedEndTime: string
   actualStartTime: string
   actualEndTime: string
-  status: string
+  status: number
   remark?: string
 }
 

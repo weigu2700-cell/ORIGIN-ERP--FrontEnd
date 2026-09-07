@@ -26,11 +26,6 @@ const sourceTypeOptions = [
   { label: '手工创建', value: 'MANUAL' }
 ]
 
-const statusOptions = [
-  { label: '待生产', value: 'PENDING' },
-  { label: '已计划', value: 'PLANNED' },
-  { label: '已取消', value: 'CANCELLED' }
-]
 </script>
 
 <template>
@@ -41,9 +36,6 @@ const statusOptions = [
       <el-select v-model="props.queryData.sourceType" placeholder="请选择来源类型" clearable>
         <el-option v-for="item in sourceTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
-      <el-select v-model="props.queryData.status" placeholder="请选择状态" clearable>
-        <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
-      </el-select>
     </div>
   </ProSearch>
 </template>
@@ -51,11 +43,18 @@ const statusOptions = [
 <style scoped>
 .search-container {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  width: auto;
   gap: 10px;
 
-  :deep(.el-input),
-  :deep(.el-select) {
-    min-width: 240px;
-  }
+}
+
+.search-container > :deep(.el-input),
+.search-container > :deep(.el-select) {
+  flex: 0 1 200px;
+  min-width: 0;
+  width: 200px;
 }
 </style>

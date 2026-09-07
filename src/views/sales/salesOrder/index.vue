@@ -10,6 +10,7 @@ import DetailDialog from './components/detailDialog.vue'
 import { ElMessage } from 'element-plus';
 import { formatDecimal } from '@/composables/useFormat';
 import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 const queryData = reactive<GetPageSalesOrderQuery>({
   pageNum: 1,
@@ -144,6 +145,7 @@ onMounted(() => {
 
 <template>
   <div class="container">
+    <ProPageTitle title="销售订单" description="管理客户订单与履约状态" />
     <section class="selector">
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </section>

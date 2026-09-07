@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import ProTable, { type ProColumn } from '@/components/ProTable.vue';
-import { onMounted, ref, reactive } from 'vue';
-import { getPageProductionDemand, getDetailProductionDemand } from '@/api/product/productionDemand';
+import { computed, onMounted, ref, reactive } from 'vue';
+import { getPageProductionDemand } from '@/api/product/productionDemand';
 import type { PageProductionDemandVo, ProductionDemandVo, GetPageProductionDemandRequest } from '@/types/product/productionDemand';
 import ProToolbar from '@/components/ProToolbar.vue';
 import Selector from './components/selector.vue'
 import DetailDialog from './components/detailDialog.vue'
-import { ElMessage } from 'element-plus';
 import { formatDecimal } from '@/composables/useFormat';
-import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
+import ProPageHeader, { type ProPageHeaderCard } from '@/components/ProPageHeader.vue'
+
 
 const queryData = reactive<GetPageProductionDemandRequest>({
   pageNum: 1,
@@ -55,10 +55,22 @@ const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'war
 }
 
 const quickStatusOptions = [
-  { label: '待生产', value: 'PENDING' },
+  { label: '待生产', value: 'PENDING', tone: 'warning' },
   { label: '已计划', value: 'PLANNED', tone: 'success' },
   { label: '已取消', value: 'CANCELLED', tone: 'danger' },
-]
+] as const
+
+const statusCards = computed<ProPageHeaderCard[]>(() => {
+  const counts = new Map<string, number>()
+  for (const record of tableData.value?.records ?? []) {
+    counts.set(record.status, (counts.get(record.status) ?? 0) + 1)
+  }
+  return quickStatusOptions.map(option => ({
+    ...option,
+    count: counts.get(option.value) ?? 0,
+    hint: '条 · 当前页',
+  }))
+})
 
 const handleQuery = () => {
   queryData.pageNum = 1;
@@ -96,15 +108,21 @@ onMounted(() => {
 
 <template>
   <div class="container">
-    <section class="selector">
-      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
-    </section>
-    <section class="toolbar">
-      <ProToolbar @refresh="handleRefresh">
-        <BusinessStatusFilter :model-value="queryData.status ?? ''" business-type="production"
-          :options="quickStatusOptions" empty-value="" @change="handleQuickStatus" />
-      </ProToolbar>
-    </section>
+    <ProPageHeader
+      title="生产需求"
+      description="查看生产需求，跟踪计划安排与需求状态"
+      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`"
+      :cards="statusCards"
+      :model-value="queryData.status"
+      @change="handleQuickStatus"
+    >
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar @refresh="handleRefresh" />
+      </template>
+    </ProPageHeader>
     <section class="table">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.pageNum" :page-size="queryData.pageSize"

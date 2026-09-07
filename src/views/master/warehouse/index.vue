@@ -14,6 +14,7 @@ import type {
 import SaveDialog from "@/views/master/warehouse/components/saveDialog.vue";
 import DetailDialog from "@/views/master/warehouse/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 const queryData = reactive<WarehouseListRequest>({
   page: 1,
@@ -160,6 +161,7 @@ const handleCancel = () => {
 
 <template>
   <div class="warehouse-container round">
+    <ProPageTitle title="仓库管理" description="维护仓库资料、地址与启用状态" />
     <div class="selector round">
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>

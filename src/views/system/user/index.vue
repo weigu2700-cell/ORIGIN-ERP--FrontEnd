@@ -20,6 +20,7 @@ import type {
   UserListRecord,
   UserStatus
 } from "@/types/system/user.ts";
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 defineOptions({ name: 'SystemUserPage' })
 
@@ -177,6 +178,7 @@ onMounted(() => {
 
 <template>
   <div class="user-container round">
+    <ProPageTitle title="用户管理" description="维护系统用户、角色与账号状态" />
     <div class="selector round">
       <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
     </div>

@@ -8,6 +8,7 @@ import Selector from "@/views/system/dept/components/selector.vue";
 import ProTable from "@/components/ProTable.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTree from "@/components/ProTree.vue";
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 const tableData = ref<deptResponse>()
 const selectedData = ref<deptResponse['records']>([])
@@ -125,6 +126,7 @@ onMounted(() => {
 
 <template>
   <div class="dept-container round">
+    <ProPageTitle title="部门管理" description="维护组织部门与层级关系" />
     <div class="page-body">
       <div class="tree round">
         <ProTree :data="treeData" show-root @node-click="handleTreeClick" />

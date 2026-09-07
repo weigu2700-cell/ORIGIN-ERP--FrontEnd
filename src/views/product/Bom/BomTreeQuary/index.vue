@@ -6,6 +6,7 @@ import ProTable, { type ProColumn } from '@/components/ProTable.vue'
 import ProTree from '@/components/ProTree.vue'
 import type { BomExplosionVo, BomVo } from '@/types/product/Bom'
 import Selector, { type BomTreeQuery } from './components/selector.vue'
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 defineOptions({ name: 'BomTreeQuery' })
 
@@ -195,6 +196,7 @@ onMounted(loadBomTree)
 
 <template>
   <div class="bom-tree-container round">
+    <ProPageTitle title="BOM 树形查询" description="按层级查看产品物料组成与用量" />
     <div class="page-body">
       <div class="tree round">
         <div v-loading="treeLoading" class="tree-content">

@@ -6,8 +6,8 @@ export interface PurchaseDemandVo {
   sourceType: string
   sourceNo: string
   status: string
-  createTime: Date
-  updateTime: Date
+  createTime: string
+  updateTime: string
 }
 
 export interface PagePurchaseDemandVo {
@@ -15,8 +15,8 @@ export interface PagePurchaseDemandVo {
   total: number
   size: number
   current: number
-  optimizeCountSql: string
-  searchCount: string
+  optimizeCountSql?: string
+  searchCount?: string
 }
 
 export interface PagePurchaseDemandRequest {

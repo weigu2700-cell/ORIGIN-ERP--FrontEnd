@@ -14,6 +14,7 @@ import type {
 import SaveDialog from "@/views/master/production_line/components/saveDialog.vue";
 import DetailDialog from "@/views/master/production_line/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 const queryData = reactive<ProductionLineListRequest>({
   page: 1,
@@ -144,6 +145,7 @@ const handleCancel = () => {
 
 <template>
   <div class="production-line-container round">
+    <ProPageTitle title="生产线管理" description="维护生产线归属与运行状态" />
     <div class="selector round">
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </div>

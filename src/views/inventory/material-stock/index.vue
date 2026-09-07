@@ -9,6 +9,7 @@ import SaveDialog from "@/views/inventory/material-stock/components/saveDialog.v
 import DetailDialog from "@/views/inventory/material-stock/components/detailDialog.vue";
 import { ElMessage } from "element-plus";
 import { formatDecimal } from "@/composables/useFormat";
+import PageHeader from '@/components/PageHeader.vue'
 
 // 注意：库存接口分页参数是 pageNum
 const queryData = reactive<MaterialStockListRequest>({
@@ -83,13 +84,11 @@ const handleCancel = () => {
 
 <template>
   <div class="material-stock-container round">
-    <div class="selector round">
-      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
-    </div>
-    <div class="toolbar round">
-      <ProToolbar :show-edit="false" :show-delete="false" :show-export="false" @add="handleAdd"
-        @refresh="handleRefresh" />
-    </div>
+    <PageHeader title="物料库存" description="查看各仓库物料的在库、预留与可用数量">
+      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
+      <template #toolbar><ProToolbar :show-edit="false" :show-delete="false" :show-export="false"
+        @add="handleAdd" @refresh="handleRefresh" /></template>
+    </PageHeader>
     <div class="table round">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.pageNum" :page-size="queryData.pageSize"

@@ -13,9 +13,9 @@ export interface PurchaseOrderVo {
   completeQuantity: number
   unitPrice: number
   totalAmount: number
-  orderDate: Date
-  expectedDeliveryDate: Date
-  actualDeliveryDate: Date
+  orderDate?: string
+  expectedDeliveryDate?: string
+  actualDeliveryDate?: string
   status: string
 }
 
@@ -24,8 +24,8 @@ export interface PagePurchaseOrderVo {
   total: number
   size: number
   current: number
-  optimizeCountSql: string
-  searchCount: string
+  optimizeCountSql?: string
+  searchCount?: string
 }
 
 export interface PagePurchaseOrderRequest {
@@ -43,12 +43,12 @@ export interface CreatePurchaseOrderRequest {
   purchaseDemandId: string
   unitPrice: number
   plannedQuantity: number
-  expectedDeliveryDate: Date
+  expectedDeliveryDate: string
 }
 
 export interface UpdatePurchaseOrderRequest {
   supplierId: string
   unitPrice: number
   plannedQuantity: number
-  expectedDeliveryDate: Date
+  expectedDeliveryDate: string
 }

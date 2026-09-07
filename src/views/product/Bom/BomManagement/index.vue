@@ -10,6 +10,7 @@ import detailDialog from './components/detail.vue';
 import saveDialog from './components/save.vue'
 import type { BomVo } from '@/types/product/Bom';
 import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 const SelectionId = ref<string>()
 const tableRef = ref<Element>()
@@ -175,6 +176,7 @@ onMounted(() => {
 
 <template>
   <div class="container">
+    <ProPageTitle title="BOM 管理" description="维护产品物料清单与版本状态" />
     <section class="query">
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </section>

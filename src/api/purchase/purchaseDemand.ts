@@ -1,7 +1,8 @@
 import type { 
   PagePurchaseDemandRequest,
   PagePurchaseDemandVo, 
-  PurchaseDemandVo
+  PurchaseDemandVo,
+  CreatePurchaseDemandRequest
 } from '@/types/purchase/purchaseDemand'
 import service from '@/utils/request'
 
@@ -11,7 +12,7 @@ import service from '@/utils/request'
  * @returns 采购需求分页数据
  */
 export function getPagePurchaseDemand(request: PagePurchaseDemandRequest) {
-  return service.get<PagePurchaseDemandVo>('/purchase/demand/page', {
+  return service.get<PagePurchaseDemandVo>('/purchase/demand', {
     params: request
   })
 }
@@ -23,7 +24,7 @@ export function getPagePurchaseDemand(request: PagePurchaseDemandRequest) {
  */
 export function getDetailPurchaseDemand(id: string) {
   return service.get<PurchaseDemandVo>(
-    `/purchase/demand/detail/${id}`
+    `/purchase/demand/${id}`
   )
 }
 
@@ -32,9 +33,9 @@ export function getDetailPurchaseDemand(id: string) {
  * @param request 采购需求数据
  * @returns 创建的采购需求
  */
-export function createPurchaseDemand(request: PurchaseDemandVo) {
+export function createPurchaseDemand(request: CreatePurchaseDemandRequest) {
   return service.post<PurchaseDemandVo>(
-    '/purchase/demand/create', 
+    '/purchase/demand',
     request
   )
 }
@@ -45,7 +46,7 @@ export function createPurchaseDemand(request: PurchaseDemandVo) {
  * @returns 更新后的采购需求
  */
 export function closePurchaseDemand(id:string) {
-  return service.put<PurchaseDemandVo>(
+  return service.put<void>(
     `/purchase/demand/${id}/close`
   )
 }
@@ -56,7 +57,7 @@ export function closePurchaseDemand(id:string) {
  * @returns 更新后的采购需求
  */
 export function approvePurchaseDemand(id:string) {
-  return service.put<PurchaseDemandVo>(
+  return service.put<void>(
     `/purchase/demand/${id}/approve`
   )
 }

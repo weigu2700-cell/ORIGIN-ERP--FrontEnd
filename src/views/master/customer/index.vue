@@ -14,6 +14,7 @@ import type {
 import SaveDialog from "@/views/master/customer/components/saveDialog.vue";
 import DetailDialog from "@/views/master/customer/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import PageHeader from '@/components/PageHeader.vue'
 
 const queryData = reactive<CustomerListRequest>({
   page: 1,
@@ -146,13 +147,11 @@ const handleCancel = () => {
 
 <template>
   <div class="customer-container round">
-    <div class="selector round">
-      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
-    </div>
-    <div class="toolbar round">
-      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
-        @refresh="handleRefresh" />
-    </div>
+    <PageHeader title="客户管理" description="维护客户资料与合作状态">
+      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
+      <template #toolbar><ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit"
+        @status="handleStatus" @refresh="handleRefresh" /></template>
+    </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.page" :page-size="queryData.pageSize"

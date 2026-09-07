@@ -31,7 +31,7 @@ const form = reactive<CreateProductionOrderRequest>({
 })
 
 const rules: FormRules = {
-  productionDemandId: [{ required: true, message: '请选择生产需求', trigger: 'change' }],
+  productionDemandId: [{ required: false, message: '请选择生产需求', trigger: 'change' }],
   materialId: [{ required: true, message: '请选择物料', trigger: 'change' }],
   plannedQuantity: [{ required: true, message: '请输入计划数量', trigger: 'blur' }],
   plannedStartTime: [{ required: true, message: '请选择计划开始时间', trigger: 'change' }],

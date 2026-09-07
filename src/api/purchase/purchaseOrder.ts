@@ -14,7 +14,7 @@ import service from '@/utils/request'
  */
 export function getPagePurchaseOrder(request: PagePurchaseOrderRequest) {
   return service.get<PagePurchaseOrderVo>(
-    '/purchase/order/page', 
+    '/purchase/order',
     {params: request}
   )
 }
@@ -26,7 +26,7 @@ export function getPagePurchaseOrder(request: PagePurchaseOrderRequest) {
  */
 export function getDetailPurchaseOrder(id: string) {
   return service.get<PurchaseOrderVo>(
-    `/purchase/order/detail/${id}`
+    `/purchase/order/${id}`
   )
 }
 
@@ -36,8 +36,8 @@ export function getDetailPurchaseOrder(id: string) {
  * @returns 创建的采购订单
  */
 export function createPurchaseOrder(request: CreatePurchaseOrderRequest) {
-  return service.post<PurchaseOrderVo>(
-    '/purchase/order/create', 
+  return service.post<void>(
+    '/purchase/order',
     request
   )
 }
@@ -49,8 +49,8 @@ export function createPurchaseOrder(request: CreatePurchaseOrderRequest) {
  * @returns 更新后的采购订单
  */
 export function updatePurchaseOrder(id: string, request: UpdatePurchaseOrderRequest) {
-  return service.put<PurchaseOrderVo>(
-    `/purchase/order/update/${id}`, 
+  return service.put<void>(
+    `/purchase/order/${id}`,
     request
   )
 }
@@ -60,9 +60,9 @@ export function updatePurchaseOrder(id: string, request: UpdatePurchaseOrderRequ
  * @param id 采购订单ID
  * @returns 更新后的采购订单
  */
-export function confirmPurchaseOrder(id: string) {
-  return service.put<PurchaseOrderVo>(
-    `/purchase/order/${id}/confirm`
+export function approvePurchaseOrder(id: string) {
+  return service.put<void>(
+    `/purchase/order/${id}/approve`
   )
 }
 
@@ -71,9 +71,9 @@ export function confirmPurchaseOrder(id: string) {
  * @param id 采购订单ID
  * @returns 更新后的采购订单
  */
-export function cancelPurchaseOrder(id: string) {
-  return service.put<PurchaseOrderVo>(
-    `/purchase/order/${id}/cancel`
+export function shipPurchaseOrder(id: string) {
+  return service.put<void>(
+    `/purchase/order/${id}/ship`
   )
 }
 
@@ -82,8 +82,12 @@ export function cancelPurchaseOrder(id: string) {
  * @param id 采购订单ID
  * @returns 更新后的采购订单
  */
-export function completePurchaseOrder(id: string) {
-  return service.put<PurchaseOrderVo>(
-    `/purchase/order/${id}/complete`
+export function receivePurchaseOrder(id: string) {
+  return service.put<void>(
+    `/purchase/order/${id}/receive`
   )
+}
+
+export function closePurchaseOrder(id: string) {
+  return service.put<void>(`/purchase/order/${id}/close`)
 }

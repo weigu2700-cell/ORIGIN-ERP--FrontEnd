@@ -15,6 +15,7 @@ import SaveDialog from "@/views/master/material-supplier/components/saveDialog.v
 import DetailDialog from "@/views/master/material-supplier/components/detailDialog.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { formatDecimal } from "@/composables/useFormat";
+import PageHeader from '@/components/PageHeader.vue'
 
 const queryData = reactive<MaterialSupplierListRequest>({
   page: 1,
@@ -149,13 +150,11 @@ const handleCancel = () => {
 
 <template>
   <div class="material-supplier-container round">
-    <div class="selector round">
-      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
-    </div>
-    <div class="toolbar round">
-      <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
-        @refresh="handleRefresh" />
-    </div>
+    <PageHeader title="物料供应商" description="维护物料、供应商及采购价格关系">
+      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
+      <template #toolbar><ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit"
+        @status="handleStatus" @refresh="handleRefresh" /></template>
+    </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.page" :page-size="queryData.pageSize"

@@ -21,6 +21,7 @@ import type {
   MenuSaveRequest,
   MenuTreeNode
 } from "@/types/system/menu.ts";
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 type EditRow = MenuSaveRequest & { parentName?: string }
 
@@ -191,6 +192,7 @@ onMounted(() => {
 
 <template>
   <div class="menu-container round">
+    <ProPageTitle title="菜单管理" description="维护系统菜单、路由与显示顺序" />
     <div class="page-body">
       <div class="tree round">
         <ProTree :data="treeData" :tree-props="{ label: 'title', children: 'children' }" show-root

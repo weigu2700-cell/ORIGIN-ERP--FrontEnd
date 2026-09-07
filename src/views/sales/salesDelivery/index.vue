@@ -9,6 +9,7 @@ import SaveDialog from './components/saveDialog.vue'
 import DetailDialog from './components/detailDialog.vue'
 import { ElMessage } from 'element-plus';
 import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 const queryData = reactive<GetPageSalesDelivery>({
   pageNum: 1,
@@ -147,6 +148,7 @@ onMounted(() => {
 
 <template>
   <div class="container">
+    <ProPageTitle title="销售发货" description="处理销售出库与发货进度" />
     <section class="selector">
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </section>

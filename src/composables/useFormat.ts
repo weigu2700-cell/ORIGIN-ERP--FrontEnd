@@ -1,10 +1,6 @@
 
-type Format<T, U> = {
-  [key: string]: (value: T, ...args: any[]) => U
-}
-
 // ==================== 日期格式化 ====================
-export const formatDate: Format<Date | string | null | undefined, string> = {
+export const formatDate = {
   /** 仅日期：2024-01-15 */
   Date: (date: Date | string | null | undefined) => {
     if (!date) return '-'

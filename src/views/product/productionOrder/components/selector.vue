@@ -20,13 +20,6 @@ const handleReset = () => {
   emit('reset')
 }
 
-const statusOptions = [
-  { label: '草稿', value: 'DRAFT' },
-  { label: '已下达', value: 'RELEASED' },
-  { label: '生产中', value: 'IN_PROGRESS' },
-  { label: '已完成', value: 'COMPLETED' },
-  { label: '已取消', value: 'CANCELLED' }
-]
 </script>
 
 <template>
@@ -35,9 +28,6 @@ const statusOptions = [
       <el-input v-model="props.queryData.productionOrderNo" placeholder="请输入生产订单号" clearable />
       <el-input v-model="props.queryData.productionDemandNo" placeholder="请输入需求单号" clearable />
       <MaterialRefer v-model="props.queryData.materialId" />
-      <el-select v-model="props.queryData.status" placeholder="请选择状态" clearable>
-        <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
-      </el-select>
     </div>
   </ProSearch>
 </template>
@@ -45,11 +35,17 @@ const statusOptions = [
 <style scoped>
 .search-container {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  width: auto;
   gap: 10px;
+}
 
-  :deep(.el-input),
-  :deep(.el-select) {
-    min-width: 240px;
-  }
+.search-container > :deep(.el-input),
+.search-container > :deep(.el-select) {
+  flex: 0 1 200px;
+  min-width: 0;
+  width: 200px;
 }
 </style>

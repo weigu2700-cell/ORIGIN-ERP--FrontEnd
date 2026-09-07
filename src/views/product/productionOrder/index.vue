@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ProTable, { type ProColumn } from '@/components/ProTable.vue';
-import { onMounted, ref, reactive } from 'vue';
+import { computed, onMounted, ref, reactive } from 'vue';
 import { getPageProductionOrder, createProductionOrder, cancelProductionOrder } from '@/api/product/productionOrder';
 import type { PageProductionOrderResponse, ProductionOrderVo, GetPageProductionOrderRequest, CreateProductionOrderRequest } from '@/types/product/productionOrder';
 import ProToolbar from '@/components/ProToolbar.vue';
@@ -9,7 +9,7 @@ import SaveDialog from './components/saveDialog.vue'
 import DetailDialog from './components/detailDialog.vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { formatDate, formatDecimal } from '@/composables/useFormat';
-import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
+import ProPageHeader, { type ProPageHeaderCard } from '@/components/ProPageHeader.vue';
 
 const queryData = reactive<GetPageProductionOrderRequest>({
   pageNum: 1,
@@ -17,7 +17,7 @@ const queryData = reactive<GetPageProductionOrderRequest>({
   productionOrderNo: '',
   productionDemandNo: '',
   materialId: '',
-  status: '',
+  status: undefined,
   plannedStartTime: '',
   plannedEndTime: ''
 });
@@ -41,32 +41,44 @@ const columns = ref<ProColumn[]>([
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '生产订单号', prop: 'productionOrderNo', width: 180 },
   { label: '需求单号', prop: 'productionDemandNo', width: 180 },
-  { label: '物料编码', prop: 'materialCode', width: 140 },
-  { label: '物料名称', prop: 'materialName', width: 160 },
+  { label: '物料编码', prop: 'materialCode', width: 200 },
+  { label: '物料名称', prop: 'materialName', width: 180 },
   { label: '计划数量', prop: 'plannedQuantity', width: 100, slot: 'plannedQuantity' },
   { label: '实际数量', prop: 'actualQuantity', width: 100, slot: 'actualQuantity' },
-  { label: '计划开始时间', prop: 'plannedStartTime', width: 160, slot: 'plannedStartTime' },
-  { label: '计划结束时间', prop: 'plannedEndTime', width: 160, slot: 'plannedEndTime' },
-  { label: '实际开始时间', prop: 'actualStartTime', width: 160, slot: 'actualStartTime' },
-  { label: '实际结束时间', prop: 'actualEndTime', width: 160, slot: 'actualEndTime' },
+  { label: '计划开始时间', prop: 'plannedStartTime', width: 180, slot: 'plannedStartTime' },
+  { label: '计划结束时间', prop: 'plannedEndTime', width: 180, slot: 'plannedEndTime' },
+  { label: '实际开始时间', prop: 'actualStartTime', width: 180, slot: 'actualStartTime' },
+  { label: '实际结束时间', prop: 'actualEndTime', width: 180, slot: 'actualEndTime' },
   { label: '备注', prop: 'remark', minWidth: 150 }
 ]);
 
-const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
-  DRAFT: { label: '草稿', type: 'info' },
-  RELEASED: { label: '已下达', type: 'success' },
-  IN_PROGRESS: { label: '生产中', type: 'warning' },
-  COMPLETED: { label: '已完成', type: 'success' },
-  CANCELLED: { label: '已取消', type: 'danger' }
+const statusMap: Record<number, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
+  0: { label: '草稿', type: 'info' },
+  1: { label: '已下达', type: 'success' },
+  2: { label: '生产中', type: 'warning' },
+  3: { label: '已完成', type: 'success' },
+  4: { label: '已取消', type: 'danger' }
 }
 
 const quickStatusOptions = [
-  { label: '草稿', value: 'DRAFT' },
-  { label: '已下达', value: 'RELEASED', tone: 'success' },
-  { label: '生产中', value: 'IN_PROGRESS', tone: 'warning' },
-  { label: '已完成', value: 'COMPLETED', tone: 'success' },
-  { label: '已取消', value: 'CANCELLED', tone: 'danger' },
-]
+  { label: '草稿', value: 0, tone: 'info' },
+  { label: '已下达', value: 1, tone: 'success' },
+  { label: '生产中', value: 2, tone: 'warning' },
+  { label: '已完成', value: 3, tone: 'success' },
+  { label: '已取消', value: 4, tone: 'danger' },
+] as const
+
+const statusCards = computed<ProPageHeaderCard[]>(() => {
+  const counts = new Map<number, number>()
+  for (const record of tableData.value?.records ?? []) {
+    counts.set(record.status, (counts.get(record.status) ?? 0) + 1)
+  }
+  return quickStatusOptions.map(option => ({
+    ...option,
+    count: counts.get(option.value) ?? 0,
+    hint: '条 · 当前页',
+  }))
+})
 
 const handleQuery = () => {
   queryData.pageNum = 1;
@@ -74,7 +86,7 @@ const handleQuery = () => {
 }
 
 const handleQuickStatus = (status: string | number | null) => {
-  queryData.status = typeof status === 'string' ? status : ''
+  queryData.status = status === null || status === '' ? undefined : Number(status)
   handleQuery()
 }
 
@@ -82,7 +94,7 @@ const handleReset = () => {
   queryData.productionOrderNo = '';
   queryData.productionDemandNo = '';
   queryData.materialId = '';
-  queryData.status = '';
+  queryData.status = undefined;
   queryData.plannedStartTime = '';
   queryData.plannedEndTime = '';
   queryData.pageNum = 1;
@@ -151,15 +163,16 @@ onMounted(() => {
 
 <template>
   <div class="container">
-    <section class="selector">
-      <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
-    </section>
-    <section class="toolbar">
-      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh">
-        <BusinessStatusFilter :model-value="queryData.status ?? ''" business-type="production"
-          :options="quickStatusOptions" empty-value="" @change="handleQuickStatus" />
-      </ProToolbar>
-    </section>
+    <ProPageHeader title="生产订单" description="安排生产计划，跟踪订单执行与完工进度"
+      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`" :cards="statusCards"
+      :model-value="queryData.status" @change="handleQuickStatus">
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
+      </template>
+    </ProPageHeader>
     <section class="table">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
         :page="queryData.pageNum" :page-size="queryData.pageSize"

@@ -14,6 +14,7 @@ import type {
 import { ElMessage, ElMessageBox } from "element-plus";
 import SaveDialog from "@/views/master/workshop/components/saveDialog.vue";
 import DetailDialog from "@/views/master/workshop/components/detailDialog.vue";
+import ProPageTitle from '@/components/ProPageTitle.vue'
 
 const queryData = reactive<WorkshopListRequest>({
   page: 1,
@@ -153,6 +154,7 @@ onMounted(() => {
 
 <template>
   <div class="workshop-index round">
+    <ProPageTitle title="车间管理" description="维护工厂车间资料与启用状态" />
     <div class="selector round">
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset"></Selector>
     </div>

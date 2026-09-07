@@ -36,6 +36,15 @@ const handleReset = () => {
 <style scoped>
 .search-container {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
+}
+
+.search-container > :deep(.el-input),
+.search-container > :deep(.el-select) {
+  flex: 0 1 200px;
+  min-width: 0;
+  width: 200px;
 }
 </style>
