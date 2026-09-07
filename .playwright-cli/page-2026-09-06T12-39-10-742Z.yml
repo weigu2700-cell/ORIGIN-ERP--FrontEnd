@@ -1,0 +1,23 @@
+- generic [active] [ref=e1]:
+  - main [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: 制造企业一体化管理平台
+      - heading "从订单到交付 全程清晰可控" [level=1] [ref=e6]: 从订单到交付全程清晰可控
+      - paragraph [ref=e7]: 围绕物料、库存、生产与交付，连接制造企业每一个关键环节。
+      - paragraph [ref=e8]: 计划 · 执行 · 协同 · 追溯
+    - generic [ref=e10]:
+      - generic [ref=e11]:
+        - img "原点智造 ERP" [ref=e12]
+        - generic [ref=e13]:
+          - strong [ref=e14]: 原点智造 ERP
+          - generic [ref=e15]: 制造企业管理系统
+      - generic [ref=e16]:
+        - heading "欢迎登录" [level=1] [ref=e17]
+        - paragraph [ref=e18]: 请输入账号和密码进入系统
+      - generic [ref=e19]:
+        - textbox "用户名" [ref=e28]
+        - textbox "密码" [ref=e38]
+        - button "登录" [ref=e39] [cursor=pointer]
+      - paragraph [ref=e41]: 账号问题请联系系统管理员
+    - generic [ref=e42]: © 2026 原点智造 ERP
+  - generic "Toggle devtools panel" [ref=e44] [cursor=pointer]

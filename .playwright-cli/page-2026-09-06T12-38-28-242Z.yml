@@ -1,0 +1,111 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e55]:
+    - banner [ref=e56]:
+      - generic [ref=e57]:
+        - navigation "Breadcrumb" [ref=e60]:
+          - link "首页" [ref=e62]
+        - generic [ref=e63]:
+          - generic [ref=e66]:
+            - textbox "搜索菜单或功能" [ref=e67]
+            - generic [ref=e69] [cursor=pointer]
+          - button "切换主题" [ref=e72] [cursor=pointer]
+          - generic [ref=e77]:
+            - button "通知" [ref=e78] [cursor=pointer]
+            - button "刷新页面" [ref=e85] [cursor=pointer]
+            - button "全屏" [ref=e90] [cursor=pointer]
+            - button "外观设置" [ref=e95] [cursor=pointer]
+          - button "用 用户" [ref=e101] [cursor=pointer]:
+            - generic [ref=e102]: 用
+            - generic [ref=e103]: 用户
+    - complementary [ref=e107]:
+      - generic [ref=e108]:
+        - img "原点智造 ERP" [ref=e109]
+        - generic [ref=e110]:
+          - strong [ref=e111]: 原点智造 ERP
+          - generic [ref=e112]: ORIGIN · 制造运营管理平台
+      - menubar [ref=e116]:
+        - menuitem "工作台" [ref=e117] [cursor=pointer]
+        - menuitem "模具管理" [ref=e122] [cursor=pointer]
+        - menuitem "基础资料" [ref=e130]
+        - menuitem "销售管理" [ref=e139]
+        - menuitem "设备管理" [ref=e149] [cursor=pointer]
+        - menuitem "系统管理" [ref=e155]
+        - menuitem "数字化建模" [ref=e164] [cursor=pointer]
+        - menuitem "库存管理" [ref=e170]
+        - menuitem "EIP平台" [ref=e181] [cursor=pointer]
+        - menuitem "生产管理" [ref=e186]
+      - button [ref=e196] [cursor=pointer]
+    - main [ref=e201]:
+      - main [ref=e203]:
+        - generic [ref=e204]:
+          - generic [ref=e206]:
+            - paragraph [ref=e207]: ORIGIN ERP / 工作台
+            - heading "欢迎回来，开始今天的工作" [level=1] [ref=e208]
+            - paragraph [ref=e209]: 2026年9月6日星期日
+          - region "经营概览" [ref=e212]:
+            - generic [ref=e218]:
+              - generic [ref=e219]: 本月销售额
+              - strong [ref=e220]: ¥ 286,420
+              - generic [ref=e221]:
+                - text: +12.6%
+                - emphasis [ref=e224]: 较上月
+            - generic [ref=e232]:
+              - generic [ref=e233]: 库存总价值
+              - strong [ref=e234]: ¥ 1,248,600
+              - generic [ref=e235]:
+                - text: +4.8%
+                - emphasis [ref=e238]: 较上月
+            - generic [ref=e244]:
+              - generic [ref=e245]: 活跃客户
+              - strong [ref=e246]: 1,286
+              - generic [ref=e247]:
+                - text: +8.2%
+                - emphasis [ref=e250]: 本月新增
+            - generic [ref=e256]:
+              - generic [ref=e257]: 订单完成率
+              - strong [ref=e258]: 96.8%
+              - generic [ref=e259]:
+                - text: +2.4%
+                - emphasis [ref=e262]: 较上月
+          - generic [ref=e263]:
+            - generic [ref=e264]:
+              - generic [ref=e267]:
+                - strong [ref=e268]: 常用功能
+                - generic [ref=e269]: 快速进入日常工作
+              - generic [ref=e271]:
+                - link "新增物料 维护物料主数据" [ref=e272] [cursor=pointer]:
+                  - /url: /master/material
+                  - generic [ref=e278]:
+                    - strong [ref=e279]: 新增物料
+                    - generic [ref=e280]: 维护物料主数据
+                - link "库存查询 查看实时库存" [ref=e284] [cursor=pointer]:
+                  - /url: /inventory/material-stock
+                  - generic [ref=e288]:
+                    - strong [ref=e289]: 库存查询
+                    - generic [ref=e290]: 查看实时库存
+                - link "客户管理 管理客户档案" [ref=e294] [cursor=pointer]:
+                  - /url: /master/customer
+                  - generic [ref=e298]:
+                    - strong [ref=e299]: 客户管理
+                    - generic [ref=e300]: 管理客户档案
+            - generic [ref=e304]:
+              - generic [ref=e306]:
+                - generic [ref=e307]:
+                  - strong [ref=e308]: 最近动态
+                  - generic [ref=e309]: 系统操作与业务提醒
+                - button "查看全部" [ref=e310] [cursor=pointer]
+              - generic [ref=e313]:
+                - generic [ref=e316]:
+                  - strong [ref=e317]: 库存盘点任务已完成
+                  - generic [ref=e318]: 仓库 A-01 · 15 分钟前
+                - generic [ref=e321]:
+                  - strong [ref=e322]: 新增客户「华东制造」
+                  - generic [ref=e323]: 客户管理 · 1 小时前
+                - generic [ref=e326]:
+                  - strong [ref=e327]: 采购订单待确认
+                  - generic [ref=e328]: 采购协同 · 2 小时前
+  - generic [ref=e43]:
+    - generic "Toggle devtools panel" [ref=e44] [cursor=pointer]
+    - generic "Toggle Component Inspector" [ref=e50] [cursor=pointer]
+  - alert [ref=e329]:
+    - paragraph [ref=e333]: 登录成功

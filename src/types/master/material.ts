@@ -10,7 +10,7 @@ export interface MaterialListRequest {
   code?: string | null
   spec?: string | null
   type?: string | null
-  status?: number | null
+  status?: MaterialStatus | null
 }
 
 export interface MaterialVO {

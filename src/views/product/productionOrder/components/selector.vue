@@ -21,7 +21,7 @@ const handleReset = () => {
 }
 
 const statusOptions = [
-  { label: '待下达', value: 'PENDING' },
+  { label: '草稿', value: 'DRAFT' },
   { label: '已下达', value: 'RELEASED' },
   { label: '生产中', value: 'IN_PROGRESS' },
   { label: '已完成', value: 'COMPLETED' },

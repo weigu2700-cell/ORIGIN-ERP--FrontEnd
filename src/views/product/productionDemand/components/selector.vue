@@ -27,9 +27,8 @@ const sourceTypeOptions = [
 ]
 
 const statusOptions = [
-  { label: '待处理', value: 'PENDING' },
-  { label: '处理中', value: 'IN_PROGRESS' },
-  { label: '已完成', value: 'COMPLETED' },
+  { label: '待生产', value: 'PENDING' },
+  { label: '已计划', value: 'PLANNED' },
   { label: '已取消', value: 'CANCELLED' }
 ]
 </script>

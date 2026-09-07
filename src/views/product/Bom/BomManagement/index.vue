@@ -9,6 +9,7 @@ import ProToolbar from '@/components/ProToolbar.vue';
 import detailDialog from './components/detail.vue';
 import saveDialog from './components/save.vue'
 import type { BomVo } from '@/types/product/Bom';
+import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
 
 const SelectionId = ref<string>()
 const tableRef = ref<Element>()
@@ -57,6 +58,12 @@ const columns = ref<ProColumn[]>([
   { label: '创建时间', prop: 'createTime', width: 180 },
   { label: '更新时间', prop: 'updateTime', width: 180 },
 ])
+
+const quickStatusOptions = [
+  { label: '草稿', value: 'DRAFT' },
+  { label: '使用中', value: 'ACTIVE', tone: 'success' },
+  { label: '已停用', value: 'INACTIVE' },
+]
 
 const loadData = async (): Promise<void> => {
   try {
@@ -107,7 +114,13 @@ const handleCancel = () => {
 }
 
 const handleQuery = () => {
+  queryData.value.pageNum = 1
   loadData()
+}
+
+const handleQuickStatus = (status: string | number | null) => {
+  queryData.value.status = typeof status === 'string' ? status : null
+  handleQuery()
 }
 
 const handleReset = () => {
@@ -167,7 +180,10 @@ onMounted(() => {
     </section>
     <section class="toolbar">
       <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @export="handleExport"
-        @refresh="handleRefresh" />
+        @refresh="handleRefresh">
+        <BusinessStatusFilter :model-value="queryData.status ?? null" business-type="production"
+          :options="quickStatusOptions" @change="handleQuickStatus" />
+      </ProToolbar>
     </section>
     <section class="table">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns"

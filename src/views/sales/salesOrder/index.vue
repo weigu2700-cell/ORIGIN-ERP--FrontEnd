@@ -9,6 +9,7 @@ import SaveDialog from './components/saveDialog.vue'
 import DetailDialog from './components/detailDialog.vue'
 import { ElMessage } from 'element-plus';
 import { formatDecimal } from '@/composables/useFormat';
+import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
 
 const queryData = reactive<GetPageSalesOrderQuery>({
   pageNum: 1,
@@ -52,9 +53,21 @@ const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'war
   CANCELLED: { label: '已取消', type: 'danger' }
 }
 
+const quickStatusOptions = [
+  { label: '草稿', value: 0 },
+  { label: '已确认', value: 1, tone: 'success' },
+  { label: '已完成', value: 2, tone: 'success' },
+  { label: '已取消', value: 3, tone: 'danger' },
+]
+
 const handleQuery = () => {
   queryData.pageNum = 1;
   loadData();
+}
+
+const handleQuickStatus = (status: string | number | null) => {
+  queryData.status = status as number | null
+  handleQuery()
 }
 
 const handleReset = () => {
@@ -135,7 +148,10 @@ onMounted(() => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </section>
     <section class="toolbar">
-      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
+      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh">
+        <BusinessStatusFilter :model-value="queryData.status" business-type="sales" :options="quickStatusOptions"
+          @change="handleQuickStatus" />
+      </ProToolbar>
     </section>
     <section class="table">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

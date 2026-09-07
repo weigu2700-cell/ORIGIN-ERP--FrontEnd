@@ -9,6 +9,7 @@ import SaveDialog from './components/saveDialog.vue'
 import DetailDialog from './components/detailDialog.vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { formatDate, formatDecimal } from '@/composables/useFormat';
+import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
 
 const queryData = reactive<GetPageProductionOrderRequest>({
   pageNum: 1,
@@ -52,16 +53,29 @@ const columns = ref<ProColumn[]>([
 ]);
 
 const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
-  PENDING: { label: '待下达', type: 'info' },
+  DRAFT: { label: '草稿', type: 'info' },
   RELEASED: { label: '已下达', type: 'success' },
   IN_PROGRESS: { label: '生产中', type: 'warning' },
   COMPLETED: { label: '已完成', type: 'success' },
   CANCELLED: { label: '已取消', type: 'danger' }
 }
 
+const quickStatusOptions = [
+  { label: '草稿', value: 'DRAFT' },
+  { label: '已下达', value: 'RELEASED', tone: 'success' },
+  { label: '生产中', value: 'IN_PROGRESS', tone: 'warning' },
+  { label: '已完成', value: 'COMPLETED', tone: 'success' },
+  { label: '已取消', value: 'CANCELLED', tone: 'danger' },
+]
+
 const handleQuery = () => {
   queryData.pageNum = 1;
   loadData();
+}
+
+const handleQuickStatus = (status: string | number | null) => {
+  queryData.status = typeof status === 'string' ? status : ''
+  handleQuery()
 }
 
 const handleReset = () => {
@@ -141,7 +155,10 @@ onMounted(() => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </section>
     <section class="toolbar">
-      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
+      <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh">
+        <BusinessStatusFilter :model-value="queryData.status ?? ''" business-type="production"
+          :options="quickStatusOptions" empty-value="" @change="handleQuickStatus" />
+      </ProToolbar>
     </section>
     <section class="table">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

@@ -8,6 +8,7 @@ import Selector from './components/selector.vue'
 import SaveDialog from './components/saveDialog.vue'
 import DetailDialog from './components/detailDialog.vue'
 import { ElMessage } from 'element-plus';
+import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
 
 const queryData = reactive<GetPageSalesDelivery>({
   pageNum: 1,
@@ -33,6 +34,13 @@ const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'war
   CANCELLED: { label: '已取消', type: 'danger' }
 }
 
+const quickStatusOptions = [
+  { label: '草稿', value: 'DRAFT' },
+  { label: '已确认', value: 'CONFIRMED', tone: 'success' },
+  { label: '已完成', value: 'COMPLETED', tone: 'success' },
+  { label: '已取消', value: 'CANCELLED', tone: 'danger' },
+]
+
 const handleSelectionChange = (rows: SalesDeliveryVo[]) => {
   selectedRowId.value = rows[0] ? String(rows[0].id) : undefined;
 };
@@ -53,6 +61,11 @@ const columns = ref<ProColumn[]>([
 const handleQuery = () => {
   queryData.pageNum = 1;
   loadData();
+}
+
+const handleQuickStatus = (status: string | number | null) => {
+  queryData.status = typeof status === 'string' ? status : ''
+  handleQuery()
 }
 
 const handleReset = () => {
@@ -138,7 +151,10 @@ onMounted(() => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </section>
     <section class="toolbar">
-      <ProToolbar @add="handleAdd" @delete="handleDelete" @refresh="handleRefresh" @detail="handleDetail" />
+      <ProToolbar @add="handleAdd" @delete="handleDelete" @refresh="handleRefresh" @detail="handleDetail">
+        <BusinessStatusFilter :model-value="queryData.status" business-type="sales" :options="quickStatusOptions"
+          empty-value="" @change="handleQuickStatus" />
+      </ProToolbar>
     </section>
     <section class="table">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

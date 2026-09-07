@@ -1,0 +1,152 @@
+- generic [ref=e1]:
+  - generic [ref=e334]:
+    - banner [ref=e335]:
+      - generic [ref=e336]:
+        - navigation "Breadcrumb" [ref=e339]:
+          - generic [ref=e340]:
+            - link "销售管理" [ref=e617]
+            - text: /
+          - link "销售订单" [ref=e619]
+        - generic [ref=e342]:
+          - generic [ref=e345]:
+            - textbox "搜索菜单或功能" [ref=e346]
+            - generic [ref=e348] [cursor=pointer]
+          - button "切换主题" [ref=e351] [cursor=pointer]
+          - generic [ref=e356]:
+            - button "通知" [ref=e357] [cursor=pointer]
+            - button "刷新页面" [ref=e364] [cursor=pointer]
+            - button "全屏" [ref=e369] [cursor=pointer]
+            - button "外观设置" [ref=e374] [cursor=pointer]
+          - button "用 用户" [ref=e380] [cursor=pointer]:
+            - generic [ref=e381]: 用
+            - generic [ref=e382]: 用户
+    - complementary [ref=e386]:
+      - generic [ref=e387]:
+        - img "原点智造 ERP" [ref=e388]
+        - generic [ref=e389]:
+          - strong [ref=e390]: 原点智造 ERP
+          - generic [ref=e391]: ORIGIN · 制造运营管理平台
+      - menubar [ref=e395]:
+        - menuitem "工作台" [ref=e396] [cursor=pointer]
+        - menuitem "模具管理" [ref=e401] [cursor=pointer]
+        - menuitem "基础资料" [ref=e409]
+        - menuitem "销售管理" [expanded] [ref=e418]:
+          - menu [ref=e606]:
+            - menuitem "销售出库" [ref=e607] [cursor=pointer]
+            - menuitem "销售订单" [ref=e612] [cursor=pointer]
+        - menuitem "设备管理" [ref=e428] [cursor=pointer]
+        - menuitem "系统管理" [ref=e434]
+        - menuitem "数字化建模" [ref=e443] [cursor=pointer]
+        - menuitem "库存管理" [ref=e449]
+        - menuitem "EIP平台" [ref=e460] [cursor=pointer]
+        - menuitem "生产管理" [ref=e465]
+      - button [ref=e475] [cursor=pointer]
+    - main [ref=e480]:
+      - generic [ref=e620]:
+        - generic [ref=e622]:
+          - generic [ref=e624]:
+            - textbox "请输入订单号" [ref=e627]
+            - generic [ref=e630]:
+              - textbox "请选择客户" [ref=e631]
+              - generic [ref=e633] [cursor=pointer]
+            - generic [ref=e639] [cursor=pointer]:
+              - generic:
+                - combobox [ref=e641]
+                - generic [ref=e642]: 草稿
+          - generic [ref=e647]:
+            - button "查询" [ref=e648] [cursor=pointer]
+            - button "重置" [ref=e653] [cursor=pointer]
+        - generic [ref=e656]:
+          - button "新增" [ref=e658] [cursor=pointer]
+          - generic [ref=e664]:
+            - button "修改" [ref=e665] [cursor=pointer]
+            - button "删除" [ref=e671] [cursor=pointer]
+            - button "导出" [ref=e676] [cursor=pointer]
+            - button "刷新" [ref=e681] [cursor=pointer]
+          - generic [ref=e686]:
+            - generic [ref=e687]: 单据进度
+            - group "状态快捷筛选" [ref=e688]:
+              - button "全部" [ref=e689] [cursor=pointer]
+              - button "草稿" [active] [pressed] [ref=e690] [cursor=pointer]
+              - button "已确认" [ref=e692] [cursor=pointer]
+              - button "已完成" [ref=e694] [cursor=pointer]
+              - button "已取消" [ref=e696] [cursor=pointer]
+        - generic [ref=e699]:
+          - generic [ref=e701]:
+            - table [ref=e703]:
+              - rowgroup [ref=e713]:
+                - row [ref=e714]:
+                  - columnheader [ref=e715]:
+                    - generic "Select all rows" [ref=e717] [cursor=pointer]:
+                      - generic [ref=e718]:
+                        - checkbox "Select all rows"
+                  - columnheader "订单号" [ref=e720]
+                  - columnheader "客户名称" [ref=e722]
+                  - columnheader "订单日期" [ref=e724]
+                  - columnheader "交货日期" [ref=e726]
+                  - columnheader "总金额" [ref=e728]
+                  - columnheader "状态" [ref=e730]
+                  - columnheader "备注" [ref=e732]
+            - table [ref=e738]:
+              - rowgroup [ref=e748]:
+                - row [ref=e884]:
+                  - cell [ref=e750]:
+                    - generic "Select this row" [ref=e752] [cursor=pointer]:
+                      - generic [ref=e753]:
+                        - checkbox "Select this row"
+                  - cell "SO-DEMO-20260902-002" [ref=e885]
+                  - cell "华南工业自动化有限公司" [ref=e886]
+                  - cell "2026-09-02T21:35:52" [ref=e887]
+                  - cell "2026-09-15T21:35:52" [ref=e888]
+                  - cell "19,200.00" [ref=e889]
+                  - cell "草稿" [ref=e890]
+                  - cell "待确认订单" [ref=e891]
+                - row [ref=e892]:
+                  - cell [ref=e772]:
+                    - generic "Select this row" [ref=e774] [cursor=pointer]:
+                      - generic [ref=e775]:
+                        - checkbox "Select this row"
+                  - cell "SO202609060004" [ref=e893]
+                  - cell "华东智能设备有限公司" [ref=e894]
+                  - cell "2026-09-06T17:55:48" [ref=e895]
+                  - cell "2026-09-07T00:00:00" [ref=e896]
+                  - cell "1.00" [ref=e897]
+                  - cell "草稿" [ref=e787]
+                  - cell [ref=e898]
+                - row [ref=e899]:
+                  - cell [ref=e794]:
+                    - generic "Select this row" [ref=e796] [cursor=pointer]:
+                      - generic [ref=e797]:
+                        - checkbox "Select this row"
+                  - cell "SO202609060005" [ref=e900]
+                  - cell "华东智能设备有限公司" [ref=e901]
+                  - cell "2026-09-06T17:56:34" [ref=e902]
+                  - cell "2026-09-07T00:00:00" [ref=e903]
+                  - cell "2.00" [ref=e904]
+                  - cell "草稿" [ref=e905]
+                  - cell [ref=e906]
+                - row [ref=e907]:
+                  - cell [ref=e816]:
+                    - generic "Select this row" [ref=e818] [cursor=pointer]:
+                      - generic [ref=e819]:
+                        - checkbox "Select this row"
+                  - cell "SO202609060006" [ref=e908]
+                  - cell "华东智能设备有限公司" [ref=e823]
+                  - cell "2026-09-06T17:59:15" [ref=e909]
+                  - cell "2026-09-08T00:00:00" [ref=e910]
+                  - cell "1.00" [ref=e829]
+                  - cell "草稿" [ref=e831]
+                  - cell [ref=e835]
+          - generic [ref=e878]:
+            - generic [ref=e879]: 共 4 条
+            - combobox [ref=e880] [cursor=pointer]:
+              - option "10 条/页" [selected]
+              - option "20 条/页"
+              - option "50 条/页"
+              - option "100 条/页"
+            - button "上一页" [disabled] [ref=e881]
+            - button "1" [ref=e882] [cursor=pointer]
+            - button "下一页" [disabled] [ref=e883]
+  - generic [ref=e43]:
+    - generic "Toggle devtools panel" [ref=e44] [cursor=pointer]
+    - generic "Toggle Component Inspector" [ref=e50] [cursor=pointer]

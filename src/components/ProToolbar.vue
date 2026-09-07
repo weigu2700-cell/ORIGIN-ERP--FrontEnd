@@ -68,8 +68,8 @@
         </el-button>
       </el-tooltip>
     </div>
-    <slot />
     <div class="pro-toolbar-spacer"></div>
+    <slot />
   </div>
 </template>
 

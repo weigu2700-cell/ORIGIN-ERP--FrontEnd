@@ -8,6 +8,7 @@ import Selector from './components/selector.vue'
 import DetailDialog from './components/detailDialog.vue'
 import { ElMessage } from 'element-plus';
 import { formatDecimal } from '@/composables/useFormat';
+import BusinessStatusFilter from '@/components/BusinessStatusFilter.vue';
 
 const queryData = reactive<GetPageProductionDemandRequest>({
   pageNum: 1,
@@ -48,15 +49,25 @@ const sourceTypeMap: Record<string, string> = {
 }
 
 const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
-  PENDING: { label: '待处理', type: 'info' },
-  IN_PROGRESS: { label: '处理中', type: 'warning' },
-  COMPLETED: { label: '已完成', type: 'success' },
+  PENDING: { label: '待生产', type: 'info' },
+  PLANNED: { label: '已计划', type: 'success' },
   CANCELLED: { label: '已取消', type: 'danger' }
 }
+
+const quickStatusOptions = [
+  { label: '待生产', value: 'PENDING' },
+  { label: '已计划', value: 'PLANNED', tone: 'success' },
+  { label: '已取消', value: 'CANCELLED', tone: 'danger' },
+]
 
 const handleQuery = () => {
   queryData.pageNum = 1;
   loadData();
+}
+
+const handleQuickStatus = (status: string | number | null) => {
+  queryData.status = typeof status === 'string' ? status : ''
+  handleQuery()
 }
 
 const handleReset = () => {
@@ -89,7 +100,10 @@ onMounted(() => {
       <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
     </section>
     <section class="toolbar">
-      <ProToolbar @refresh="handleRefresh" />
+      <ProToolbar @refresh="handleRefresh">
+        <BusinessStatusFilter :model-value="queryData.status ?? ''" business-type="production"
+          :options="quickStatusOptions" empty-value="" @change="handleQuickStatus" />
+      </ProToolbar>
     </section>
     <section class="table">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
