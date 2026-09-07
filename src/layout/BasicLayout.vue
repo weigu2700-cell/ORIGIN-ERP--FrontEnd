@@ -25,8 +25,10 @@ const appStore = useAppStore()
     </el-aside>
     <el-main class="main">
       <router-view v-slot="{ Component, route }">
-        <transition name="route-page" mode="out-in">
-          <component :is="Component" :key="route.fullPath" />
+        <transition name="route-page">
+          <div :key="route.fullPath" class="route-page">
+            <component :is="Component" />
+          </div>
         </transition>
       </router-view>
     </el-main>
@@ -141,6 +143,7 @@ const appStore = useAppStore()
 
 .main {
   grid-area: main;
+  position: relative;
   padding: 18px 22px 22px;
   background-color: var(--page-background);
   width: 100%;
@@ -152,11 +155,24 @@ const appStore = useAppStore()
   transition: all 0.2s;
 }
 
+.route-page {
+  height: 100%;
+}
+
 .route-page-enter-active,
 .route-page-leave-active {
   transition:
     opacity 180ms ease,
     transform 180ms ease;
+}
+
+.route-page {
+  min-height: 100%;
+}
+
+.route-page-leave-active {
+  position: absolute;
+  inset: 18px 22px 22px;
 }
 
 .route-page-enter-from {
@@ -170,6 +186,7 @@ const appStore = useAppStore()
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .route-page-enter-active,
   .route-page-leave-active {
     transition: none;
