@@ -24,7 +24,11 @@ const appStore = useAppStore()
       <Fold />
     </el-aside>
     <el-main class="main">
-      <router-view />
+      <router-view v-slot="{ Component, route }">
+        <transition name="route-page" mode="out-in">
+          <component :is="Component" :key="route.fullPath" />
+        </transition>
+      </router-view>
     </el-main>
   </div>
 </template>
@@ -146,5 +150,29 @@ const appStore = useAppStore()
   overflow: auto;
   scrollbar-gutter: stable;
   transition: all 0.2s;
+}
+
+.route-page-enter-active,
+.route-page-leave-active {
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.route-page-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.route-page-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-page-enter-active,
+  .route-page-leave-active {
+    transition: none;
+  }
 }
 </style>
