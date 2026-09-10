@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import {nextTick, ref, watch} from "vue";
+  import {computed, nextTick, ref, watch} from "vue";
   import {ElMessage} from "element-plus";
   import type {ElTree} from "element-plus";
   import type {RoleInfo} from "@/types/system/role.ts";
@@ -19,17 +19,25 @@
     (e: 'success'): void
   }>()
 
+  // 虚拟"全部"父节点 id，仅用于前端一键勾选，不提交后端
+  const ALL_NODE_ID = '__all__'
+
   const permissionTreeRef = ref<InstanceType<typeof ElTree>>()
   const menuTreeRef = ref<InstanceType<typeof ElTree>>()
-  const permissionTree = ref<PermissionNode[]>([])
+  const permissionNodes = ref<PermissionNode[]>([])
   const menuTree = ref<MenuTreeNode[]>([])
   const saving = ref(false)
   const loading = ref(false)
 
+  // 在原权限树顶层包一层"全部"父节点，勾选它即可一键分配全部权限
+  const permissionTree = computed<PermissionNode[]>(() => [
+    {id: ALL_NODE_ID, name: '全部', code: '', type: 'MENU', parentId: null, parentName: null, sort: -1, status: 'ENABLE', remark: null, children: permissionNodes.value},
+  ])
+
   // 递归收集树节点 id（后端 Long 序列化为 string，统一转 string 避免精度丢失）
   const collectIds = (nodes: {id: string | number, children?: any[]}[]): string[] => {
     const ids: string[] = []
-    const walk = (list: any[]) => {
+    const walk = (list: {id: string | number, children?: {id: string | number, children?: any[]}[]) => {
       list.forEach(n => {
         ids.push(String(n.id))
         if (n.children?.length) walk(n.children)
@@ -82,7 +90,7 @@
     try {
       // 列表行不含 permissionIds，需从详情接口获取准确回显数据
       const detail = await getRoleDetail(props.row!.id)
-      permissionTree.value = await getPermissionTree()
+      permissionNodes.value = await getPermissionTree()
       await nextTick()
       permissionTreeRef.value?.setCheckedKeys(detail.permissionIds ?? [])
     } catch {
@@ -106,7 +114,7 @@
 
   watch(() => props.visible, (visible) => {
     if (visible && props.row) {
-      permissionTree.value = []
+      permissionNodes.value = []
       menuTree.value = []
       loading.value = true
       const done = () => {
@@ -130,7 +138,10 @@
       ElMessage.warning('权限树未加载完成，请稍后重试')
       return
     }
-    const keys = [...tree.getCheckedKeys(false), ...tree.getHalfCheckedKeys()].map(k => String(k))
+    // 剔除虚拟的"全部"节点，避免把 __all__ 提交给后端
+    const keys = [...tree.getCheckedKeys(false), ...tree.getHalfCheckedKeys()]
+      .map(k => String(k))
+      .filter(k => k !== ALL_NODE_ID)
     saving.value = true
     try {
       if (props.mode === 'permission') {
@@ -171,7 +182,11 @@
         node-key="id"
         show-checkbox
         default-expand-all
-      />
+      >
+        <template #default="{ data }">
+          <span :class="{'all-node': data.id === ALL_NODE_ID}">{{ data.name }}</span>
+        </template>
+      </el-tree>
       <el-tree
         v-else
         ref="menuTreeRef"
@@ -196,5 +211,9 @@
     border: 1px solid #e4e7ed;
     border-radius: 4px;
     padding: 8px;
+
+    :deep(.all-node) {
+      font-weight: 600;
+    }
   }
 </style>
