@@ -13,7 +13,16 @@
     "lint": "run-s \"lint:*\"",
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write .",
+    "precommit": "lint-staged",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,vue}": [
+      "eslint --fix --cache",
+      "prettier --write"
+    ],
+    "*.{json,css,scss,sass,less,html,md,yml,yaml}": "prettier --write"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
@@ -38,8 +47,10 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-oxlint": "~1.79.0",
     "eslint-plugin-vue": "~10.9.2",
+    "husky": "^9.1.7",
     "jiti": "^2.7.0",
     "jsdom": "^29.1.1",
+    "lint-staged": "^16.4.0",
     "npm-run-all2": "^9.0.2",
     "oxlint": "~1.79.0",
     "prettier": "3.9.5",

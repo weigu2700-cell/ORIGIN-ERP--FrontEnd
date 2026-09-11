@@ -26,6 +26,17 @@ export default defineConfigWithVueTs(
     files: ['src/**/__tests__/*'],
   },
 
+  {
+    name: 'app/code-style',
+    rules: {
+      'eol-last': ['error', 'always'],
+      'no-multiple-empty-lines': ['error', { max: 1, maxBOF: 0, maxEOF: 0 }],
+      'padded-blocks': ['error', 'never'],
+      // 页面按目录组织并普遍命名为 index.vue，目录名已经提供完整语义。
+      'vue/multi-word-component-names': 'off',
+    },
+  },
+
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
 
   skipFormatting,

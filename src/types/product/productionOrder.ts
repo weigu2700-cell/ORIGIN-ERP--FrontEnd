@@ -31,7 +31,7 @@ export interface ProductionOrderVo {
   materialCode: string
   materialName: string
   plannedQuantity: number
-  actualQuantity: number
+  completedQuantity: number
   plannedStartTime: string
   plannedEndTime: string
   actualStartTime: string

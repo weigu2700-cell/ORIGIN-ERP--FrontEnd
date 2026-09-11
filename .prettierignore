@@ -1,0 +1,6 @@
+dist
+coverage
+node_modules
+.idea
+.playwright-cli
+package-lock.json

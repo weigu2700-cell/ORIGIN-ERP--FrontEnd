@@ -16,35 +16,47 @@ export interface DashboardOverview {
     salesToDeliver: number
   }
   productionStatus: Array<{ name: string; value: number }>
-  recentOrders: Array<{ id: string; title: string; detail: string; time: string; path: string; tone: string }>
+  recentOrders: Array<{
+    id: string
+    title: string
+    detail: string
+    time: string
+    path: string
+    tone: string
+  }>
   failedRequests: number
 }
 
-const totalOf = (result: PromiseSettledResult<{ total: number }>) => result.status === 'fulfilled' ? result.value.total : 0
+const totalOf = (result: PromiseSettledResult<{ total: number }>) =>
+  result.status === 'fulfilled' ? result.value.total : 0
 
 export async function getDashboardOverview(): Promise<DashboardOverview> {
   const requests = [
     getPageProductionDemand({ pageNum: 1, pageSize: 1, status: 'PENDING' }),
-    ...[0, 1, 2, 3, 4].map(status => getPageProductionOrder({ pageNum: 1, pageSize: 1, status })),
+    ...[0, 1, 2, 3, 4].map((status) => getPageProductionOrder({ pageNum: 1, pageSize: 1, status })),
     getPagePurchaseOrder({ pageNum: 1, pageSize: 1, status: 'DRAFT' }),
     getPagePurchaseOrder({ pageNum: 1, pageSize: 1, status: 'SHIPPED' }),
-    getPageSalesOrder({ pageNum: 1, pageSize: 1, orderNo: '', customerId: '', status: 1 }),
+    getPageSalesOrder({
+      pageNum: 1,
+      pageSize: 1,
+      orderNo: '',
+      customerId: '',
+      status: 'CONFIRMED',
+    }),
     getPageProductionOrder({ pageNum: 1, pageSize: 4 }),
     getPagePurchaseOrder({ pageNum: 1, pageSize: 4 }),
   ] as const
   const results = await Promise.allSettled(requests)
-  const totals = results.slice(0, 9).map(result => totalOf(result as PromiseSettledResult<{ total: number }>))
+  const totals = results.slice(0, 9).map((result) => totalOf(result as PromiseSettledResult<{ total: number }>))
   const productionResult = results[9]
   const purchaseResult = results[10]
-  const productionRecent = productionResult?.status === 'fulfilled'
-    ? (productionResult.value as PageResult<ProductionOrderVo>).records
-    : []
-  const purchaseRecent = purchaseResult?.status === 'fulfilled'
-    ? (purchaseResult.value as PageResult<PurchaseOrderVo>).records
-    : []
+  const productionRecent =
+    productionResult?.status === 'fulfilled' ? (productionResult.value as PageResult<ProductionOrderVo>).records : []
+  const purchaseRecent =
+    purchaseResult?.status === 'fulfilled' ? (purchaseResult.value as PageResult<PurchaseOrderVo>).records : []
 
   const recentOrders = [
-    ...productionRecent.map(row => ({
+    ...productionRecent.map((row) => ({
       id: `production-${row.id}`,
       title: row.productionOrderNo,
       detail: `${row.materialName ?? '未知物料'} · 计划 ${row.plannedQuantity ?? 0}`,
@@ -52,7 +64,7 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
       path: '/product/productionOrder',
       tone: 'production',
     })),
-    ...purchaseRecent.map(row => ({
+    ...purchaseRecent.map((row) => ({
       id: `purchase-${row.id}`,
       title: row.purchaseOrderNo,
       detail: `${row.supplierName ?? '供应商待补充'} · ${row.materialName ?? '未知物料'}`,
@@ -60,7 +72,9 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
       path: '/purchase/purchaseOrder',
       tone: 'purchase',
     })),
-  ].sort((a, b) => b.time.localeCompare(a.time)).slice(0, 6)
+  ]
+    .sort((a, b) => b.time.localeCompare(a.time))
+    .slice(0, 6)
 
   return {
     metrics: {
@@ -76,6 +90,6 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
       value: totals[index + 1] ?? 0,
     })),
     recentOrders,
-    failedRequests: results.filter(result => result.status === 'rejected').length,
+    failedRequests: results.filter((result) => result.status === 'rejected').length,
   }
 }

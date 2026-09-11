@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { BomVo } from '@/types/product/Bom';
-import { formatDecimal } from '@/composables/useFormat';
+import type { BomVo } from '@/types/product/Bom'
+import { formatDecimal } from '@/composables/useFormat'
 
 const props = defineProps<{
-  visible: boolean;
-  row?: BomVo | null;
-}>();
+  visible: boolean
+  row?: BomVo | null
+}>()
 
 const emit = defineEmits<{
-  (e: 'cancel'): void;
-}>();
+  (e: 'cancel'): void
+}>()
 
-const handleClose = () => emit('cancel');
+const handleClose = () => emit('cancel')
 </script>
 
 <template>
@@ -36,14 +36,10 @@ const handleClose = () => emit('cancel');
       <el-table-column label="组成物料编码" prop="componentMaterialCode" width="200" />
       <el-table-column label="组成物料名称" prop="componentMaterialName" min-width="180" />
       <el-table-column label="数量" prop="quantity" width="100" align="right">
-        <template #default="{ row }">
-          {{ formatDecimal.default(row.quantity, 2) }}
-        </template>
+        <template #default="{ row }">{{ formatDecimal.default(row.quantity, 2) }}</template>
       </el-table-column>
       <el-table-column label="损耗率(%)" prop="lossRate" width="100" align="right">
-        <template #default="{ row }">
-          {{ formatDecimal.default(row.lossRate, 2) }}
-        </template>
+        <template #default="{ row }">{{ formatDecimal.default(row.lossRate, 2) }}</template>
       </el-table-column>
       <el-table-column label="备注" prop="remark" min-width="120" />
     </el-table>

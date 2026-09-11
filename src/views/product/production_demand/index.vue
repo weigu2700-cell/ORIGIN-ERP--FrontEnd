@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import ProTable, { type ProColumn } from '@/components/ProTable.vue';
-import { computed, onMounted, ref, reactive } from 'vue';
-import { getPageProductionDemand } from '@/api/product/productionDemand';
-import type { ProductionDemandVo, ProductionDemandQuery } from '@/types/product/productionDemand';
-import type { PageResult } from '@/types/common';
-import ProToolbar from '@/components/ProToolbar.vue';
+import ProTable, { type ProColumn } from '@/components/ProTable.vue'
+import { computed, onMounted, ref, reactive } from 'vue'
+import { getPageProductionDemand } from '@/api/product/productionDemand'
+import type { ProductionDemandVo, ProductionDemandQuery } from '@/types/product/productionDemand'
+import type { PageResult } from '@/types/common'
+import ProToolbar from '@/components/ProToolbar.vue'
 import Selector from './components/selector.vue'
 import DetailDialog from './components/detailDialog.vue'
-import { formatDecimal } from '@/composables/useFormat';
+import { formatDecimal } from '@/composables/useFormat'
 import ProPageHeader, { type ProPageHeaderCard } from '@/components/ProPageHeader.vue'
-
 
 const queryData = reactive<ProductionDemandQuery>({
   pageNum: 1,
@@ -17,21 +16,21 @@ const queryData = reactive<ProductionDemandQuery>({
   demandNo: '',
   materialId: '',
   sourceType: '',
-  status: ''
-});
+  status: '',
+})
 
-const tableData = ref<PageResult<ProductionDemandVo>>();
-const selectedRowId = ref<string>();
+const tableData = ref<PageResult<ProductionDemandVo>>()
+const selectedRowId = ref<string>()
 const detailVisible = ref<boolean>(false)
 const currentDetailId = ref<string>()
 
 const handleSelectionChange = (rows: ProductionDemandVo[]) => {
-  selectedRowId.value = rows[0] ? String(rows[0].id) : undefined;
-};
+  selectedRowId.value = rows[0] ? String(rows[0].id) : undefined
+}
 
 const loadData = async () => {
-  tableData.value = await getPageProductionDemand(queryData);
-};
+  tableData.value = await getPageProductionDemand(queryData)
+}
 
 const columns = ref<ProColumn<ProductionDemandVo>[]>([
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
@@ -40,19 +39,19 @@ const columns = ref<ProColumn<ProductionDemandVo>[]>([
   { label: '物料名称', prop: 'materialName', width: 160 },
   { label: '数量', prop: 'quantity', width: 100, slot: 'quantity' },
   { label: '来源类型', prop: 'sourceType', width: 120, slot: 'sourceType' },
-  { label: '来源单号', prop: 'sourceNo', width: 180 }
-]);
+  { label: '来源单号', prop: 'sourceNo', width: 180 },
+])
 
 const sourceTypeMap: Record<string, string> = {
   SALES_ORDER: '销售订单',
   FORECAST: '预测',
-  MANUAL: '手工创建'
+  MANUAL: '手工创建',
 }
 
 const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
   PENDING: { label: '待生产', type: 'info' },
   PLANNED: { label: '已计划', type: 'success' },
-  CANCELLED: { label: '已取消', type: 'danger' }
+  CANCELLED: { label: '已取消', type: 'danger' },
 }
 
 const quickStatusOptions = [
@@ -66,7 +65,7 @@ const statusCards = computed<ProPageHeaderCard[]>(() => {
   for (const record of tableData.value?.records ?? []) {
     counts.set(record.status, (counts.get(record.status) ?? 0) + 1)
   }
-  return quickStatusOptions.map(option => ({
+  return quickStatusOptions.map((option) => ({
     ...option,
     count: counts.get(option.value) ?? 0,
     hint: '条 · 当前页',
@@ -74,8 +73,8 @@ const statusCards = computed<ProPageHeaderCard[]>(() => {
 })
 
 const handleQuery = () => {
-  queryData.pageNum = 1;
-  loadData();
+  queryData.pageNum = 1
+  loadData()
 }
 
 const handleQuickStatus = (status: string | number | null) => {
@@ -84,12 +83,12 @@ const handleQuickStatus = (status: string | number | null) => {
 }
 
 const handleReset = () => {
-  queryData.demandNo = '';
-  queryData.materialId = '';
-  queryData.sourceType = '';
-  queryData.status = '';
-  queryData.pageNum = 1;
-  loadData();
+  queryData.demandNo = ''
+  queryData.materialId = ''
+  queryData.sourceType = ''
+  queryData.status = ''
+  queryData.pageNum = 1
+  loadData()
 }
 
 const handleRefresh = () => {
@@ -102,16 +101,20 @@ const handleRowDblclick = (row: ProductionDemandVo) => {
 }
 
 onMounted(() => {
-  loadData();
-});
-
+  loadData()
+})
 </script>
 
 <template>
   <div class="container">
-    <ProPageHeader title="生产需求" description="查看生产需求，跟踪计划安排与需求状态"
-      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`" :cards="statusCards"
-      :model-value="queryData.status" @change="handleQuickStatus">
+    <ProPageHeader
+      title="生产需求"
+      description="查看生产需求，跟踪计划安排与需求状态"
+      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`"
+      :cards="statusCards"
+      :model-value="queryData.status"
+      @change="handleQuickStatus"
+    >
       <template #search>
         <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
       </template>
@@ -120,17 +123,30 @@ onMounted(() => {
       </template>
     </ProPageHeader>
     <section class="table">
-      <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
-        :page="queryData.pageNum" :page-size="queryData.pageSize"
-        @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
-        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
-        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
-        <template #quantity="{ row }">
-          {{ formatDecimal.default(row.quantity, 0) }}
-        </template>
-        <template #sourceType="{ row }">
-          {{ sourceTypeMap[row.sourceType] ?? row.sourceType }}
-        </template>
+      <ProTable
+        :data="tableData?.records ?? []"
+        :columns="columns"
+        :total="tableData?.total ?? 0"
+        :page="queryData.pageNum"
+        :page-size="queryData.pageSize"
+        @update:page="
+          (p: number) => {
+            queryData.pageNum = p
+            loadData()
+          }
+        "
+        @update:pageSize="
+          (s: number) => {
+            queryData.pageSize = s
+            queryData.pageNum = 1
+            loadData()
+          }
+        "
+        @selectionChange="handleSelectionChange"
+        @rowDblclick="handleRowDblclick"
+      >
+        <template #quantity="{ row }">{{ formatDecimal.default(row.quantity, 0) }}</template>
+        <template #sourceType="{ row }">{{ sourceTypeMap[row.sourceType] ?? row.sourceType }}</template>
         <template #status="{ row }">
           <el-tag :type="statusMap[row.status]?.type ?? 'info'">
             {{ statusMap[row.status]?.label ?? row.status }}
