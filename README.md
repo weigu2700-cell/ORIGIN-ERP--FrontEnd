@@ -1,228 +1,190 @@
-# 原点 ERP · ORIGIN 前端
+<div align="center">
+  <img src="./public/origin-manufacturing-logo.svg" alt="ORIGIN ERP" width="360" />
 
-基于 Vue 3、TypeScript、Vite 和 Element Plus 的制造业 ERP Web 前端，与 ORIGIN ERP Spring Boot 后端配套使用。
+  <h1>ORIGIN ERP Web</h1>
 
-- 前端仓库：[ORIGIN-ERP--FrontEnd](https://github.com/weigu2700-cell/ORIGIN-ERP--FrontEnd)
-- 后端仓库：[ORIGIN-ERP-BackEnd](https://github.com/weigu2700-cell/ORIGIN-ERP-BackEnd)
+  <p>面向制造企业的现代化 ERP 管理端，以订单为核心串联销售、采购、库存、BOM 与生产执行。</p>
 
-## 当前功能
+  <p>
+    <img src="https://img.shields.io/badge/Vue-3.5-42b883?logo=vuedotjs&logoColor=white" alt="Vue 3.5" />
+    <img src="https://img.shields.io/badge/TypeScript-6.0-3178c6?logo=typescript&logoColor=white" alt="TypeScript 6" />
+    <img src="https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white" alt="Vite 8" />
+    <img src="https://img.shields.io/badge/Element_Plus-2.14-409eff?logo=elementplus&logoColor=white" alt="Element Plus" />
+  </p>
+</div>
 
-### 工作台与框架
+## 项目简介
 
-- 制造业风格登录页、品牌 Logo 和响应式布局
-- 后端菜单驱动的动态路由
-- 可展开、收起的多级侧边栏
-- 面包屑导航
-- 浅色、深色模式和多套品牌配色
-- Header 展示当前用户真实姓名
-- 右上角菜单模糊搜索，输入后显示权限范围内的页面，点击直接跳转
+ORIGIN ERP Web 是原点 ERP 的桌面管理端。项目采用 Vue 3、TypeScript、Vite 和 Element Plus 构建，通过后端菜单与权限动态生成业务导航，并提供统一的查询、表格、参照选择、单据详情和状态流转体验。
 
-### 系统管理
+配套项目：
 
-- 用户分页查询、新增、修改、状态管理
-- 用户真实姓名展示与查询
-- 用户分配角色和部门
-- 角色管理、权限分配和菜单分配
-- 部门、菜单和权限的树形管理页面
+- [ORIGIN ERP 后端](https://github.com/weigu2700-cell/ORIGIN-ERP-BackEnd)
+- [ORIGIN ERP 移动端](https://github.com/weigu2700-cell/ORIGIN-ERP-Moblie)
 
-### 基础资料
+## 项目亮点
 
-- 客户、供应商
-- 工厂、车间、生产线
-- 仓库、物料
-- 物料供应商关系
-- 通用查询、分页、详情、编辑和状态操作
+- **制造业务闭环**：销售订单、生产需求、BOM、生产订单、领料、采购和库存围绕同一业务链路协同。
+- **权限驱动路由**：登录后根据当前用户菜单生成路由和侧边栏，并兼容驼峰、帕斯卡、下划线及历史菜单路径。
+- **订单化交互**：销售、采购、生产相关详情采用统一单据结构，突出单号、状态、业务摘要、明细和金额。
+- **状态流转可视化**：订单确认、审核、下达、开工、完工、取消、上架等操作随当前状态动态显示。
+- **高复用业务组件**：沉淀 `ProTable`、`ProSearch`、`ProToolbar`、`ProTree`、`ReferPicker` 和单据详情容器。
+- **类型安全**：接口、查询条件和业务实体集中建模；雪花 ID 全程按字符串处理，避免 JavaScript 精度损失。
+- **自动质量门禁**：ESLint、Oxlint、Prettier、Husky 和 lint-staged 在提交前自动检查并修复代码。
+- **一致的视觉系统**：支持深浅主题、品牌配色、响应式布局和制造业工作台。
 
-### 销售与库存
+## 功能模块
 
-- 销售订单及明细维护、确认和取消
-- 销售出库单及明细、确认、完成和取消
-- 物料库存查询和详情
-- 库存流水查询、导入和导出
-
-### BOM 与生产
-
-- BOM 管理
-- BOM 树查询：左侧物料结构，右侧子物料明细
-- 多级 BOM 展开和物料需求展示
-- 生产需求查询与详情
-- 生产订单创建、查询、详情及状态流转
-- 从销售订单创建生产需求
+| 模块     | 主要能力                                                 |
+| -------- | -------------------------------------------------------- |
+| 工作台   | 业务概览、用户信息、主题切换、菜单搜索                   |
+| 系统管理 | 用户、角色、部门、菜单、权限及关联分配                   |
+| 基础资料 | 客户、供应商、物料、仓库、工厂、车间、生产线、物料供应商 |
+| 销售管理 | 销售订单、订单明细、确认/取消、销售出库及状态流转        |
+| 库存管理 | 物料库存、库存明细、库存流水、导入导出                   |
+| BOM 管理 | BOM 新增、详情、启用/停用、多级结构与需求展开            |
+| 生产管理 | 生产需求、生产订单、下达/开工/完工/取消、生产领料        |
+| 采购管理 | 采购需求、采购订单、采购入库审核与上架                   |
 
 ## 技术栈
 
-| 分类 | 技术 | 版本 |
-| --- | --- | --- |
-| 核心框架 | Vue | ^3.5 |
-| 语言 | TypeScript | ~6.0 |
-| 构建 | Vite | ^8.1 |
-| 路由 | Vue Router | ^5.2 |
-| 状态管理 | Pinia | ^4.0 |
-| UI | Element Plus | ^2.14 |
-| 请求 | Axios | ^1.19 |
-| 工具 | VueUse | ^14.4 |
-| 质量检查 | vue-tsc、ESLint、Oxlint、Vitest | - |
-
-Node.js 要求：^22.18.0 或 >=24.12.0。
-
-## 项目结构
-
-~~~text
-src
-├── api/          # 按业务模块划分的接口封装
-├── components/   # ProTable、ProSearch、ProToolbar、ProTree 等通用组件
-├── layout/       # Header、Sidebar、面包屑和基础布局
-├── refer/        # 业务参照选择组件
-├── router/       # 静态路由、动态路由生成和路由守卫
-├── stores/       # 用户、权限菜单和界面状态
-├── styles/       # 全局主题与布局样式
-├── types/        # 请求、响应和业务模型类型
-├── utils/        # 请求、Token、存储和图标工具
-└── views/
-    ├── home/
-    ├── system/
-    ├── master/
-    ├── inventory/
-    ├── sales/
-    └── product/  # BOM、生产需求和生产订单
-~~~
+| 分类       | 技术                                      |
+| ---------- | ----------------------------------------- |
+| 核心框架   | Vue 3.5、Composition API                  |
+| 开发语言   | TypeScript 6                              |
+| 构建工具   | Vite 8                                    |
+| UI 组件    | Element Plus 2.14                         |
+| 路由与状态 | Vue Router 5、Pinia 4                     |
+| 网络请求   | Axios                                     |
+| 数据可视化 | ECharts                                   |
+| 工程质量   | ESLint、Oxlint、Prettier、vue-tsc、Vitest |
+| Git 工作流 | Husky、lint-staged                        |
 
 ## 快速开始
 
-~~~bash
+### 环境要求
+
+- Node.js `^22.18.0` 或 `>=24.12.0`
+- npm 10+
+- 已启动的 [ORIGIN ERP 后端](https://github.com/weigu2700-cell/ORIGIN-ERP-BackEnd)
+
+### 安装与启动
+
+```bash
 git clone https://github.com/weigu2700-cell/ORIGIN-ERP--FrontEnd.git
 cd ORIGIN-ERP--FrontEnd
 
 npm install
 npm run dev
-~~~
+```
 
-开发服务器默认使用 Vite 地址，通常为 http://localhost:5173。
+开发地址以终端输出为准，通常为 <http://localhost:5173>。
 
-启动前请确保后端服务运行在 http://localhost:8080，或修改环境变量指向实际接口地址。
+### 环境变量
 
-## 环境变量
+开发环境默认读取 `.env.development`：
 
-开发环境示例：
-
-~~~dotenv
+```dotenv
 VITE_API_URL=http://localhost:8080
-~~~
+```
 
-| 变量 | 说明 |
-| --- | --- |
-| VITE_API_URL | 后端 API 根地址 |
+生产部署时在 `.env.production` 或部署平台中设置真实接口地址：
 
-请求由浏览器直接发送到该地址，后端需要允许对应前端域名跨域访问。
+```dotenv
+VITE_API_URL=https://api.example.com
+```
+
+> `VITE_` 前缀变量会进入浏览器产物，请勿在其中保存密码、Token 或其他密钥。
 
 ## 常用命令
 
-~~~bash
-# 开发
-npm run dev
+| 命令                 | 说明                            |
+| -------------------- | ------------------------------- |
+| `npm run dev`        | 启动开发服务器                  |
+| `npm run type-check` | 检查 TypeScript 与 Vue 模板类型 |
+| `npm run lint`       | 执行 Oxlint 与 ESLint 自动修复  |
+| `npm run format`     | 使用 Prettier 格式化项目        |
+| `npm run test:unit`  | 运行 Vitest 单元测试            |
+| `npm run build`      | 并行执行类型检查与生产构建      |
+| `npm run build-only` | 仅执行 Vite 生产构建            |
+| `npm run preview`    | 本地预览生产产物                |
 
-# TypeScript 和 Vue 模板检查
-npm run type-check
+安装依赖后 Husky 会自动启用。提交时 lint-staged 只检查暂存的前端文件，并自动执行 ESLint 与 Prettier。
 
-# 完整构建
-npm run build
+## 项目结构
 
-# 仅执行 Vite 构建
-npm run build-only
+```text
+src/
+├── api/          # 按业务域划分的接口封装
+├── components/   # 通用页面、表格、工具栏和单据组件
+├── composables/  # 可复用组合式逻辑
+├── layout/       # 顶栏、侧边栏、面包屑和基础布局
+├── refer/        # 客户、物料、仓库、订单等参照选择器
+├── router/       # 静态路由、动态路由解析和守卫
+├── stores/       # 用户、权限与应用状态
+├── styles/       # 全局样式和主题变量
+├── types/        # 接口 DTO、VO 与业务类型
+├── utils/        # 请求、认证、存储和图标工具
+└── views/
+    ├── home/      # 工作台
+    ├── system/    # 系统管理
+    ├── master/    # 基础资料
+    ├── inventory/ # 库存管理
+    ├── sales/     # 销售管理
+    ├── purchase/  # 采购管理
+    └── product/   # BOM 与生产管理
+```
 
-# ESLint 与 Oxlint
-npm run lint
+## 核心设计
 
-# 单元测试
-npm run test:unit
+### 动态菜单与权限
 
-# 预览构建结果
-npm run preview
-~~~
+```text
+登录 → 获取用户信息 → 获取菜单树 → 注册动态路由 → 渲染侧边栏 → 进入业务页面
+```
 
-## 核心约定
+菜单决定页面入口，后端 Permission 与 Spring Security 决定接口操作权限。菜单组件路径支持以下写法：
 
-### 请求封装
-
-页面通过 src/api 下的模块调用接口，不直接使用 Axios。统一请求层位于 src/utils/request.ts，负责：
-
-- 添加 Authorization Bearer Token
-- 解包后端统一响应
-- 统一处理业务错误和 401 登录失效
-
-### 雪花 ID
-
-后端 Long 主键可能超过 JavaScript 安全整数范围。前端接口类型统一使用字符串保存 ID，禁止使用 Number(id) 转换。
-
-### 动态菜单与路由
-
-登录后通过 GET /system/menu/current 获取当前用户菜单树，并根据菜单的 component 字段匹配 src/views 下的 Vue 页面。
-
-支持以下组件路径形式：
-
-~~~text
+```text
 master/material
 master/material/index
-master/productionLine/index
-master/production_line/index
-~~~
+product/Bom/BomManagement/index
+product/bom/bom_management/index
+```
 
-路由生成器会兼容驼峰、下划线和连字符目录名。工作台统一映射到 src/views/home/home.vue。
+### 统一请求层
 
-### 菜单搜索
+页面只调用 `src/api` 中的业务接口。`src/utils/request.ts` 负责：
 
-Header 搜索框通过 input 事件触发，并进行短延时防抖：
+- 自动添加 Bearer Token；
+- 解包后端统一响应；
+- 统一处理业务异常和网络异常；
+- 在登录失效时清理会话并返回登录页。
 
-~~~http
-GET /system/menu/search?keyword=用户
-~~~
+### 通用业务页面
 
-后端仅返回当前用户有权限访问且可跳转的菜单。搜索结果点击后通过 Vue Router 跳转。
+列表页优先组合通用组件：
 
-### 通用页面结构
+```text
+ProPageHeader + ProSearch + ProToolbar + ProTable + ReferPicker
+```
 
-业务列表页优先复用：
+订单详情统一使用 `BusinessDocumentDialog`，使销售、采购和生产单据拥有一致的信息层级与操作体验。
 
-- ProSearch：查询条件
-- ProToolbar：新增、修改、状态、刷新、导入和导出
-- ProTable：列表、选择和分页
-- ProTree：左侧树形结构
-- BaseSaveDialog：新增、修改弹窗
-- refer 目录：部门、物料、BOM、生产需求等参照选择
+## 开发规范
 
-### 菜单图标
+- 使用 `<script setup lang="ts">` 和 Composition API。
+- API、类型和页面按业务域组织，页面不直接调用 Axios。
+- 相邻函数之间保留一个空行，简单模板插值保持紧凑。
+- 状态操作必须同时校验当前选中记录和允许流转的业务状态。
+- 后端 `Long` 主键在前端统一使用字符串，不执行 `Number(id)` 转换。
+- 提交前至少执行 `npm run type-check` 和 `npm run build-only`。
 
-菜单 icon 保存 Element Plus 图标组件名，例如 User、Setting。包含连字符、空格、点或斜线的值按 CSS 类名处理。
+## 参与贡献
 
-## 登录与权限流程
+1. Fork 仓库并创建功能分支：`git checkout -b feature/your-feature`
+2. 完成功能并执行类型检查、Lint 和构建
+3. 使用清晰的提交信息，例如：`feat: add production picking workflow`
+4. 推送分支并创建 Pull Request，说明改动目的、影响范围和验证方式
 
-~~~text
-登录
-  ↓
-保存 JWT
-  ↓
-获取当前用户信息
-  ↓
-获取当前用户菜单树
-  ↓
-注册动态路由
-  ↓
-渲染侧边栏与业务页面
-~~~
-
-菜单控制页面入口，后端 Permission 与 Spring Security 负责接口操作权限。
-
-## 开发检查
-
-提交前至少执行：
-
-~~~bash
-npm run type-check
-npm run build-only
-~~~
-
-修改公共组件、路由或类型后，同时执行：
-
-~~~bash
-npm run lint
-~~~
+问题与建议请提交到 [GitHub Issues](https://github.com/weigu2700-cell/ORIGIN-ERP--FrontEnd/issues)。
