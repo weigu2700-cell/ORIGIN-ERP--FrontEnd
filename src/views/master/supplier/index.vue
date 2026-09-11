@@ -3,7 +3,7 @@ import Selector from "@/views/master/supplier/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
-import { changeSupplierStatus, createSupplier, getSupplierList, updateSupplier } from "@/api/master/supplier.ts";
+import { changeSupplierStatus, addSupplier, getPageSupplierList, updateSupplier } from "@/api/master/supplier.ts";
 import type {
   SupplierCreateRequest,
   SupplierListRequest,
@@ -38,7 +38,7 @@ const handleSelectionChange = (rows: SupplierVO[]) => {
 }
 
 const loadData = async () => {
-  tableData.value = await getSupplierList(queryData)
+  tableData.value = await getPageSupplierList(queryData)
 }
 
 const columns = ref<ProColumn<SupplierVO>[]>([
@@ -132,7 +132,7 @@ const handleSubmit = async (form: SupplierCreateRequest | SupplierUpdateRequest)
     if (model.value === 'edit' && selectedRowId.value) {
       await updateSupplier(selectedRowId.value, form as SupplierUpdateRequest)
     } else {
-      await createSupplier(form as SupplierCreateRequest)
+      await addSupplier(form as SupplierCreateRequest)
     }
     ElMessage.success('保存成功')
     visible.value = false

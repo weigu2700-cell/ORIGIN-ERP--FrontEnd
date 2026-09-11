@@ -44,10 +44,13 @@ defineExpose({
 // 把最后一列转为弹性列（min-width），吃掉剩余空间使表格撑满
 const tableColumns = computed(() => {
   const cols = props.columns.map((c) => ({ ...c }))
-  if (cols.length > 0 && cols.every((c) => c.width != null)) {
+  if (cols.length > 0) {
     const last = cols[cols.length - 1]!
-    last.minWidth = last.minWidth ?? last.width
-    last.width = undefined
+    // 如果最后一列没有 minWidth，则将其 width 转为 minWidth
+    if (last.minWidth == null) {
+      last.minWidth = last.width ?? 100
+      last.width = undefined
+    }
   }
   return cols
 })

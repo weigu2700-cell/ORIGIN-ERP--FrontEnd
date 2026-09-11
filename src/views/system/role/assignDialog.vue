@@ -6,8 +6,8 @@ import type { RoleInfo } from "@/types/system/role.ts";
 import type { PermissionNode } from "@/types/system/permission.ts";
 import type { MenuTreeNode, MenuListVO } from "@/types/system/menu.ts";
 import { getPermissionTree } from "@/api/system/permission.ts";
-import { getMenuTree, getMenuList } from "@/api/system/menu.ts";
-import { assignRolePermissions, assignRoleMenus, getRoleDetail } from "@/api/system/role.ts";
+import { getMenuTree, getPageMenuList } from "@/api/system/menu.ts";
+import { assignRolePermissions, assignRoleMenus, getDetailRole } from "@/api/system/role.ts";
 
 const props = defineProps<{
   visible: boolean
@@ -53,7 +53,7 @@ const fetchAllMenus = async (): Promise<MenuTreeNode[]> => {
   const pageSize = 100
   let page = 1
   for (; ;) {
-    const res = await getMenuList({
+    const res = await getPageMenuList({
       page,
       pageSize,
       title: null,
@@ -89,7 +89,7 @@ const fetchAllMenus = async (): Promise<MenuTreeNode[]> => {
 const loadPermissionTree = async () => {
   try {
     // 列表行不含 permissionIds，需从详情接口获取准确回显数据
-    const detail = await getRoleDetail(props.row!.id)
+    const detail = await getDetailRole(props.row!.id)
     permissionNodes.value = await getPermissionTree()
     await nextTick()
     permissionTreeRef.value?.setCheckedKeys(detail.permissionIds ?? [])

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Search } from "@element-plus/icons-vue";
+import { el } from "element-plus/es/locale/index.mjs";
 
 const emit = defineEmits<{
   (e: 'search'): void

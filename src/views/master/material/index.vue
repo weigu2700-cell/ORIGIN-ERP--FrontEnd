@@ -5,8 +5,8 @@ import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
 import {
   changeMaterialStatus,
-  createMaterial,
-  getMaterialList,
+  addMaterial,
+  getPageMaterialList,
   updateMaterial
 } from "@/api/master/material.ts";
 import type {
@@ -43,7 +43,7 @@ const handleSelectionChange = (rows: MaterialVO[]) => {
 }
 
 const loadData = async () => {
-  tableData.value = await getMaterialList(queryData)
+  tableData.value = await getPageMaterialList(queryData)
 }
 
 const columns = ref<ProColumn<MaterialVO>[]>([
@@ -146,7 +146,7 @@ const handleSubmit = async (form: MaterialCreateRequest | MaterialUpdateRequest)
     if (model.value === 'edit' && selectedRowId.value) {
       await updateMaterial(selectedRowId.value, form as MaterialUpdateRequest)
     } else {
-      await createMaterial(form as MaterialCreateRequest)
+      await addMaterial(form as MaterialCreateRequest)
     }
     ElMessage.success('保存成功')
     visible.value = false

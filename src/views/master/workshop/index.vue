@@ -3,7 +3,7 @@ import { onMounted, reactive, ref } from 'vue'
 import Selector from "@/views/master/workshop/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
-import { getWorkshopList, createWorkshop, updateWorkshop, changeWorkshopStatus } from "@/api/master/workshop.ts";
+import { getPageWorkshopList, addWorkshop, updateWorkshop, changeWorkshopStatus } from "@/api/master/workshop.ts";
 import type {
   WorkshopCreateRequest,
   WorkshopListRequest,
@@ -45,7 +45,7 @@ const loadData = async () => {
   try {
     // 完整记录实际发送的查询参数与后端返回，定位"保存成功但列表查不到"
     console.log('[workshop] loadData query =', JSON.stringify(queryData))
-    tableData.value = await getWorkshopList(queryData)
+    tableData.value = await getPageWorkshopList(queryData)
     console.log('[workshop] loadData res =', JSON.stringify(tableData.value))
   } catch {
     ElMessage.error('获取车间列表失败')
@@ -130,7 +130,7 @@ const handleSubmit = async (form: WorkshopCreateRequest | WorkshopUpdateRequest)
     if (model.value === 'edit' && selectedRowId.value) {
       await updateWorkshop(String(selectedRowId.value), form)
     } else {
-      await createWorkshop(form as WorkshopCreateRequest)
+      await addWorkshop(form as WorkshopCreateRequest)
     }
     ElMessage.success('保存成功')
     visible.value = false

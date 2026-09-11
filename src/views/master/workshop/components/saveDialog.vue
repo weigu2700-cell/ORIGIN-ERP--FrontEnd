@@ -3,7 +3,7 @@ import { reactive, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
 import FactoryRefer from "@/refer/FactoryRefer.vue";
-import { getWorkshopDetail } from "@/api/master/workshop.ts";
+import { getDetailWorkshop } from "@/api/master/workshop.ts";
 import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
 import type {
   WorkshopCreateRequest,
@@ -52,7 +52,7 @@ watch(() => props.modelValue, async (val) => {
   if (props.model === 'edit' && props.selectedRowId) {
     try {
       loading.value = true
-      const row: WorkshopVO = await getWorkshopDetail(String(props.selectedRowId))
+      const row: WorkshopVO = await getDetailWorkshop(String(props.selectedRowId))
       form.name = row.name
       form.shortName = row.shortName ?? ''
       form.factoryId = row.factoryId

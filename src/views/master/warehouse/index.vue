@@ -3,7 +3,7 @@ import Selector from "@/views/master/warehouse/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
-import { changeWarehouseStatus, createWarehouse, getWarehouseList, updateWarehouse } from "@/api/master/warehouse.ts";
+import { changeWarehouseStatus, addWarehouse, getPageWarehouseList, updateWarehouse } from "@/api/master/warehouse.ts";
 import type {
   WarehouseCreateRequest,
   WarehouseListRequest,
@@ -41,7 +41,7 @@ const handleSelectionChange = (rows: WarehouseVO[]) => {
 }
 
 const loadData = async () => {
-  tableData.value = await getWarehouseList(queryData)
+  tableData.value = await getPageWarehouseList(queryData)
 }
 
 const columns = ref<ProColumn<WarehouseVO>[]>([
@@ -142,7 +142,7 @@ const handleSubmit = async (form: WarehouseCreateRequest | WarehouseUpdateReques
     if (model.value === 'edit' && selectedRowId.value) {
       await updateWarehouse(selectedRowId.value, form as WarehouseUpdateRequest)
     } else {
-      await createWarehouse(form as WarehouseCreateRequest)
+      await addWarehouse(form as WarehouseCreateRequest)
     }
     ElMessage.success('保存成功')
     visible.value = false

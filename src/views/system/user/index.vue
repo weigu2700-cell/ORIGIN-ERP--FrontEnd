@@ -4,10 +4,10 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue";
 import type { UserQuery, getUserListResponse } from "@/types/system/user.ts";
 import {
-  getUserList,
-  createUser,
+  getPageUserList,
+  addUser,
   updateUser,
-  getUserDetail,
+  getDetailUser,
   updateUserStatus
 } from "@/api/system/user.ts";
 import ProToolbar from "@/components/ProToolbar.vue";
@@ -76,7 +76,7 @@ const statusTagType: Record<UserStatus, 'success' | 'warning' | 'info'> = {
 
 const handleQuery = async (queryData: UserQuery) => {
   try {
-    tableData.value = await getUserList(queryData)
+    tableData.value = await getPageUserList(queryData)
   } catch { }
 }
 
@@ -114,7 +114,7 @@ const handleEdit = async () => {
     return
   }
   try {
-    const detail = await getUserDetail(row.id)
+    const detail = await getDetailUser(row.id)
     dialogMode.value = 'edit'
     editRow.value = {
       id: detail.id,
@@ -163,7 +163,7 @@ const handleSubmit = async (form: UserAdd & { id?: string }) => {
       await updateUser(form as UserUpdate)
       ElMessage.success('修改成功')
     } else {
-      await createUser(form)
+      await addUser(form)
       ElMessage.success('新增成功')
     }
     dialogVisible.value = false

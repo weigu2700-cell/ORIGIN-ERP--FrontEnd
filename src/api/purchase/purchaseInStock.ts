@@ -4,7 +4,7 @@ import service from "@/utils/request"
 
 export function getPagePurchaseInStock(query: PurchaseInStockQuery) {
   return service.get<PurchaseInStockPage>(
-    "/purchaseInStock/page", 
+    "/purchase/in/stock", 
     {params: query}
   )
 }
@@ -12,6 +12,6 @@ export function getPagePurchaseInStock(query: PurchaseInStockQuery) {
 
 export function getDetailPurchaseInStock(id: string) {
   return service.get<PurchaseInStock>(
-    `/purchaseInStock/${id}`
+    `/purchase/in/stock/${id}`
   )
 }

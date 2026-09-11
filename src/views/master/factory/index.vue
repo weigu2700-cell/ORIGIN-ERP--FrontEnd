@@ -3,7 +3,7 @@ import Selector from "@/views/master/factory/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
-import { addFactory, changeFactoryStatus, getPageFactory, updateFactory } from "@/api/master/factory.ts";
+import { addFactory, changeFactoryStatus, getPageFactoryList, updateFactory } from "@/api/master/factory.ts";
 import type {
   FactoryAdd, FactoryUpdate,
   FactoryListRequest,
@@ -38,7 +38,7 @@ const handleSelectionChange = (rows: FactoryVO[]) => {
 }
 
 const loadData = async () => {
-  tableData.value = await getPageFactory(queryData)
+  tableData.value = await getPageFactoryList(queryData)
 }
 
 const columns = ref<ProColumn<FactoryVO>[]>([

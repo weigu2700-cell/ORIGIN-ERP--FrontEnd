@@ -6,11 +6,11 @@ import type {
   FactoryVO
 } from "@/types/master/factory.ts";
 
-export function getFactoryList(data: FactoryListRequest) {
+export function getPageFactoryList(data: FactoryListRequest) {
   return service.get<PageResult<FactoryVO>>('master/factory', {params: data})
 }
 
-export function getFactoryDetail(id: string) {
+export function getDetailFactory(id: string) {
   return service.get<FactoryVO>(`master/factory/${id}`)
 }
 

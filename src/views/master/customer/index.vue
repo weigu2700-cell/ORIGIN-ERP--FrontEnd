@@ -3,7 +3,7 @@ import Selector from "@/views/master/customer/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
-import { changeCustomerStatus, createCustomer, getCustomerList, updateCustomer } from "@/api/master/customer.ts";
+import { changeCustomerStatus, addCustomer, getPageCustomerList, updateCustomer } from "@/api/master/customer.ts";
 import type {
   CustomerCreateRequest,
   CustomerListRequest,
@@ -36,7 +36,7 @@ const handleSelectionChange = (rows: CustomerVO[]) => {
 }
 
 const loadData = async () => {
-  tableData.value = await getCustomerList(queryData)
+  tableData.value = await getPageCustomerList(queryData)
 }
 
 const columns = ref<ProColumn<CustomerVO>[]>([
@@ -128,7 +128,7 @@ const handleSubmit = async (form: CustomerCreateRequest | CustomerUpdateRequest)
       // 客户更新接口是 PUT master/customer，id 在 body 里
       await updateCustomer({ ...(form as CustomerUpdateRequest), id: selectedRowId.value })
     } else {
-      await createCustomer(form as CustomerCreateRequest)
+      await addCustomer(form as CustomerCreateRequest)
     }
     ElMessage.success('保存成功')
     visible.value = false

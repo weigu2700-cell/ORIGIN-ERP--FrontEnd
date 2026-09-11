@@ -38,6 +38,7 @@ export interface PurchaseInStockPage {
 export interface PurchaseInStockQuery {
   pageNum: number;
   pageSize: number;
+  purchaseInStockNo: string;
   purchaseOrderNo: string;
   materialId: string;
   supplierId: string;
