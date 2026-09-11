@@ -4,9 +4,9 @@ import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
-import { exportTransaction, getTransactionList, importTransaction } from "@/api/inventory/transaction.ts";
+import { exportTransaction, getPageTransactionList, importTransaction } from "@/api/inventory/transaction.ts";
 import DetailDialog from "@/views/inventory/transaction/components/detailDialog.vue";
-import type { TransactionListRequest, TransactionListResponse } from "@/types/inventory/transaction.ts";
+import type { TransactionListRequest, TransactionListResponse, TransactionVO } from "@/types/inventory/transaction.ts";
 import { formatDate, formatDecimal } from "@/composables/useFormat.ts";
 import PageHeader from "@/components/PageHeader.vue";
 
@@ -26,10 +26,10 @@ const detailRow = ref<TransactionListResponse['records'][number] | null>(null)
 const fileInput = ref<HTMLInputElement>()
 
 const loadData = async () => {
-  tableData.value = await getTransactionList(queryData)
+  tableData.value = await getPageTransactionList(queryData)
 }
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<TransactionVO>[]>([
   { label: '仓库', prop: 'warehouseName', minWidth: 130 },
   { label: '物料编码', prop: 'materialCode', width: 220 },
   { label: '物料名称', prop: 'materialName', minWidth: 140 },
@@ -119,8 +119,8 @@ const handleRowDblclick = (row: TransactionListResponse['records'][number]) => {
         <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
       </template>
       <template #toolbar>
-        <ProToolbar :show-add="false" :show-edit="false" :show-delete="false" show-import
-          @import="handleImport" @export="handleExport" @refresh="handleRefresh" />
+        <ProToolbar :show-add="false" :show-edit="false" :show-delete="false" show-import @import="handleImport"
+          @export="handleExport" @refresh="handleRefresh" />
       </template>
     </PageHeader>
     <input ref="fileInput" class="file-input" type="file" accept=".xlsx" @change="handleFileChange" />

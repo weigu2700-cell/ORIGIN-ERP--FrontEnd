@@ -8,15 +8,15 @@ import type {
   MaterialVO
 } from "@/types/master/material.ts";
 
-export function getMaterialList(data: MaterialListRequest) {
+export function getPageMaterialList(data: MaterialListRequest) {
   return service.get<MaterialListResponse>('master/material', {params: data})
 }
 
-export function getMaterialDetail(id: string) {
+export function getDetailMaterial(id: string) {
   return service.get<MaterialVO>(`master/material/${id}`)
 }
 
-export function createMaterial(data: MaterialCreateRequest) {
+export function addMaterial(data: MaterialCreateRequest) {
   return service.post<void>('master/material', data)
 }
 

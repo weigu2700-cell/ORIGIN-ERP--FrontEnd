@@ -2,11 +2,11 @@
 import ProSearch from '@/components/ProSearch.vue'
 import MaterialRefer from '@/refer/MaterialRefer.vue'
 import SupplierRefer from '@/refer/SupplierRefer.vue'
-import type { PagePurchaseOrderRequest } from '@/types/purchase/purchaseOrder'
+import type { PurchaseOrderQuery } from '@/types/purchase/purchaseOrder'
 
-const props = defineProps<{ queryData: PagePurchaseOrderRequest }>()
+const props = defineProps<{ queryData: PurchaseOrderQuery }>()
 const emit = defineEmits<{
-  (e: 'query', params: PagePurchaseOrderRequest): void
+  (e: 'query', params: PurchaseOrderQuery): void
   (e: 'reset'): void
 }>()
 </script>
@@ -22,7 +22,17 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
-.search-container { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
-.search-container > :deep(.el-input),
-.search-container > :deep(.el-select) { flex: 0 1 200px; min-width: 0; width: 200px; }
+.search-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.search-container> :deep(.el-input),
+.search-container> :deep(.el-select) {
+  flex: 0 1 200px;
+  min-width: 0;
+  width: 200px;
+}
 </style>

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import ProSearch from '@/components/ProSearch.vue';
 import MaterialRefer from '@/refer/MaterialRefer.vue';
-import type { GetPageProductionDemandRequest } from '@/types/product/productionDemand';
+import type { ProductionDemandQuery } from '@/types/product/productionDemand';
 
 const props = defineProps<{
-  queryData: GetPageProductionDemandRequest
+  queryData: ProductionDemandQuery
 }>()
 
 const emit = defineEmits<{
-  (e: 'query', params: GetPageProductionDemandRequest): void
+  (e: 'query', params: ProductionDemandQuery): void
   (e: 'reset'): void
 }>()
 
@@ -51,8 +51,8 @@ const sourceTypeOptions = [
 
 }
 
-.search-container > :deep(.el-input),
-.search-container > :deep(.el-select) {
+.search-container> :deep(.el-input),
+.search-container> :deep(.el-select) {
   flex: 0 1 200px;
   min-width: 0;
   width: 200px;

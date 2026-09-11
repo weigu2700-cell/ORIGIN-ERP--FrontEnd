@@ -1,10 +1,10 @@
 import type { 
-  PagePurchaseOrderRequest, 
-  PagePurchaseOrderVo, 
+  PurchaseOrderQuery, 
   PurchaseOrderVo,
-  CreatePurchaseOrderRequest,
-  UpdatePurchaseOrderRequest
+  PurchaseOrderAdd,
+  PurchaseOrderUpdate
 } from '@/types/purchase/purchaseOrder'
+import type { PageResult } from '@/types/common'
 import service from '@/utils/request'
 
 /**
@@ -12,8 +12,8 @@ import service from '@/utils/request'
  * @param request 查询参数
  * @returns 采购订单分页数据
  */
-export function getPagePurchaseOrder(request: PagePurchaseOrderRequest) {
-  return service.get<PagePurchaseOrderVo>(
+export function getPagePurchaseOrder(request: PurchaseOrderQuery) {
+  return service.get<PageResult<PurchaseOrderVo>>(
     '/purchase/order',
     {params: request}
   )
@@ -35,7 +35,7 @@ export function getDetailPurchaseOrder(id: string) {
  * @param request 采购订单数据
  * @returns 创建的采购订单
  */
-export function createPurchaseOrder(request: CreatePurchaseOrderRequest) {
+export function createPurchaseOrder(request: PurchaseOrderAdd) {
   return service.post<void>(
     '/purchase/order',
     request
@@ -48,7 +48,7 @@ export function createPurchaseOrder(request: CreatePurchaseOrderRequest) {
  * @param request 采购订单数据
  * @returns 更新后的采购订单
  */
-export function updatePurchaseOrder(id: string, request: UpdatePurchaseOrderRequest) {
+export function updatePurchaseOrder(id: string, request: PurchaseOrderUpdate) {
   return service.put<void>(
     `/purchase/order/${id}`,
     request

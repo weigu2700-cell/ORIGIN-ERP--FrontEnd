@@ -6,15 +6,15 @@ import type {
   WorkshopVO
 } from "@/types/master/workshop.ts";
 
-export function getWorkshopList(data: WorkshopListRequest) {
+export function getPageWorkshopList(data: WorkshopListRequest) {
   return service.get<WorkshopListResponse>('master/workshop', {params: data})
 }
 
-export function getWorkshopDetail(id: string) {
+export function getDetailWorkshop(id: string) {
   return service.get<WorkshopVO>(`master/workshop/${id}`)
 }
 
-export function createWorkshop(data: WorkshopCreateRequest) {
+export function addWorkshop(data: WorkshopCreateRequest) {
   return service.post<void>('master/workshop', data)
 }
 

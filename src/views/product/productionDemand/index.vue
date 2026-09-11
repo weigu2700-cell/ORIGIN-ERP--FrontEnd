@@ -2,7 +2,8 @@
 import ProTable, { type ProColumn } from '@/components/ProTable.vue';
 import { computed, onMounted, ref, reactive } from 'vue';
 import { getPageProductionDemand } from '@/api/product/productionDemand';
-import type { PageProductionDemandVo, ProductionDemandVo, GetPageProductionDemandRequest } from '@/types/product/productionDemand';
+import type { ProductionDemandVo, ProductionDemandQuery } from '@/types/product/productionDemand';
+import type { PageResult } from '@/types/common';
 import ProToolbar from '@/components/ProToolbar.vue';
 import Selector from './components/selector.vue'
 import DetailDialog from './components/detailDialog.vue'
@@ -10,7 +11,7 @@ import { formatDecimal } from '@/composables/useFormat';
 import ProPageHeader, { type ProPageHeaderCard } from '@/components/ProPageHeader.vue'
 
 
-const queryData = reactive<GetPageProductionDemandRequest>({
+const queryData = reactive<ProductionDemandQuery>({
   pageNum: 1,
   pageSize: 10,
   demandNo: '',
@@ -19,7 +20,7 @@ const queryData = reactive<GetPageProductionDemandRequest>({
   status: ''
 });
 
-const tableData = ref<PageProductionDemandVo>();
+const tableData = ref<PageResult<ProductionDemandVo>>();
 const selectedRowId = ref<string>();
 const detailVisible = ref<boolean>(false)
 const currentDetailId = ref<string>()
@@ -32,7 +33,7 @@ const loadData = async () => {
   tableData.value = await getPageProductionDemand(queryData);
 };
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<ProductionDemandVo>[]>([
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '需求单号', prop: 'demandNo', width: 180 },
   { label: '物料编码', prop: 'materialCode', width: 140 },
@@ -108,14 +109,9 @@ onMounted(() => {
 
 <template>
   <div class="container">
-    <ProPageHeader
-      title="生产需求"
-      description="查看生产需求，跟踪计划安排与需求状态"
-      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`"
-      :cards="statusCards"
-      :model-value="queryData.status"
-      @change="handleQuickStatus"
-    >
+    <ProPageHeader title="生产需求" description="查看生产需求，跟踪计划安排与需求状态"
+      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`" :cards="statusCards"
+      :model-value="queryData.status" @change="handleQuickStatus">
       <template #search>
         <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
       </template>

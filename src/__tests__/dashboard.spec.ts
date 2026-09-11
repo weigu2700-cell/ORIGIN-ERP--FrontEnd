@@ -10,7 +10,7 @@ vi.mock('@/api/product/productionOrder', () => ({ getPageProductionOrder: vi.fn(
 vi.mock('@/api/purchase/purchaseOrder', () => ({ getPagePurchaseOrder: vi.fn() }))
 vi.mock('@/api/sales/salesOrder', () => ({ getPageSalesOrder: vi.fn() }))
 
-const page = <T>(total: number, records: T[] = []) => ({ total, records, size: 1, current: 1 })
+const page = <T>(total: number, records: T[] = []) => ({ total, records, size: 1, current: 1, pages: 1 })
 
 describe('getDashboardOverview', () => {
   beforeEach(() => vi.clearAllMocks())

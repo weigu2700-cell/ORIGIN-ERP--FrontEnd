@@ -41,7 +41,7 @@ const loadData = async () => {
   tableData.value = await getSupplierList(queryData)
 }
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<SupplierVO>[]>([
   { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '供应商名称', prop: 'name', minWidth: 160 },
   { label: '供应商编码', prop: 'code', width: 240 },
@@ -152,9 +152,13 @@ const handleCancel = () => {
 <template>
   <div class="supplier-container round">
     <PageHeader title="供应商管理" description="维护供应商资料与合作状态">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
-      <template #toolbar><ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit"
-        @status="handleStatus" @refresh="handleRefresh" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+          @refresh="handleRefresh" />
+      </template>
     </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

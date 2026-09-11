@@ -8,15 +8,15 @@ import type {
   RoleMenuAssignRequest
 } from "@/types/system/role.ts";
 
-export function getRoleList(data: RoleListRequest): Promise<RoleListResponse> {
+export function getPageRoleList(data: RoleListRequest): Promise<RoleListResponse> {
   return service.get<RoleListResponse>('system/role/list', {params: data})
 }
 
-export function getRoleDetail(id: string): Promise<RoleDetailResponse> {
+export function getDetailRole(id: string): Promise<RoleDetailResponse> {
   return service.get<RoleDetailResponse>(`system/role/${id}`)
 }
 
-export function createRole(data: RoleSaveRequest): Promise<unknown> {
+export function addRole(data: RoleSaveRequest): Promise<unknown> {
   return service.post<unknown>('system/role/add', data)
 }
 
@@ -24,7 +24,7 @@ export function updateRole(data: RoleSaveRequest): Promise<unknown> {
   return service.put<unknown>(`system/role/${data.id}`, data)
 }
 
-export function deleteRole(id: string): Promise<unknown> {
+export function removeRole(id: string): Promise<unknown> {
   return service.del<unknown>(`system/role/${id}`)
 }
 

@@ -1,4 +1,6 @@
-export interface GetPageProductionDemandRequest {
+import type { PageResult } from '../common'
+
+export interface ProductionDemandQuery {
   pageNum: number
   pageSize: number
   sourceType?: 'SALES_ORDER' | string
@@ -19,11 +21,4 @@ export interface ProductionDemandVo {
   status: 'PENDING' | string
 }
 
-export interface PageProductionDemandVo {
-  records: ProductionDemandVo[]
-  total: number
-  size: number
-  current: number
-  optimizeCountSql?: string
-  searchCount?: string
-}
+export type PageProductionDemandVo = PageResult<ProductionDemandVo>

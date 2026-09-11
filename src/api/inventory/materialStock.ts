@@ -6,14 +6,14 @@ import type {
   MaterialStockVO
 } from "@/types/inventory/materialStock.ts";
 
-export function getMaterialStockList(data: MaterialStockListRequest) {
+export function getPageMaterialStockList(data: MaterialStockListRequest) {
   return service.get<MaterialStockListResponse>('inventory/material-stock', {params: data})
 }
 
-export function getMaterialStockDetail(id: string) {
+export function getDetailMaterialStock(id: string) {
   return service.get<MaterialStockVO>(`inventory/material-stock/${id}`)
 }
 
-export function createMaterialStock(data: MaterialStockCreateRequest) {
+export function addMaterialStock(data: MaterialStockCreateRequest) {
   return service.post<MaterialStockVO>('inventory/material-stock', data)
 }

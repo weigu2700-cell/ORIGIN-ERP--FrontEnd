@@ -1,4 +1,6 @@
-export interface GetPageProductionOrderRequest {
+import type { PageResult } from '../common'
+
+export interface ProductionOrderQuery {
   pageNum: number
   pageSize: number
   productionOrderNo?: string
@@ -11,7 +13,7 @@ export interface GetPageProductionOrderRequest {
   actualEndTime?: string
 }
 
-export interface CreateProductionOrderRequest {
+export interface ProductionOrderAdd {
   productionDemandId: number | string
   materialId: string
   plannedQuantity: number
@@ -38,11 +40,4 @@ export interface ProductionOrderVo {
   remark?: string
 }
 
-export interface PageProductionOrderResponse {
-  records: ProductionOrderVo[]
-  total: number
-  size: number
-  current: number
-  optimizeCountSql?: string
-  searchCount?: string
-}
+export type PageProductionOrderResponse = PageResult<ProductionOrderVo>

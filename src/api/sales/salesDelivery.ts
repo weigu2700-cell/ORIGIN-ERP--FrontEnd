@@ -7,20 +7,20 @@ import type {
 } from '@/types/sales/salesDelivery'
 
 
-export function getLPageSalesDelivery (data:GetPageSalesDelivery) {
+export function getPageSalesDelivery (data:GetPageSalesDelivery) {
   return service.get<PageSalesDelivery>(
     'sales/delivery',
     {params:data}
   )
 }
 
-export function getSalesDeliveryDetail (id:string) {
+export function getDetailSalesDelivery (id:string) {
   return service.get<SalesDeliveryVo>(
     `sales/delivery/${id}`
   )
 }
 
-export function postSalesDelivery (data:PostSaleDelivery) {
+export function addSalesDelivery (data:PostSaleDelivery) {
   return service.post<SalesDeliveryVo>(
     'sales/delivery',
     data

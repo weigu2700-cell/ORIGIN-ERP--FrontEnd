@@ -8,15 +8,15 @@ import type {
   SupplierVO
 } from "@/types/master/supplier.ts";
 
-export function getSupplierList(data: SupplierListRequest) {
+export function getPageSupplierList(data: SupplierListRequest) {
   return service.get<SupplierListResponse>('master/supplier/list', {params: data})
 }
 
-export function getSupplierDetail(id: string) {
+export function getDetailSupplier(id: string) {
   return service.get<SupplierVO>(`master/supplier/${id}`)
 }
 
-export function createSupplier(data: SupplierCreateRequest) {
+export function addSupplier(data: SupplierCreateRequest) {
   return service.post<void>('master/supplier', data)
 }
 

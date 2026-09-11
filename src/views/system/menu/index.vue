@@ -7,11 +7,11 @@ import ProTree from "@/components/ProTree.vue";
 import Selector from "@/views/system/menu/components/selector.vue";
 import SaveDialog from "@/views/system/menu/components/saveDialog.vue";
 import {
-  getMenuList,
+  getPageMenuList,
   getCurrentUserMenu,
-  createMenu,
+  addMenu,
   updateMenu,
-  deleteMenu
+  removeMenu
 } from "@/api/system/menu.ts";
 import { isClassIcon } from "@/utils/icon.ts";
 import type {
@@ -41,7 +41,7 @@ const queryData = reactive<MenuListRequest>({
   status: null,
 })
 
-const columns: ProColumn[] = [
+const columns: ProColumn<MenuListVO>[] = [
   { label: '菜单名称', prop: 'title', width: 160, fixed: 'left' },
   { label: '菜单编码', prop: 'name', width: 180 },
   { label: '路由路径', prop: 'path', width: 240 },
@@ -53,7 +53,7 @@ const columns: ProColumn[] = [
 
 const handleQuery = async (params: MenuListRequest) => {
   try {
-    tableData.value = await getMenuList(params)
+    tableData.value = await getPageMenuList(params)
   } catch {
     // 错误信息已由请求拦截器统一提示
   }
@@ -137,7 +137,7 @@ const handleDelete = async () => {
       { type: 'warning', confirmButtonText: '确定', cancelButtonText: '取消' }
     )
     const ids = selectedData.value.map(item => item.id)
-    await Promise.all(ids.map(id => deleteMenu(id)))
+    await Promise.all(ids.map(id => removeMenu(id)))
     ElMessage.success('删除成功')
     await handleQuery(queryData)
   } catch {
@@ -165,7 +165,7 @@ const handleSubmit = async (form: MenuSaveRequest) => {
       })
       ElMessage.success('修改成功')
     } else {
-      await createMenu({
+      await addMenu({
         name: form.name,
         title: form.title,
         path: form.path,
@@ -193,9 +193,13 @@ onMounted(() => {
 <template>
   <div class="menu-container round">
     <PageHeader title="菜单管理" description="维护系统菜单、路由与显示顺序">
-      <template #search><Selector @query="handleSelectorQuery" @reset="handleSelectorReset" /></template>
-      <template #toolbar><ProToolbar :show-export="false" @add="handleAdd" @edit="handleEdit"
-        @delete="handleDelete" @refresh="handleQuery(queryData)" /></template>
+      <template #search>
+        <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-export="false" @add="handleAdd" @edit="handleEdit" @delete="handleDelete"
+          @refresh="handleQuery(queryData)" />
+      </template>
     </PageHeader>
     <div class="page-body">
       <div class="tree round">

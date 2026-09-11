@@ -9,15 +9,15 @@ import type {
   WarehouseVO
 } from "@/types/master/warehouse.ts";
 
-export function getWarehouseList(data: WarehouseListRequest) {
+export function getPageWarehouseList(data: WarehouseListRequest) {
   return service.get<WarehouseListResponse>('master/warehouse', {params: data})
 }
 
-export function getWarehouseDetail(id: string) {
+export function getDetailWarehouse(id: string) {
   return service.get<WarehouseVO>(`master/warehouse/${id}`)
 }
 
-export function createWarehouse(data: WarehouseCreateRequest) {
+export function addWarehouse(data: WarehouseCreateRequest) {
   return service.post<void>('master/warehouse', data)
 }
 

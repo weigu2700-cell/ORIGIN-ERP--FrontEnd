@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { ProColumn } from '@/components/ProTable.vue';
 import ProTable from '@/components/ProTable.vue';
-import type { CreateBomItemRequest, CreateBomRequest, GetPageBomRequest, GetPageBomResponse } from '@/types/product/Bom';
+import type { BomAdd, BomQuery } from '@/types/product/Bom';
+import type { PageResult } from '@/types/common';
 import { onMounted, ref } from 'vue'
 import { createBom, getDetailBom, getPageBom } from '../../../../api/product/Bom.ts';
 import Selector from './components/selector.vue';
@@ -12,13 +13,12 @@ import type { BomVo } from '@/types/product/Bom';
 import PageHeader from '@/components/PageHeader.vue'
 
 const SelectionId = ref<string>()
-const tableRef = ref<Element>()
 const detailVisible = ref<boolean>(false)
 const saveVisible = ref<boolean>(false)
 const detailRow = ref<BomVo | null>(null)
 const model = ref<'add' | 'edit'>('add')
 
-const queryData = ref<GetPageBomRequest>({
+const queryData = ref<BomQuery>({
   pageNum: 1,
   pageSize: 10,
   bomNo: null,
@@ -26,30 +26,15 @@ const queryData = ref<GetPageBomRequest>({
   status: null
 })
 
-const tableData = ref<GetPageBomResponse>({
+const tableData = ref<PageResult<BomVo>>({
   records: [],
   total: 0,
   size: 0,
   current: 0,
-  optimizeCountSql: 'string',
-  searchCount: ''
+  pages: 0,
 })
 
-const tableDataDetail = ref<BomVo>({
-  id: '',
-  bomNo: '',
-  materialId: '',
-  materialCode: '',
-  materialName: '',
-  status: '',
-  version: 0,
-  remark: '',
-  createTime: '',
-  updateTime: '',
-  bomItems: []
-})
-
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<BomVo>[]>([
   { label: '状态', prop: 'status', width: 100 },
   { label: 'BOM编号', prop: 'bomNo', width: 200 },
   { label: '物料编码', prop: 'materialCode', width: 200 },
@@ -77,7 +62,7 @@ const handleRowDblclick = (row: BomVo) => {
   detailVisible.value = true
 }
 
-const handleSubmit = async (submitData: CreateBomRequest) => {
+const handleSubmit = async (submitData: BomAdd) => {
   if (model.value === 'add') {
     try {
       await createBom(submitData)
@@ -165,7 +150,9 @@ onMounted(() => {
 <template>
   <div class="container">
     <PageHeader title="BOM 管理" description="维护产品物料清单与版本状态">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
       <template #toolbar>
         <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @export="handleExport"
           @refresh="handleRefresh" />

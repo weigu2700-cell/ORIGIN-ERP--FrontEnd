@@ -1,8 +1,9 @@
-import type { BomExplosionVo, BomVo, CreateBomRequest, GetPageBomRequest, GetPageBomResponse, MaterialRequirementVo } from "@/types/product/Bom";
+import type { PageResult } from '@/types/common'
+import type { BomExplosionVo, BomVo, BomAdd, BomQuery, MaterialRequirementVo } from "@/types/product/Bom";
 import service from "@/utils/request";
 
-export function getPageBom (data:GetPageBomRequest) {
-  return service.get<GetPageBomResponse>(
+export function getPageBom (data:BomQuery) {
+  return service.get<PageResult<BomVo>>(
   '/prd/bom', 
   {params:data}
   )
@@ -14,7 +15,7 @@ export function getDetailBom (id:string) {
   )
 }
 
-export function createBom (data:CreateBomRequest) {
+export function createBom (data:BomAdd) {
   return service.post<void>(
     '/prd/bom',
     data

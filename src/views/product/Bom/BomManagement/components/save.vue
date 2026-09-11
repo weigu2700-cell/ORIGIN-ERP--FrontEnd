@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BaseSaveDialog from '@/components/BaseSaveDialog.vue';
 import MaterialRefer from '@/refer/MaterialRefer.vue';
-import type { BomVo, CreateBomRequest } from '@/types/product/Bom';
+import type { BomVo, BomAdd } from '@/types/product/Bom';
 import { reactive, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 
@@ -13,11 +13,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'submit', data: CreateBomRequest): void;
+  (e: 'submit', data: BomAdd): void;
   (e: 'cancel'): void;
 }>();
 
-const submitData = reactive<CreateBomRequest>({
+const submitData = reactive<BomAdd>({
   materialId: '',
   bomItems: []
 });

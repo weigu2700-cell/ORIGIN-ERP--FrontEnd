@@ -1,3 +1,5 @@
+import type { PageResult } from '../common'
+
 export interface PurchaseDemandVo {
   id: string
   purchaseDemandNo: string
@@ -10,16 +12,9 @@ export interface PurchaseDemandVo {
   updateTime: string
 }
 
-export interface PagePurchaseDemandVo {
-  records: PurchaseDemandVo[]
-  total: number
-  size: number
-  current: number
-  optimizeCountSql?: string
-  searchCount?: string
-}
+export type PagePurchaseDemandVo = PageResult<PurchaseDemandVo>
 
-export interface PagePurchaseDemandRequest {
+export interface PurchaseDemandQuery {
   pageNum: number
   pageSize: number
   materialId?: string
@@ -28,7 +23,7 @@ export interface PagePurchaseDemandRequest {
   status?: string
 }
 
-export interface CreatePurchaseDemandRequest {
+export interface PurchaseDemandAdd {
   materialId: string
   sourceType: string
   sourceNo: string

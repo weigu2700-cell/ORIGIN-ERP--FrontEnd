@@ -2,7 +2,8 @@
 import ProTable, { type ProColumn } from '@/components/ProTable.vue';
 import { computed, onMounted, ref, reactive } from 'vue';
 import { getPageProductionOrder, createProductionOrder, cancelProductionOrder } from '@/api/product/productionOrder';
-import type { PageProductionOrderResponse, ProductionOrderVo, GetPageProductionOrderRequest, CreateProductionOrderRequest } from '@/types/product/productionOrder';
+import type { ProductionOrderVo, ProductionOrderQuery, ProductionOrderAdd } from '@/types/product/productionOrder';
+import type { PageResult } from '@/types/common';
 import ProToolbar from '@/components/ProToolbar.vue';
 import Selector from './components/selector.vue'
 import SaveDialog from './components/saveDialog.vue'
@@ -11,7 +12,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { formatDate, formatDecimal } from '@/composables/useFormat';
 import ProPageHeader, { type ProPageHeaderCard } from '@/components/ProPageHeader.vue';
 
-const queryData = reactive<GetPageProductionOrderRequest>({
+const queryData = reactive<ProductionOrderQuery>({
   pageNum: 1,
   pageSize: 10,
   productionOrderNo: '',
@@ -22,7 +23,7 @@ const queryData = reactive<GetPageProductionOrderRequest>({
   plannedEndTime: ''
 });
 
-const tableData = ref<PageProductionOrderResponse>();
+const tableData = ref<PageResult<ProductionOrderVo>>();
 const selectedRowId = ref<string>();
 const visible = ref<boolean>(false)
 const detailVisible = ref<boolean>(false)
@@ -37,7 +38,7 @@ const loadData = async () => {
   tableData.value = await getPageProductionOrder(queryData);
 };
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<ProductionOrderVo>[]>([
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '生产订单号', prop: 'productionOrderNo', width: 180 },
   { label: '需求单号', prop: 'productionDemandNo', width: 180 },
@@ -140,7 +141,7 @@ const handleRowDblclick = (row: ProductionOrderVo) => {
   detailVisible.value = true
 }
 
-const handleSubmit = async (data: CreateProductionOrderRequest) => {
+const handleSubmit = async (data: ProductionOrderAdd) => {
   try {
     await createProductionOrder(data)
     ElMessage.success(model.value === 'edit' ? '修改成功' : '新增成功')

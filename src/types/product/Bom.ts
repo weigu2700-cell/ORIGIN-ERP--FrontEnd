@@ -1,9 +1,11 @@
-export interface CreateBomRequest {
+
+
+export interface BomAdd {
   materialId: string
-  bomItems: CreateBomItemRequest[]
+  bomItems: BomAddItem[]
 }
 
-export interface CreateBomItemRequest {
+export interface BomAddItem {
   lineNo: number
   componentMaterialId: string
   componentMaterialName?: string
@@ -12,7 +14,7 @@ export interface CreateBomItemRequest {
   remark?: string | null
 }
 
-export interface GetPageBomRequest {
+export interface BomQuery {
   pageNum: number;
   pageSize: number;
   bomNo?: string | null;
@@ -44,16 +46,6 @@ export interface BomVo {
   createTime: string;
   updateTime: string;
   bomItems: BomItemVo[];
-}
-
-export interface GetPageBomResponse {
-  records: BomVo[];
-  total: string | number;
-  size: string | number;
-  current: string | number;
-  pages?: string | number;
-  optimizeCountSql?: string;
-  searchCount?: string;
 }
 
 export interface BomExplosionVo {

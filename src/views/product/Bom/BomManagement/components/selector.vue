@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ProSearch from '@/components/ProSearch.vue';
 import MaterialRefer from '@/refer/MaterialRefer.vue';
-import type { GetPageBomRequest } from '@/types/product/Bom';
+import type { BomQuery } from '@/types/product/Bom';
 import { ref } from 'vue';
 
 const options = ref([
@@ -11,11 +11,11 @@ const options = ref([
 ])
 
 const props = defineProps<{
-  queryData: GetPageBomRequest
+  queryData: BomQuery
 }>()
 
 const emit = defineEmits<{
-  (e: 'query', params: GetPageBomRequest): void
+  (e: 'query', params: BomQuery): void
   (e: 'reset'): void
 }>()
 

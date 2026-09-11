@@ -24,7 +24,7 @@ export interface FactoryVO {
 export interface FactoryListResponse extends PageResult<FactoryVO> {}
 
 
-export interface addOrUpdateFactoryRequest {
+export interface FactoryAdd {
   name: string
   shortName: string
   status?: number
@@ -32,7 +32,11 @@ export interface addOrUpdateFactoryRequest {
   remark?: string
 }
 
-export interface changeFactoryStatusRequest {
+export interface FactoryUpdate extends FactoryAdd {
+  id: string
+}
+
+export interface FactoryUpdateStatus {
   id: string
   status: FactoryStatus
 }

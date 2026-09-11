@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { SalesDeliveryVo } from '@/types/sales/salesDelivery';
-import { getSalesDeliveryDetail } from '@/api/sales/salesDelivery';
+import { getDetailSalesDelivery } from '@/api/sales/salesDelivery';
 import { ElMessage } from 'element-plus';
 import { formatDecimal } from '@/composables/useFormat';
 
@@ -27,7 +27,7 @@ const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'war
 const loadDetail = async (id: string) => {
   try {
     loading.value = true
-    detail.value = await getSalesDeliveryDetail(id)
+    detail.value = await getDetailSalesDelivery(id)
   } catch {
     ElMessage.error('获取交货单详情失败')
   } finally {

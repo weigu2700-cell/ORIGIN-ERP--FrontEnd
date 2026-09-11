@@ -7,9 +7,9 @@ import ProTree from "@/components/ProTree.vue";
 import Selector from "@/views/system/permission/components/selector.vue";
 import SaveDialog from "@/views/system/permission/components/saveDialog.vue";
 import {
-  getPermissionList,
+  getPagePermissionList,
   getPermissionTree,
-  createPermission,
+  addPermission,
   updatePermission
 } from "@/api/system/permission.ts";
 import type {
@@ -37,7 +37,7 @@ const queryData = reactive<PermissionListRequest>({
   status: null,
 })
 
-const columns: ProColumn[] = [
+const columns: ProColumn<PermissionNode>[] = [
   { label: '权限名称', prop: 'name', width: 180, fixed: 'left' },
   { label: '权限编码', prop: 'code', width: 260 },
   { label: '类型', prop: 'type', width: 100, slot: 'type' },
@@ -48,7 +48,7 @@ const columns: ProColumn[] = [
 
 const handleQuery = async (params: PermissionListRequest) => {
   try {
-    tableData.value = await getPermissionList(params)
+    tableData.value = await getPagePermissionList(params)
   } catch {
     // 错误信息已由请求拦截器统一提示
   }
@@ -132,7 +132,7 @@ const handleSubmit = async (form: PermissionSaveRequest) => {
       })
       ElMessage.success('修改成功')
     } else {
-      await createPermission({
+      await addPermission({
         name: form.name,
         code: form.code,
         type: form.type,
@@ -159,9 +159,13 @@ onMounted(() => {
 <template>
   <div class="permission-container round">
     <PageHeader title="权限管理" description="维护权限节点与访问标识">
-      <template #search><Selector @query="handleSelectorQuery" @reset="handleSelectorReset" /></template>
-      <template #toolbar><ProToolbar :show-delete="false" :show-export="false" @add="handleAdd"
-        @edit="handleEdit" @refresh="handleQuery(queryData)" /></template>
+      <template #search>
+        <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" :show-export="false" @add="handleAdd" @edit="handleEdit"
+          @refresh="handleQuery(queryData)" />
+      </template>
     </PageHeader>
     <div class="page-body">
       <div class="tree round">

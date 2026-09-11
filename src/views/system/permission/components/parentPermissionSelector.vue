@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TreeTableSelector, { type SelectorColumn, type SelectorListParams } from "@/refer/TreeTableSelector.vue"
 import type { PermissionNode } from "@/types/system/permission.ts"
-import { getPermissionTree, getPermissionList } from "@/api/system/permission.ts"
+import { getPermissionTree, getPagePermissionList } from "@/api/system/permission.ts"
 
 const props = defineProps<{
   visible: boolean
@@ -25,7 +25,7 @@ const columns: SelectorColumn<PermissionNode>[] = [
 const loadTree = () => getPermissionTree()
 
 const loadList = (params: SelectorListParams) => {
-  return getPermissionList({
+  return getPagePermissionList({
     page: params.page,
     pageSize: params.pageSize,
     parentId: params.parentId == null ? null : String(params.parentId),

@@ -7,15 +7,15 @@ import type {
   MaterialSupplierVO
 } from "@/types/master/materialSupplier.ts";
 
-export function getMaterialSupplierList(data: MaterialSupplierListRequest) {
+export function getPageMaterialSupplierList(data: MaterialSupplierListRequest) {
   return service.get<MaterialSupplierListResponse>('master/material-supplier', {params: data})
 }
 
-export function getMaterialSupplierDetail(id: string) {
+export function getDetailMaterialSupplier(id: string) {
   return service.get<MaterialSupplierVO>(`master/material-supplier/${id}`)
 }
 
-export function createMaterialSupplier(data: MaterialSupplierCreateRequest) {
+export function addMaterialSupplier(data: MaterialSupplierCreateRequest) {
   return service.post<void>('master/material-supplier', data)
 }
 

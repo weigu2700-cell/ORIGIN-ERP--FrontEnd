@@ -1,9 +1,9 @@
 import type { 
-  PagePurchaseDemandRequest,
-  PagePurchaseDemandVo, 
+  PurchaseDemandQuery,
   PurchaseDemandVo,
-  CreatePurchaseDemandRequest
+  PurchaseDemandAdd
 } from '@/types/purchase/purchaseDemand'
+import type { PageResult } from '@/types/common'
 import service from '@/utils/request'
 
 /**
@@ -11,8 +11,8 @@ import service from '@/utils/request'
  * @param request 查询参数
  * @returns 采购需求分页数据
  */
-export function getPagePurchaseDemand(request: PagePurchaseDemandRequest) {
-  return service.get<PagePurchaseDemandVo>('/purchase/demand', {
+export function getPagePurchaseDemand(request: PurchaseDemandQuery) {
+  return service.get<PageResult<PurchaseDemandVo>>('/purchase/demand', {
     params: request
   })
 }
@@ -33,7 +33,7 @@ export function getDetailPurchaseDemand(id: string) {
  * @param request 采购需求数据
  * @returns 创建的采购需求
  */
-export function createPurchaseDemand(request: CreatePurchaseDemandRequest) {
+export function createPurchaseDemand(request: PurchaseDemandAdd) {
   return service.post<PurchaseDemandVo>(
     '/purchase/demand',
     request

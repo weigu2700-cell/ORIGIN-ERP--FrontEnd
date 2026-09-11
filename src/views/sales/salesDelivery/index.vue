@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ProTable, { type ProColumn } from '@/components/ProTable.vue';
 import { onMounted, ref, reactive } from 'vue';
-import { getLPageSalesDelivery, postSalesDelivery, removeSalesDelivery } from '@/api/sales/salesDelivery';
+import { getPageSalesDelivery, addSalesDelivery, removeSalesDelivery } from '@/api/sales/salesDelivery';
 import type { PageSalesDelivery, SalesDeliveryVo, GetPageSalesDelivery, PostSaleDelivery } from '@/types/sales/salesDelivery';
 import ProToolbar from '@/components/ProToolbar.vue';
 import Selector from './components/selector.vue'
@@ -39,10 +39,10 @@ const handleSelectionChange = (rows: SalesDeliveryVo[]) => {
 };
 
 const loadData = async () => {
-  tableData.value = await getLPageSalesDelivery(queryData);
+  tableData.value = await getPageSalesDelivery(queryData);
 };
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<SalesDeliveryVo>[]>([
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '交货单号', prop: 'deliveryNo', width: 200 },
   { label: '销售订单号', prop: 'salesOrderNo', width: 200 },
@@ -114,7 +114,7 @@ const handleRowDblclick = (row: SalesDeliveryVo) => {
 
 const handleSubmit = async (data: PostSaleDelivery) => {
   try {
-    await postSalesDelivery(data)
+    await addSalesDelivery(data)
     visible.value = false
     ElMessage.success('新增成功')
     loadData()
@@ -136,7 +136,9 @@ onMounted(() => {
 <template>
   <div class="container">
     <PageHeader title="销售发货" description="处理销售出库与发货进度">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
       <template #toolbar>
         <ProToolbar @add="handleAdd" @delete="handleDelete" @refresh="handleRefresh" @detail="handleDetail" />
       </template>

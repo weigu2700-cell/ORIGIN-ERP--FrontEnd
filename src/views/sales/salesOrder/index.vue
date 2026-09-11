@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ProTable, { type ProColumn } from '@/components/ProTable.vue';
 import { onMounted, ref, reactive } from 'vue';
-import { getPageSalesOrder, postSalesOrder, changeSalesorder, removeSalesOrder } from '@/api/sales/salesOrder';
+import { getPageSalesOrder, addSalesOrder, updateSalesOrder, removeSalesOrder } from '@/api/sales/salesOrder';
 import type { PageSalesOrder, SalesOrderVo, GetPageSalesOrderQuery, PostOrPutSalesOrder } from '@/types/sales/salesOrder';
 import ProToolbar from '@/components/ProToolbar.vue';
 import Selector from './components/selector.vue'
@@ -35,7 +35,7 @@ const loadData = async () => {
   tableData.value = await getPageSalesOrder(queryData);
 };
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<SalesOrderVo>[]>([
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '订单号', prop: 'orderNo', width: 200 },
   { label: '客户名称', prop: 'customerName', width: 200 },
@@ -107,10 +107,10 @@ const handleRowDblclick = (row: SalesOrderVo) => {
 const handleSubmit = async (data: PostOrPutSalesOrder) => {
   try {
     if (model.value === 'edit') {
-      await changeSalesorder(selectedRowId.value!, data)
+      await updateSalesOrder(selectedRowId.value!, data)
       ElMessage.success('修改成功')
     } else {
-      await postSalesOrder(data)
+      await addSalesOrder(data)
       ElMessage.success('新增成功')
     }
     visible.value = false
@@ -133,7 +133,9 @@ onMounted(() => {
 <template>
   <div class="container">
     <PageHeader title="销售订单" description="管理客户订单与履约状态">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
       <template #toolbar>
         <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleRefresh" />
       </template>

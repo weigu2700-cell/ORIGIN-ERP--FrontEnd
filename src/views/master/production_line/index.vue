@@ -3,7 +3,7 @@ import Selector from "@/views/master/production_line/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
-import { changeProductionLineStatus, createProductionLine, getProductionLineList, updateProductionLine } from "@/api/master/productionLine.ts";
+import { changeProductionLineStatus, addProductionLine, getPageProductionLineList, updateProductionLine } from "@/api/master/productionLine.ts";
 import type {
   ProductionLineCreateRequest,
   ProductionLineListRequest,
@@ -36,10 +36,10 @@ const handleSelectionChange = (rows: ProductionLineVO[]) => {
 }
 
 const loadData = async () => {
-  tableData.value = await getProductionLineList(queryData)
+  tableData.value = await getPageProductionLineList(queryData)
 }
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<ProductionLineVO>[]>([
   { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '生产线名称', prop: 'name', minWidth: 140 },
   { label: '所属车间', prop: 'workshopName', minWidth: 140 },
@@ -126,7 +126,7 @@ const handleSubmit = async (form: ProductionLineCreateRequest | ProductionLineUp
     if (model.value === 'edit' && selectedRowId.value) {
       await updateProductionLine(selectedRowId.value, form as ProductionLineUpdateRequest)
     } else {
-      await createProductionLine(form as ProductionLineCreateRequest)
+      await addProductionLine(form as ProductionLineCreateRequest)
     }
     ElMessage.success('保存成功')
     visible.value = false
@@ -146,9 +146,13 @@ const handleCancel = () => {
 <template>
   <div class="production-line-container round">
     <PageHeader title="生产线管理" description="维护生产线归属与运行状态">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
-      <template #toolbar><ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit"
-        @status="handleStatus" @refresh="handleRefresh" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+          @refresh="handleRefresh" />
+      </template>
     </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

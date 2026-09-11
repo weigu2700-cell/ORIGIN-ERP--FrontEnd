@@ -6,15 +6,15 @@ import BaseSaveDialog from '@/components/BaseSaveDialog.vue'
 import MaterialRefer from '@/refer/MaterialRefer.vue'
 import SupplierRefer from '@/refer/SupplierRefer.vue'
 import PurchaseDemandRefer from '@/refer/PurchaseDemandRefer.vue'
-import type { CreatePurchaseOrderRequest, PurchaseOrderVo, UpdatePurchaseOrderRequest } from '@/types/purchase/purchaseOrder'
+import type { PurchaseOrderAdd, PurchaseOrderVo, PurchaseOrderUpdate } from '@/types/purchase/purchaseOrder'
 
 const props = defineProps<{ visible: boolean; mode: 'add' | 'edit'; row?: PurchaseOrderVo | null }>()
 const emit = defineEmits<{
-  (e: 'submit', data: CreatePurchaseOrderRequest | UpdatePurchaseOrderRequest): void
+  (e: 'submit', data: PurchaseOrderAdd | PurchaseOrderUpdate): void
   (e: 'cancel'): void
 }>()
 const formRef = ref<FormInstance>()
-const form = reactive<CreatePurchaseOrderRequest>({
+const form = reactive<PurchaseOrderAdd>({
   purchaseDemandId: '', materialId: '', supplierId: '', plannedQuantity: 1, unitPrice: 0, expectedDeliveryDate: '',
 })
 const rules: FormRules = {
@@ -59,21 +59,27 @@ const submit = async () => {
     @cancel="emit('cancel')" @submit="submit">
     <el-form ref="formRef" :model="form" :rules="rules" label-width="110px">
       <el-row :gutter="18">
-        <el-col :span="12"><el-form-item label="采购需求" prop="purchaseDemandId"><PurchaseDemandRefer
-          v-model="form.purchaseDemandId" :display-text="row?.purchaseDemandNo" @change="selectDemand" /></el-form-item></el-col>
-        <el-col :span="12"><el-form-item label="物料" prop="materialId"><MaterialRefer v-model="form.materialId"
-          :display-text="row?.materialName" /></el-form-item></el-col>
+        <el-col :span="12"><el-form-item label="采购需求" prop="purchaseDemandId">
+            <PurchaseDemandRefer v-model="form.purchaseDemandId" :display-text="row?.purchaseDemandNo"
+              @change="selectDemand" />
+          </el-form-item></el-col>
+        <el-col :span="12"><el-form-item label="物料" prop="materialId">
+            <MaterialRefer v-model="form.materialId" :display-text="row?.materialName" />
+          </el-form-item></el-col>
       </el-row>
       <el-row :gutter="18">
-        <el-col :span="12"><el-form-item label="供应商" prop="supplierId"><SupplierRefer v-model="form.supplierId" /></el-form-item></el-col>
+        <el-col :span="12"><el-form-item label="供应商" prop="supplierId">
+            <SupplierRefer v-model="form.supplierId" />
+          </el-form-item></el-col>
         <el-col :span="12"><el-form-item label="预计交货" prop="expectedDeliveryDate"><el-date-picker
-          v-model="form.expectedDeliveryDate" type="datetime" value-format="YYYY-MM-DDTHH:mm:ss" style="width: 100%" /></el-form-item></el-col>
+              v-model="form.expectedDeliveryDate" type="datetime" value-format="YYYY-MM-DDTHH:mm:ss"
+              style="width: 100%" /></el-form-item></el-col>
       </el-row>
       <el-row :gutter="18">
         <el-col :span="12"><el-form-item label="计划数量" prop="plannedQuantity"><el-input-number
-          v-model="form.plannedQuantity" :min="0.0001" :precision="4" style="width: 100%" /></el-form-item></el-col>
-        <el-col :span="12"><el-form-item label="采购单价" prop="unitPrice"><el-input-number
-          v-model="form.unitPrice" :min="0" :precision="4" style="width: 100%" /></el-form-item></el-col>
+              v-model="form.plannedQuantity" :min="0.0001" :precision="4" style="width: 100%" /></el-form-item></el-col>
+        <el-col :span="12"><el-form-item label="采购单价" prop="unitPrice"><el-input-number v-model="form.unitPrice"
+              :min="0" :precision="4" style="width: 100%" /></el-form-item></el-col>
       </el-row>
     </el-form>
   </BaseSaveDialog>

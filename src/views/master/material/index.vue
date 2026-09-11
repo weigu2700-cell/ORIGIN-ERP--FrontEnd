@@ -46,7 +46,7 @@ const loadData = async () => {
   tableData.value = await getMaterialList(queryData)
 }
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<MaterialVO>[]>([
   { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '物料编码', prop: 'code', width: 240 },
   { label: '物料名称', prop: 'name', width: 220 },
@@ -166,7 +166,9 @@ const handleCancel = () => {
 <template>
   <div class="material-container round">
     <PageHeader title="物料管理" description="维护物料编码、规格与基础属性">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
       <template #toolbar>
         <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
           @refresh="handleRefresh" />

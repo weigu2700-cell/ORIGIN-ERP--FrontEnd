@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ReferPicker from "@/components/ReferPicker.vue";
-import { getMaterialList } from "@/api/master/material.ts";
+import { getPageMaterialList } from "@/api/master/material.ts";
 import type { MaterialListRequest } from "@/types/master/material.ts";
 
 const props = defineProps<{
@@ -30,7 +30,7 @@ const columns = [
 ]
 
 const fetcher = (params: Record<string, any>) =>
-  getMaterialList(params as MaterialListRequest)
+  getPageMaterialList(params as MaterialListRequest)
 </script>
 
 <template>

@@ -32,7 +32,7 @@ const model = ref<'add' | 'edit'>('add')
 const selectedRowId = ref<string>('')
 const tableRef = ref<{ clearSelection: () => void }>()
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<WorkshopVO>[]>([
   { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '车间名称', prop: 'name', minWidth: 140 },
   { label: '简称', prop: 'shortName', width: 120 },
@@ -155,9 +155,13 @@ onMounted(() => {
 <template>
   <div class="workshop-index round">
     <PageHeader title="车间管理" description="维护工厂车间资料与启用状态">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
-      <template #toolbar><ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit"
-        @status="handleStatus" @refresh="handleRefresh" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+          @refresh="handleRefresh" />
+      </template>
     </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

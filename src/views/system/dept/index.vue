@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue"
 import { ElMessage } from "element-plus";
-import type { deptResponse, deptRequest, deptColumns, saveDeptRequest, deptTree } from "@/types/system/dept.ts";
-import { getDeptList, getDeptTree, saveDept, updateDept } from "@/api/system/dept.ts";
+import type { DeptQuery, deptColumns, DeptAdd, deptTree } from "@/types/system/dept.ts";
+import { getPageDeptList, getDeptTree, addDept, updateDept } from "@/api/system/dept.ts";
 import SaveDialog from "@/views/system/dept/components/saveDialog.vue";
 import Selector from "@/views/system/dept/components/selector.vue";
 import ProTable from "@/components/ProTable.vue";
@@ -10,13 +10,24 @@ import ProToolbar from "@/components/ProToolbar.vue";
 import ProTree from "@/components/ProTree.vue";
 import PageHeader from '@/components/PageHeader.vue'
 
-const tableData = ref<deptResponse>()
-const selectedData = ref<deptResponse['records']>([])
+import type { PageResult } from '@/types/common'
+
+interface DeptRecord {
+  id: string
+  name: string
+  code: string
+  parentName: string
+  createTime: string
+  updateTime: string
+}
+
+const tableData = ref<PageResult<DeptRecord>>()
+const selectedData = ref<DeptRecord[]>([])
 const dialogVisible = ref(false)
 const dialogMode = ref<'add' | 'edit'>('add')
-const editRow = ref<saveDeptRequest & { parentName?: string } | null>(null)
+const editRow = ref<DeptAdd & { parentName?: string } | null>(null)
 const treeData = ref<deptTree[]>([])
-const queryData = reactive<deptRequest>({
+const queryData = reactive<DeptQuery>({
   page: 1,
   pageSize: 10,
   name: null,
@@ -33,8 +44,8 @@ const columns: deptColumns[] = [
   { label: '创建时间', prop: 'createTime', width: 200, sortable: true, fixed: 'left' },
 ]
 
-const handleQuery = async (queryData: deptRequest) => {
-  tableData.value = await getDeptList(queryData)
+const handleQuery = async (queryData: DeptQuery) => {
+  tableData.value = await getPageDeptList(queryData)
 }
 
 const loadTree = async () => {
@@ -52,7 +63,7 @@ const handleTreeClick = (node: deptTree | { id: string }) => {
   handleQuery(queryData)
 }
 
-const handleSelectorQuery = (params: Omit<deptRequest, 'page' | 'pageSize'>) => {
+const handleSelectorQuery = (params: Omit<DeptQuery, 'page' | 'pageSize'>) => {
   Object.assign(queryData, params, { page: 1 })
   handleQuery(queryData)
 }
@@ -98,13 +109,13 @@ const handleDelete = () => {
   ElMessage.warning('删除功能待接入')
 }
 
-const handleSubmit = async (form: saveDeptRequest) => {
+const handleSubmit = async (form: DeptAdd) => {
   try {
     if (dialogMode.value === 'edit') {
       await updateDept(form)
       ElMessage.success('修改成功')
     } else {
-      await saveDept(form)
+      await addDept(form)
       ElMessage.success('新增成功')
     }
     dialogVisible.value = false
@@ -127,9 +138,12 @@ onMounted(() => {
 <template>
   <div class="dept-container round">
     <PageHeader title="部门管理" description="维护组织部门与层级关系">
-      <template #search><Selector @query="handleSelectorQuery" @reset="handleSelectorReset" /></template>
-      <template #toolbar><ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete"
-        @refresh="handleQuery(queryData)" /></template>
+      <template #search>
+        <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar @add="handleAdd" @edit="handleEdit" @delete="handleDelete" @refresh="handleQuery(queryData)" />
+      </template>
     </PageHeader>
     <div class="page-body">
       <div class="tree round">
@@ -141,7 +155,7 @@ onMounted(() => {
             :page="queryData.page" :page-size="queryData.pageSize"
             @update:page="(p) => { queryData.page = p; handleQuery(queryData) }"
             @update:pageSize="(s) => { queryData.pageSize = s; queryData.page = 1; handleQuery(queryData) }"
-            @selectionChange="(rows) => selectedData = rows as deptResponse['records']" />
+            @selectionChange="(rows) => selectedData = rows as DeptRecord[]" />
         </div>
       </div>
     </div>

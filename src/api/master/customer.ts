@@ -9,15 +9,15 @@ import type {
   CustomerVO
 } from "@/types/master/customer.ts";
 
-export function getCustomerList(data: CustomerListRequest) {
+export function getPageCustomerList(data: CustomerListRequest) {
   return service.get<CustomerListResponse>('master/customer/list', {params: data})
 }
 
-export function getCustomerDetail(id: string) {
+export function getDetailCustomer(id: string) {
   return service.get<CustomerVO>(`master/customer/${id}`)
 }
 
-export function createCustomer(data: CustomerCreateRequest) {
+export function addCustomer(data: CustomerCreateRequest) {
   return service.post<void>('master/customer', data)
 }
 

@@ -4,7 +4,7 @@ import type {
   TransactionListResponse
 } from "@/types/inventory/transaction.ts";
 
-export function getTransactionList(data: TransactionListRequest) {
+export function getPageTransactionList(data: TransactionListRequest) {
   return service.get<TransactionListResponse>('inventory/transaction', {params: data})
 }
 

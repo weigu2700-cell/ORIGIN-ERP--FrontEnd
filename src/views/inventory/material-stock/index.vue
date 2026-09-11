@@ -3,8 +3,8 @@ import Selector from "@/views/inventory/material-stock/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
-import { createMaterialStock, getMaterialStockList } from "@/api/inventory/materialStock.ts";
-import type { MaterialStockCreateRequest, MaterialStockListRequest, MaterialStockListResponse } from "@/types/inventory/materialStock.ts";
+import { addMaterialStock, getPageMaterialStockList } from "@/api/inventory/materialStock.ts";
+import type { MaterialStockCreateRequest, MaterialStockListRequest, MaterialStockListResponse, MaterialStockVO } from "@/types/inventory/materialStock.ts";
 import SaveDialog from "@/views/inventory/material-stock/components/saveDialog.vue";
 import DetailDialog from "@/views/inventory/material-stock/components/detailDialog.vue";
 import { ElMessage } from "element-plus";
@@ -25,10 +25,10 @@ const detailVisible = ref(false)
 const detailRow = ref<MaterialStockListResponse['records'][number] | null>(null)
 
 const loadData = async () => {
-  tableData.value = await getMaterialStockList(queryData)
+  tableData.value = await getPageMaterialStockList(queryData)
 }
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<MaterialStockVO>[]>([
   { label: '物料编码', prop: 'materialCode', width: 240 },
   { label: '物料名称', prop: 'materialName', minWidth: 160 },
   { label: '仓库', prop: 'warehouseName', minWidth: 140 },
@@ -68,7 +68,7 @@ const handleRowDblclick = (row: MaterialStockListResponse['records'][number]) =>
 
 const handleSubmit = async (form: MaterialStockCreateRequest) => {
   try {
-    await createMaterialStock(form as MaterialStockCreateRequest)
+    await addMaterialStock(form as MaterialStockCreateRequest)
     ElMessage.success('创建库存成功')
     visible.value = false
     await loadData()
@@ -85,9 +85,13 @@ const handleCancel = () => {
 <template>
   <div class="material-stock-container round">
     <PageHeader title="物料库存" description="查看各仓库物料的在库、预留与可用数量">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
-      <template #toolbar><ProToolbar :show-edit="false" :show-delete="false" :show-export="false"
-        @add="handleAdd" @refresh="handleRefresh" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-edit="false" :show-delete="false" :show-export="false" @add="handleAdd"
+          @refresh="handleRefresh" />
+      </template>
     </PageHeader>
     <div class="table round">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

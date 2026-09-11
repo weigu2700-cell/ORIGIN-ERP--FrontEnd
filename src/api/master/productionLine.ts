@@ -8,15 +8,15 @@ import type {
   ProductionLineVO
 } from "@/types/master/productionLine.ts";
 
-export function getProductionLineList(data: ProductionLineListRequest) {
+export function getPageProductionLineList(data: ProductionLineListRequest) {
   return service.get<ProductionLineListResponse>('master/production_line', {params: data})
 }
 
-export function getProductionLineDetail(id: string) {
+export function getDetailProductionLine(id: string) {
   return service.get<ProductionLineVO>(`master/production_line/${id}`)
 }
 
-export function createProductionLine(data: ProductionLineCreateRequest) {
+export function addProductionLine(data: ProductionLineCreateRequest) {
   return service.post<void>('master/production_line', data)
 }
 

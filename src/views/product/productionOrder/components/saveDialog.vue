@@ -2,7 +2,7 @@
 import { reactive, ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
-import type { CreateProductionOrderRequest, ProductionOrderVo } from '@/types/product/productionOrder';
+import type { ProductionOrderAdd, ProductionOrderVo } from '@/types/product/productionOrder';
 import MaterialRefer from '@/refer/MaterialRefer.vue';
 import ProductionDemandRefer from '@/refer/ProductionDemandRefer.vue';
 import BaseSaveDialog from '@/components/BaseSaveDialog.vue';
@@ -15,13 +15,13 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'submit', data: CreateProductionOrderRequest): void
+  (e: 'submit', data: ProductionOrderAdd): void
   (e: 'cancel'): void
 }>()
 
 const formRef = ref<FormInstance>()
 
-const form = reactive<CreateProductionOrderRequest>({
+const form = reactive<ProductionOrderAdd>({
   productionDemandId: '',
   materialId: '',
   plannedQuantity: 0,

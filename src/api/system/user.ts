@@ -1,10 +1,11 @@
 import service from "@/utils/request.ts";
+import type { PageResult } from '@/types/common'
 import type {
-  createUserRequest,
+  UserAdd,
   getUserDetailResponse,
-  getUserListRequest,
-  getUserListResponse,
-  updateUserRequest,
+  UserQuery,
+  UserListRecord,
+  UserUpdate,
   UserInfo,
   UserRoleAssignRequest,
   UserStatusUpdateRequest
@@ -14,19 +15,19 @@ export function getCurrentUser() {
   return service.get<UserInfo>('system/user/current')
 }
 
-export function getUserList(params: getUserListRequest) {
-  return service.get<getUserListResponse>('system/user/list', {params})
+export function getPageUserList(params: UserQuery) {
+  return service.get<PageResult<UserListRecord>>('system/user/list', {params})
 }
 
-export function createUser(data: createUserRequest) {
+export function addUser(data: UserAdd) {
   return service.post('system/user/create', data)
 }
 
-export function getUserDetail(id: string) {
+export function getDetailUser(id: string) {
   return service.get<getUserDetailResponse>(`system/user/detail/${id}`)
 }
 
-export function updateUser(data: updateUserRequest) {
+export function updateUser(data: UserUpdate) {
   return service.put(`system/user/${data.id}`, data)
 }
 

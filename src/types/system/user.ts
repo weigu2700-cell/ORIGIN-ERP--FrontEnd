@@ -10,7 +10,7 @@ export interface UserInfo {
   deptName?: string
 }
 
-export interface getUserListRequest {
+export interface UserQuery {
   page: number
   pageSize: number
   username?: string | null
@@ -52,7 +52,7 @@ export interface getUserDetailResponse {
   status?: UserStatus
 }
 
-export interface createUserRequest {
+export interface UserAdd {
   username: string
   password: string
   realName: string
@@ -60,7 +60,7 @@ export interface createUserRequest {
   roleIds?: string[] | null
 }
 
-export interface updateUserRequest {
+export interface UserUpdate {
   id: string
   username: string
   realName?: string | null

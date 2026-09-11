@@ -7,7 +7,7 @@ import type {
   PermissionUpdateRequest
 } from "@/types/system/permission.ts";
 
-export function getPermissionList(data: PermissionListRequest): Promise<PermissionListResponse> {
+export function getPagePermissionList(data: PermissionListRequest): Promise<PermissionListResponse> {
   return service.get<PermissionListResponse>('system/permission/list', {params: data})
 }
 
@@ -15,11 +15,11 @@ export function getPermissionTree(): Promise<PermissionNode[]> {
   return service.get<PermissionNode[]>('system/permission/tree')
 }
 
-export function getPermissionDetail(id: string): Promise<PermissionNode> {
+export function getDetailPermission(id: string): Promise<PermissionNode> {
   return service.get<PermissionNode>(`system/permission/${id}`)
 }
 
-export function createPermission(data: PermissionCreateRequest): Promise<unknown> {
+export function addPermission(data: PermissionCreateRequest): Promise<unknown> {
   return service.post<unknown>('system/permission/add', data)
 }
 

@@ -3,7 +3,7 @@ import Selector from "@/views/master/material-supplier/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
-import { changeMaterialSupplierStatus, createMaterialSupplier, getMaterialSupplierList, updateMaterialSupplier } from "@/api/master/materialSupplier.ts";
+import { changeMaterialSupplierStatus, addMaterialSupplier, getPageMaterialSupplierList, updateMaterialSupplier } from "@/api/master/materialSupplier.ts";
 import type {
   MaterialSupplierCreateRequest,
   MaterialSupplierListRequest,
@@ -38,10 +38,10 @@ const handleSelectionChange = (rows: MaterialSupplierVO[]) => {
 }
 
 const loadData = async () => {
-  tableData.value = await getMaterialSupplierList(queryData)
+  tableData.value = await getPageMaterialSupplierList(queryData)
 }
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<MaterialSupplierVO>[]>([
   { label: '关联编码', prop: 'materialSupplierCode', minWidth: 140 },
   { label: '物料名称', prop: 'materialName', minWidth: 140 },
   { label: '供应商', prop: 'supplierName', minWidth: 140 },
@@ -131,7 +131,7 @@ const handleSubmit = async (form: MaterialSupplierCreateRequest | MaterialSuppli
     if (model.value === 'edit' && selectedRowId.value) {
       await updateMaterialSupplier(selectedRowId.value, form as MaterialSupplierUpdateRequest)
     } else {
-      await createMaterialSupplier(form as MaterialSupplierCreateRequest)
+      await addMaterialSupplier(form as MaterialSupplierCreateRequest)
     }
     ElMessage.success('保存成功')
     visible.value = false
@@ -151,9 +151,13 @@ const handleCancel = () => {
 <template>
   <div class="material-supplier-container round">
     <PageHeader title="物料供应商" description="维护物料、供应商及采购价格关系">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
-      <template #toolbar><ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit"
-        @status="handleStatus" @refresh="handleRefresh" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+          @refresh="handleRefresh" />
+      </template>
     </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

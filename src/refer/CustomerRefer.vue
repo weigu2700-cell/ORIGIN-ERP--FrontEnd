@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ReferPicker from "@/components/ReferPicker.vue";
-import { getCustomerList } from "@/api/master/customer.ts";
+import { getPageCustomerList } from "@/api/master/customer.ts";
 import type { CustomerListRequest } from "@/types/master/customer.ts";
 import { ref } from "vue";
 
@@ -29,7 +29,7 @@ const columns = ref([
 ])
 
 const fetcher = (params: Record<string, any>) =>
-  getCustomerList(params as CustomerListRequest)
+  getPageCustomerList(params as CustomerListRequest)
 </script>
 
 <template>

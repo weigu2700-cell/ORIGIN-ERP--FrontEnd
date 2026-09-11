@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import ProSearch from '@/components/ProSearch.vue'
 import MaterialRefer from '@/refer/MaterialRefer.vue'
-import type { PagePurchaseDemandRequest } from '@/types/purchase/purchaseDemand'
+import type { PurchaseDemandQuery } from '@/types/purchase/purchaseDemand'
 
-const props = defineProps<{ queryData: PagePurchaseDemandRequest }>()
+const props = defineProps<{ queryData: PurchaseDemandQuery }>()
 const emit = defineEmits<{
-  (e: 'query', params: PagePurchaseDemandRequest): void
+  (e: 'query', params: PurchaseDemandQuery): void
   (e: 'reset'): void
 }>()
 
@@ -35,8 +35,8 @@ const sourceOptions = [
   gap: 10px;
 }
 
-.search-container > :deep(.el-input),
-.search-container > :deep(.el-select) {
+.search-container> :deep(.el-input),
+.search-container> :deep(.el-select) {
   flex: 0 1 200px;
   min-width: 0;
   width: 200px;

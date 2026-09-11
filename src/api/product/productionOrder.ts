@@ -1,12 +1,12 @@
 import service from '@/utils/request'
+import type { PageResult } from '@/types/common'
 import type {
-  CreateProductionOrderRequest, 
-  GetPageProductionOrderRequest,
-  PageProductionOrderResponse, 
+  ProductionOrderAdd, 
+  ProductionOrderQuery,
   ProductionOrderVo } from '../../types/product/productionOrder';
 
-export function getPageProductionOrder (data:GetPageProductionOrderRequest) {
-  return service.get<PageProductionOrderResponse>(
+export function getPageProductionOrder (data:ProductionOrderQuery) {
+  return service.get<PageResult<ProductionOrderVo>>(
     '/prd/order',
     {params:data}
   )
@@ -18,32 +18,33 @@ export function getDetailProductionOrder (id:string) {
   )
 }
 
-export function createProductionOrder (data:CreateProductionOrderRequest) {
-  return service.post<void>(
+export function createProductionOrder (data:ProductionOrderAdd) {
+  return service.post(
     '/prd/order',
     data
   )
 }
 
 export function startProductionOrder (id:string) {
-  return service.put<void>(
+  return service.put(
     `/prd/order/${id}/start`
   )
 }
 
 export function releaseProductionOrder (id:string) {
-  return service.put<void>(
+  return service.put(
     `/prd/order/${id}/release`
   )
 }
+
 export function completeProductionOrder (id:string) {
-  return service.put<void>(
+  return service.put(
     `/prd/order/${id}/complete`
   )
 }
 
 export function cancelProductionOrder (id:string) {
-  return service.put<void>(
+  return service.put(
     `/prd/order/${id}/cancel`
   )
 }

@@ -44,7 +44,7 @@ const loadData = async () => {
   tableData.value = await getWarehouseList(queryData)
 }
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<WarehouseVO>[]>([
   { label: '仓库名称', prop: 'name', minWidth: 140 },
   { label: '仓库编码', prop: 'code', width: 240 },
   { label: '仓库类型', prop: 'type', width: 100, slot: 'type' },
@@ -162,9 +162,13 @@ const handleCancel = () => {
 <template>
   <div class="warehouse-container round">
     <PageHeader title="仓库管理" description="维护仓库资料、地址与启用状态">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
-      <template #toolbar><ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit"
-        @status="handleStatus" @refresh="handleRefresh" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+          @refresh="handleRefresh" />
+      </template>
     </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

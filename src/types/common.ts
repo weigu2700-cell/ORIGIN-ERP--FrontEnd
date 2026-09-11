@@ -7,11 +7,12 @@
  */
 export interface PageResult<T> {
   records: T[]
-  total: number
-  size: number
-  current: number
-  /** 总页数（部分接口未返回，故为可选） */
-  pages?: number
+  total: number,
+  size: number,
+  current: number,
+  pages: number,
+  optimizeCountSql?: string,
+  searchCount?: string,
 }
 
 export interface statusType {

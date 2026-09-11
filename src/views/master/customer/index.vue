@@ -39,7 +39,7 @@ const loadData = async () => {
   tableData.value = await getCustomerList(queryData)
 }
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<CustomerVO>[]>([
   { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '客户名称', prop: 'name', minWidth: 160 },
   { label: '客户编码', prop: 'code', width: 240 },
@@ -148,9 +148,13 @@ const handleCancel = () => {
 <template>
   <div class="customer-container round">
     <PageHeader title="客户管理" description="维护客户资料与合作状态">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
-      <template #toolbar><ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit"
-        @status="handleStatus" @refresh="handleRefresh" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+          @refresh="handleRefresh" />
+      </template>
     </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

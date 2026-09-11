@@ -4,15 +4,15 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import BaseSaveDialog from '@/components/BaseSaveDialog.vue'
 import MaterialRefer from '@/refer/MaterialRefer.vue'
-import type { CreatePurchaseDemandRequest } from '@/types/purchase/purchaseDemand'
+import type { PurchaseDemandAdd } from '@/types/purchase/purchaseDemand'
 
 const props = defineProps<{ visible: boolean }>()
 const emit = defineEmits<{
-  (e: 'submit', data: CreatePurchaseDemandRequest): void
+  (e: 'submit', data: PurchaseDemandAdd): void
   (e: 'cancel'): void
 }>()
 const formRef = ref<FormInstance>()
-const form = reactive<CreatePurchaseDemandRequest>({
+const form = reactive<PurchaseDemandAdd>({
   materialId: '', sourceType: 'OTHER', sourceNo: '', purchaseQuantity: 1,
 })
 const rules: FormRules = {

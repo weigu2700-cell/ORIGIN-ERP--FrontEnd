@@ -8,11 +8,12 @@ import Selector from './components/selector.vue'
 import SaveDialog from './components/save.vue'
 import DetailDialog from './components/detail.vue'
 import { approvePurchaseDemand, closePurchaseDemand, createPurchaseDemand, getPagePurchaseDemand } from '@/api/purchase/purchaseDemand'
-import type { CreatePurchaseDemandRequest, PagePurchaseDemandRequest, PagePurchaseDemandVo, PurchaseDemandVo } from '@/types/purchase/purchaseDemand'
+import type { PurchaseDemandAdd, PurchaseDemandQuery, PurchaseDemandVo } from '@/types/purchase/purchaseDemand'
+import type { PageResult } from '@/types/common'
 import { formatDate, formatDecimal } from '@/composables/useFormat'
 
-const queryData = reactive<PagePurchaseDemandRequest>({ pageNum: 1, pageSize: 10, materialId: '', sourceType: '', sourceNo: '', status: '' })
-const tableData = ref<PagePurchaseDemandVo>()
+const queryData = reactive<PurchaseDemandQuery>({ pageNum: 1, pageSize: 10, materialId: '', sourceType: '', sourceNo: '', status: '' })
+const tableData = ref<PageResult<PurchaseDemandVo>>()
 const selectedRow = ref<PurchaseDemandVo | null>(null)
 const saveVisible = ref(false)
 const detailVisible = ref(false)
@@ -33,7 +34,7 @@ const workflow = computed(() => {
   if (selectedRow.value?.status === 'APPROVED') return { label: '关闭需求', next: 'CLOSED' }
   return null
 })
-const columns: ProColumn[] = [
+const columns: ProColumn<PurchaseDemandVo>[] = [
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '需求单号', prop: 'purchaseDemandNo', minWidth: 180 },
   { label: '物料 ID', prop: 'materialId', width: 120 },
@@ -53,7 +54,7 @@ const reset = () => { Object.assign(queryData, { pageNum: 1, materialId: '', sou
 const changeStatusFilter = (status: string | number) => { queryData.status = String(status); query() }
 const openDetail = (row: PurchaseDemandVo) => { detailId.value = String(row.id); detailVisible.value = true }
 
-const submit = async (data: CreatePurchaseDemandRequest) => {
+const submit = async (data: PurchaseDemandAdd) => {
   await createPurchaseDemand(data)
   ElMessage.success('采购需求创建成功')
   saveVisible.value = false
@@ -81,9 +82,11 @@ onMounted(loadData)
 <template>
   <div class="container">
     <ProPageHeader title="采购需求" description="汇总物料采购需求，跟踪审批与关闭状态"
-      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`" :cards="cards"
-      :model-value="queryData.status" @change="changeStatusFilter">
-      <template #search><Selector :query-data="queryData" @query="query" @reset="reset" /></template>
+      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`" :cards="cards" :model-value="queryData.status"
+      @change="changeStatusFilter">
+      <template #search>
+        <Selector :query-data="queryData" @query="query" @reset="reset" />
+      </template>
       <template #toolbar>
         <ProToolbar :show-edit="false" :show-delete="false" :show-export="false" :show-status="!!workflow"
           :status-label="workflow?.label" @add="saveVisible = true" @status="advanceWorkflow" @refresh="loadData" />
@@ -95,7 +98,8 @@ onMounted(loadData)
         @update:page="(page: number) => { queryData.pageNum = page; loadData() }"
         @update:page-size="(size: number) => { queryData.pageSize = size; queryData.pageNum = 1; loadData() }"
         @selection-change="(rows: PurchaseDemandVo[]) => selectedRow = rows[0] ?? null" @row-dblclick="openDetail">
-        <template #status="{ row }"><el-tag :type="statusMap[row.status]?.type ?? 'info'">{{ statusMap[row.status]?.label ?? row.status }}</el-tag></template>
+        <template #status="{ row }"><el-tag :type="statusMap[row.status]?.type ?? 'info'">{{
+          statusMap[row.status]?.label ?? row.status }}</el-tag></template>
         <template #quantity="{ row }">{{ formatDecimal.default(row.purchaseQuantity, 4) }}</template>
         <template #sourceType="{ row }">{{ sourceMap[row.sourceType] ?? row.sourceType }}</template>
         <template #createTime="{ row }">{{ formatDate.DateTime(row.createTime) }}</template>
@@ -107,6 +111,17 @@ onMounted(loadData)
 </template>
 
 <style scoped>
-.container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 10px; }
-.table { flex: 1; min-height: 0; overflow: auto; }
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.table {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
 </style>

@@ -8,11 +8,12 @@ import Selector from './components/selector.vue'
 import SaveDialog from './components/save.vue'
 import DetailDialog from './components/detail.vue'
 import { approvePurchaseOrder, closePurchaseOrder, createPurchaseOrder, getPagePurchaseOrder, receivePurchaseOrder, shipPurchaseOrder, updatePurchaseOrder } from '@/api/purchase/purchaseOrder'
-import type { CreatePurchaseOrderRequest, PagePurchaseOrderRequest, PagePurchaseOrderVo, PurchaseOrderVo, UpdatePurchaseOrderRequest } from '@/types/purchase/purchaseOrder'
+import type { PurchaseOrderAdd, PurchaseOrderQuery, PurchaseOrderVo, PurchaseOrderUpdate } from '@/types/purchase/purchaseOrder'
+import type { PageResult } from '@/types/common'
 import { formatDate, formatDecimal } from '@/composables/useFormat'
 
-const queryData = reactive<PagePurchaseOrderRequest>({ pageNum: 1, pageSize: 10, purchaseOrderNo: '', materialId: '', supplierId: '', status: '' })
-const tableData = ref<PagePurchaseOrderVo>()
+const queryData = reactive<PurchaseOrderQuery>({ pageNum: 1, pageSize: 10, purchaseOrderNo: '', materialId: '', supplierId: '', status: '' })
+const tableData = ref<PageResult<PurchaseOrderVo>>()
 const selectedRow = ref<PurchaseOrderVo | null>(null)
 const saveVisible = ref(false)
 const saveMode = ref<'add' | 'edit'>('add')
@@ -37,7 +38,7 @@ const statusMap: Record<string, { label: string; type: 'info' | 'primary' | 'war
   DRAFT: { label: '草稿', type: 'info' }, APPROVED: { label: '已审批', type: 'primary' },
   SHIPPED: { label: '已发货', type: 'warning' }, RECEIVED: { label: '已收货', type: 'success' }, CLOSED: { label: '已关闭', type: 'danger' },
 }
-const columns: ProColumn[] = [
+const columns: ProColumn<PurchaseOrderVo>[] = [
   { label: '状态', prop: 'status', width: 100, slot: 'status' }, { label: '采购订单号', prop: 'purchaseOrderNo', minWidth: 180 },
   { label: '采购需求单号', prop: 'purchaseDemandNo', minWidth: 180 }, { label: '供应商', prop: 'supplierName', minWidth: 150 },
   { label: '物料编码', prop: 'materialCode', width: 140 }, { label: '物料名称', prop: 'materialName', minWidth: 150 },
@@ -59,9 +60,9 @@ const openEdit = () => {
   saveMode.value = 'edit'; saveVisible.value = true
 }
 const openDetail = (row: PurchaseOrderVo) => { detailId.value = row.id; detailVisible.value = true }
-const submit = async (data: CreatePurchaseOrderRequest | UpdatePurchaseOrderRequest) => {
-  if (saveMode.value === 'edit' && selectedRow.value) await updatePurchaseOrder(selectedRow.value.id, data as UpdatePurchaseOrderRequest)
-  else await createPurchaseOrder(data as CreatePurchaseOrderRequest)
+const submit = async (data: PurchaseOrderAdd | PurchaseOrderUpdate) => {
+  if (saveMode.value === 'edit' && selectedRow.value) await updatePurchaseOrder(selectedRow.value.id, data as PurchaseOrderUpdate)
+  else await createPurchaseOrder(data as PurchaseOrderAdd)
   ElMessage.success(saveMode.value === 'edit' ? '采购订单更新成功' : '采购订单创建成功')
   saveVisible.value = false
   loadData()
@@ -87,11 +88,15 @@ onMounted(loadData)
 <template>
   <div class="container">
     <ProPageHeader title="采购订单" description="管理供应商采购订单，跟踪审批、发货与收货进度"
-      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`" :cards="cards"
-      :model-value="queryData.status" @change="changeStatusFilter">
-      <template #search><Selector :query-data="queryData" @query="query" @reset="reset" /></template>
-      <template #toolbar><ProToolbar :show-delete="false" :show-export="false" :show-status="!!workflow"
-        :status-label="workflow?.label" @add="openAdd" @edit="openEdit" @status="advanceWorkflow" @refresh="loadData" /></template>
+      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`" :cards="cards" :model-value="queryData.status"
+      @change="changeStatusFilter">
+      <template #search>
+        <Selector :query-data="queryData" @query="query" @reset="reset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" :show-export="false" :show-status="!!workflow" :status-label="workflow?.label"
+          @add="openAdd" @edit="openEdit" @status="advanceWorkflow" @refresh="loadData" />
+      </template>
     </ProPageHeader>
     <section class="table">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
@@ -99,7 +104,8 @@ onMounted(loadData)
         @update:page="(page: number) => { queryData.pageNum = page; loadData() }"
         @update:page-size="(size: number) => { queryData.pageSize = size; queryData.pageNum = 1; loadData() }"
         @selection-change="(rows: PurchaseOrderVo[]) => selectedRow = rows[0] ?? null" @row-dblclick="openDetail">
-        <template #status="{ row }"><el-tag :type="statusMap[row.status]?.type ?? 'info'">{{ statusMap[row.status]?.label ?? row.status }}</el-tag></template>
+        <template #status="{ row }"><el-tag :type="statusMap[row.status]?.type ?? 'info'">{{
+          statusMap[row.status]?.label ?? row.status }}</el-tag></template>
         <template #plannedQuantity="{ row }">{{ formatDecimal.default(row.plannedQuantity, 4) }}</template>
         <template #completeQuantity="{ row }">{{ formatDecimal.default(row.completeQuantity, 4) }}</template>
         <template #totalAmount="{ row }">¥ {{ formatDecimal.thousand(row.totalAmount, 2) }}</template>
@@ -108,11 +114,23 @@ onMounted(loadData)
       </ProTable>
     </section>
   </div>
-  <SaveDialog :visible="saveVisible" :mode="saveMode" :row="selectedRow" @cancel="saveVisible = false" @submit="submit" />
+  <SaveDialog :visible="saveVisible" :mode="saveMode" :row="selectedRow" @cancel="saveVisible = false"
+    @submit="submit" />
   <DetailDialog :visible="detailVisible" :order-id="detailId" @cancel="detailVisible = false" />
 </template>
 
 <style scoped>
-.container { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 10px; }
-.table { flex: 1; min-height: 0; overflow: auto; }
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.table {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
 </style>

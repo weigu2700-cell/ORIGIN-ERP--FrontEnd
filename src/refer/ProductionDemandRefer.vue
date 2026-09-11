@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ReferPicker from "@/components/ReferPicker.vue";
 import { getPageProductionDemand } from "@/api/product/productionDemand";
-import type { GetPageProductionDemandRequest } from "@/types/product/productionDemand";
+import type { ProductionDemandQuery } from "@/types/product/productionDemand";
 
 const props = defineProps<{
   modelValue?: string | number | null
@@ -30,7 +30,7 @@ const columns = [
 ]
 
 const fetcher = (params: Record<string, any>) =>
-  getPageProductionDemand(params as GetPageProductionDemandRequest)
+  getPageProductionDemand(params as ProductionDemandQuery)
 </script>
 
 <template>

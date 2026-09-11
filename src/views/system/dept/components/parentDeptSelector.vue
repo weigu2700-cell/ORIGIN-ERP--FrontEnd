@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TreeTableSelector, { type SelectorColumn } from "@/refer/TreeTableSelector.vue"
 import type { deptResponse } from "@/types/system/dept.ts"
-import { getDeptList, getDeptTree } from "@/api/system/dept.ts"
+import { getPageDeptList, getDeptTree } from "@/api/system/dept.ts"
 
 const props = defineProps<{
   visible: boolean
@@ -21,7 +21,7 @@ const columns: SelectorColumn<DeptRow>[] = [
 const loadTree = () => getDeptTree()
 
 const loadList = (params: { page: number, pageSize: number, parentId: string | number | null }) => {
-  return getDeptList({
+  return getPageDeptList({
     page: params.page,
     pageSize: params.pageSize,
     parentId: params.parentId == null ? null : String(params.parentId),

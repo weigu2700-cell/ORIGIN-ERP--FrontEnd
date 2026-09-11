@@ -1,4 +1,4 @@
-export interface deptRequest {
+export interface DeptQuery {
   page: number
   pageSize: number
   name?: string | null
@@ -40,7 +40,7 @@ export interface deptColumns {
   fixed?: string
 }
 
-export interface saveDeptRequest {
+export interface DeptAdd {
   id?: string
   name: string
   code: string

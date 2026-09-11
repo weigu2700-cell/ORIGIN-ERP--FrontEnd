@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import ProSearch from '@/components/ProSearch.vue';
 import MaterialRefer from '@/refer/MaterialRefer.vue';
-import type { GetPageProductionOrderRequest } from '@/types/product/productionOrder';
+import type { ProductionOrderQuery } from '@/types/product/productionOrder';
 
 const props = defineProps<{
-  queryData: GetPageProductionOrderRequest
+  queryData: ProductionOrderQuery
 }>()
 
 const emit = defineEmits<{
-  (e: 'query', params: GetPageProductionOrderRequest): void
+  (e: 'query', params: ProductionOrderQuery): void
   (e: 'reset'): void
 }>()
 
@@ -42,8 +42,8 @@ const handleReset = () => {
   gap: 10px;
 }
 
-.search-container > :deep(.el-input),
-.search-container > :deep(.el-select) {
+.search-container> :deep(.el-input),
+.search-container> :deep(.el-select) {
   flex: 0 1 200px;
   min-width: 0;
   width: 200px;

@@ -3,9 +3,9 @@ import Selector from "@/views/master/factory/components/selector.vue";
 import ProToolbar from "@/components/ProToolbar.vue";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue"
 import { onMounted, ref, reactive } from 'vue'
-import { addFactory, changeFactoryStatus, getFactoryList, updateFactory } from "@/api/master/factory.ts";
+import { addFactory, changeFactoryStatus, getPageFactory, updateFactory } from "@/api/master/factory.ts";
 import type {
-  addOrUpdateFactoryRequest,
+  FactoryAdd, FactoryUpdate,
   FactoryListRequest,
   FactoryListResponse,
   FactoryVO
@@ -38,10 +38,10 @@ const handleSelectionChange = (rows: FactoryVO[]) => {
 }
 
 const loadData = async () => {
-  tableData.value = await getFactoryList(queryData)
+  tableData.value = await getPageFactory(queryData)
 }
 
-const columns = ref<ProColumn[]>([
+const columns = ref<ProColumn<FactoryVO>[]>([
   { label: '状态', prop: 'status', width: 90, slot: 'status' },
   { label: '工厂名称', prop: 'name', minWidth: 140 },
   { label: '工厂编码', prop: 'code', width: 240 },
@@ -124,12 +124,12 @@ const handleRowDblclick = (row: FactoryVO) => {
   selectedRowId.value = String(row.id)
 }
 
-const handleSubmit = async (form: addOrUpdateFactoryRequest) => {
+const handleSubmit = async (form: FactoryAdd | FactoryUpdate) => {
   try {
     if (model.value === 'edit' && selectedRowId.value) {
-      await updateFactory(selectedRowId.value, form)
+      await updateFactory(selectedRowId.value, form as FactoryUpdate)
     } else {
-      await addFactory(form)
+      await addFactory(form as FactoryAdd)
     }
     ElMessage.success('保存成功')
     visible.value = false
@@ -149,9 +149,13 @@ const handleCancel = () => {
 <template>
   <div class="factory-container round">
     <PageHeader title="工厂管理" description="维护工厂基础资料与启用状态">
-      <template #search><Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" /></template>
-      <template #toolbar><ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit"
-        @status="handleStatus" @refresh="handleRefresh" /></template>
+      <template #search>
+        <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
+          @refresh="handleRefresh" />
+      </template>
     </PageHeader>
     <div class="table round">
       <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

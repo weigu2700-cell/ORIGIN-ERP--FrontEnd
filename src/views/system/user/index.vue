@@ -2,7 +2,7 @@
 import { onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import ProTable, { type ProColumn } from "@/components/ProTable.vue";
-import type { getUserListRequest, getUserListResponse } from "@/types/system/user.ts";
+import type { UserQuery, getUserListResponse } from "@/types/system/user.ts";
 import {
   getUserList,
   createUser,
@@ -15,8 +15,8 @@ import SaveDialog from "@/views/system/user/components/saveDialog.vue";
 import AssignDialog from "@/views/system/user/assignDialog.vue";
 import Selector from "@/views/system/user/components/selector.vue";
 import type {
-  createUserRequest,
-  updateUserRequest,
+  UserAdd,
+  UserUpdate,
   UserListRecord,
   UserStatus
 } from "@/types/system/user.ts";
@@ -24,11 +24,13 @@ import PageHeader from '@/components/PageHeader.vue'
 
 defineOptions({ name: 'SystemUserPage' })
 
-const tableData = ref<getUserListResponse>()
+import type { PageResult } from '@/types/common'
+
+const tableData = ref<PageResult<UserListRecord>>()
 const dialogMode = ref<'add' | 'edit'>('add')
 const dialogVisible = ref(false)
-const editRow = ref<createUserRequest & { id?: string, deptName?: string } | null>(null)
-const selectedData = ref<getUserListResponse['records']>([])
+const editRow = ref<UserAdd & { id?: string, deptName?: string } | null>(null)
+const selectedData = ref<UserListRecord[]>([])
 const assignMode = ref<'role' | 'dept'>('role')
 const assignVisible = ref(false)
 const assignRow = ref<{ id: string, username: string, realName?: string } | null>(null)
@@ -50,7 +52,7 @@ const queryData = reactive<{
   phone: null,
 })
 
-const columns: ProColumn[] = [
+const columns: ProColumn<UserListRecord>[] = [
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '用户名', prop: 'username', width: 220, sortable: true },
   { label: '姓名', prop: 'realName', width: 220, sortable: true },
@@ -72,7 +74,7 @@ const statusTagType: Record<UserStatus, 'success' | 'warning' | 'info'> = {
   3: 'info',
 }
 
-const handleQuery = async (queryData: getUserListRequest) => {
+const handleQuery = async (queryData: UserQuery) => {
   try {
     tableData.value = await getUserList(queryData)
   } catch { }
@@ -84,7 +86,7 @@ const openAssignDialog = (row: getUserListResponse['records'][number], mode: 'ro
   assignVisible.value = true
 }
 
-const handleSelectorQuery = (params: Omit<getUserListRequest, 'page' | 'pageSize'>) => {
+const handleSelectorQuery = (params: Omit<UserQuery, 'page' | 'pageSize'>) => {
   Object.assign(queryData, params, { page: 1 })
   handleQuery(queryData)
 }
@@ -154,11 +156,11 @@ const handleStatusChange = async (row: UserListRecord, status: UserStatus) => {
   }
 }
 
-const handleSubmit = async (form: createUserRequest & { id?: string }) => {
+const handleSubmit = async (form: UserAdd & { id?: string }) => {
   try {
     if (dialogMode.value === 'edit') {
       if (!form.id) return
-      await updateUser(form as updateUserRequest)
+      await updateUser(form as UserUpdate)
       ElMessage.success('修改成功')
     } else {
       await createUser(form)
@@ -179,9 +181,13 @@ onMounted(() => {
 <template>
   <div class="user-container round">
     <PageHeader title="用户管理" description="维护系统用户、角色与账号状态">
-      <template #search><Selector @query="handleSelectorQuery" @reset="handleSelectorReset" /></template>
-      <template #toolbar><ProToolbar :show-delete="false" :show-export="false" @add="handleAdd"
-        @edit="handleEdit" @refresh="handleQuery(queryData)" /></template>
+      <template #search>
+        <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-delete="false" :show-export="false" @add="handleAdd" @edit="handleEdit"
+          @refresh="handleQuery(queryData)" />
+      </template>
     </PageHeader>
     <div class="table round">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

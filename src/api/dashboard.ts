@@ -2,8 +2,9 @@ import { getPageProductionDemand } from '@/api/product/productionDemand'
 import { getPageProductionOrder } from '@/api/product/productionOrder'
 import { getPagePurchaseOrder } from '@/api/purchase/purchaseOrder'
 import { getPageSalesOrder } from '@/api/sales/salesOrder'
-import type { PageProductionOrderResponse } from '@/types/product/productionOrder'
-import type { PagePurchaseOrderVo } from '@/types/purchase/purchaseOrder'
+import type { PageResult } from '@/types/common'
+import type { ProductionOrderVo } from '@/types/product/productionOrder'
+import type { PurchaseOrderVo } from '@/types/purchase/purchaseOrder'
 
 export interface DashboardOverview {
   metrics: {
@@ -36,10 +37,10 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
   const productionResult = results[9]
   const purchaseResult = results[10]
   const productionRecent = productionResult?.status === 'fulfilled'
-    ? (productionResult.value as PageProductionOrderResponse).records
+    ? (productionResult.value as PageResult<ProductionOrderVo>).records
     : []
   const purchaseRecent = purchaseResult?.status === 'fulfilled'
-    ? (purchaseResult.value as PagePurchaseOrderVo).records
+    ? (purchaseResult.value as PageResult<PurchaseOrderVo>).records
     : []
 
   const recentOrders = [

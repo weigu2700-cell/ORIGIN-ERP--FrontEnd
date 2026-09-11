@@ -14,20 +14,20 @@ export function getPageSalesOrder (data:GetPageSalesOrderQuery) {
   )
 }
 
-export function getSalesOrderDetail (id:string) {
+export function getDetailSalesOrder (id:string) {
   return service.get<SalesOrderVo>(
     `sales/order/${id}`
   )
 }
 
-export function postSalesOrder (data:PostOrPutSalesOrder) {
+export function addSalesOrder (data:PostOrPutSalesOrder) {
   return service.post<SalesOrderVo>(
     'sales/order',
     data
   )
 }
 
-export function changeSalesorder (id:string,data:PostOrPutSalesOrder) {
+export function updateSalesOrder (id:string,data:PostOrPutSalesOrder) {
   return service.put<SalesOrderVo>(
     `sales/order/${id}`,
     data

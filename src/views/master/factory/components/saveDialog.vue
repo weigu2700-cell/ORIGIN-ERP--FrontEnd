@@ -2,7 +2,7 @@
 import { computed, reactive, ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
-import type { addOrUpdateFactoryRequest, FactoryVO } from "@/types/master/factory.ts";
+import type { FactoryAdd, FactoryVO } from "@/types/master/factory.ts";
 import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
 
 const props = defineProps<{
@@ -14,12 +14,12 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'cancel'): void
-  (e: 'submit', form: addOrUpdateFactoryRequest): void
+  (e: 'submit', form: FactoryAdd): void
 }>()
 
 const formRef = ref<FormInstance>()
 
-const form = reactive<addOrUpdateFactoryRequest>({
+const form = reactive<FactoryAdd>({
   name: '',
   shortName: '',
   status: 1,

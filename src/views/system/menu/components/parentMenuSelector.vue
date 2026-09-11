@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TreeTableSelector, { type SelectorColumn } from "@/refer/TreeTableSelector.vue"
 import type { MenuTreeNode } from "@/types/system/menu.ts"
-import { getMenuList, getCurrentUserMenu } from "@/api/system/menu.ts"
+import { getPageMenuList, getCurrentUserMenu } from "@/api/system/menu.ts"
 
 const props = defineProps<{
   visible: boolean
@@ -25,7 +25,7 @@ const loadTree = async (): Promise<MenuTreeNode[]> => {
 }
 
 const loadList = (params: { page: number, pageSize: number, parentId: string | number | null }) => {
-  return getMenuList({
+  return getPageMenuList({
     page: params.page,
     pageSize: params.pageSize,
     title: null,

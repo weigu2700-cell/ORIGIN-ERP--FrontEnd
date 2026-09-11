@@ -1,11 +1,11 @@
 import service from '@/utils/request'
+import type { PageResult } from '@/types/common'
 import type { 
-  GetPageProductionDemandRequest,
-  PageProductionDemandVo, 
+  ProductionDemandQuery,
   ProductionDemandVo } from '@/types/product/productionDemand';
 
-export function getPageProductionDemand (data:GetPageProductionDemandRequest) {
-  return service.get<PageProductionDemandVo>(
+export function getPageProductionDemand (data:ProductionDemandQuery) {
+  return service.get<PageResult<ProductionDemandVo>>(
     '/prd/demand',
     {params:data}
   )

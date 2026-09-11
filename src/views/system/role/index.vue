@@ -7,10 +7,10 @@ import Selector from "@/views/system/role/components/selector.vue";
 import SaveDialog from "@/views/system/role/components/saveDialog.vue";
 import AssignDialog from "@/views/system/role/assignDialog.vue";
 import {
-  getRoleList,
-  createRole,
+  getPageRoleList,
+  addRole,
   updateRole,
-  deleteRole
+  removeRole
 } from "@/api/system/role.ts";
 import type { RoleListRequest, RoleListResponse, RoleInfo, RoleSaveRequest } from "@/types/system/role.ts";
 import PageHeader from '@/components/PageHeader.vue'
@@ -31,7 +31,7 @@ const queryData = reactive<RoleListRequest>({
   status: null,
 })
 
-const columns: ProColumn[] = [
+const columns: ProColumn<RoleInfo>[] = [
   { label: '角色名称', prop: 'name', width: 160, fixed: 'left' },
   { label: '角色编码', prop: 'code', width: 160 },
   { label: '排序', prop: 'sort', width: 100 },
@@ -41,7 +41,7 @@ const columns: ProColumn[] = [
 
 const handleQuery = async (params: RoleListRequest) => {
   try {
-    tableData.value = await getRoleList(params)
+    tableData.value = await getPageRoleList(params)
   } catch {
     // 错误信息已由请求拦截器统一提示
   }
@@ -98,7 +98,7 @@ const handleDelete = async () => {
       { type: 'warning', confirmButtonText: '确定', cancelButtonText: '取消' }
     )
     const ids = selectedData.value.map(item => item.id)
-    await Promise.all(ids.map(id => deleteRole(id)))
+    await Promise.all(ids.map(id => removeRole(id)))
     ElMessage.success('删除成功')
     await handleQuery(queryData)
   } catch {
@@ -123,7 +123,7 @@ const handleSubmit = async (form: RoleSaveRequest) => {
       await updateRole(form)
       ElMessage.success('修改成功')
     } else {
-      await createRole(form)
+      await addRole(form)
       ElMessage.success('新增成功')
     }
     dialogVisible.value = false
@@ -141,9 +141,13 @@ onMounted(() => {
 <template>
   <div class="role-container round">
     <PageHeader title="角色管理" description="维护角色资料并分配菜单权限">
-      <template #search><Selector @query="handleSelectorQuery" @reset="handleSelectorReset" /></template>
-      <template #toolbar><ProToolbar :show-export="false" @add="handleAdd" @edit="handleEdit"
-        @delete="handleDelete" @refresh="handleQuery(queryData)" /></template>
+      <template #search>
+        <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
+      </template>
+      <template #toolbar>
+        <ProToolbar :show-export="false" @add="handleAdd" @edit="handleEdit" @delete="handleDelete"
+          @refresh="handleQuery(queryData)" />
+      </template>
     </PageHeader>
     <div class="table round">
       <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"

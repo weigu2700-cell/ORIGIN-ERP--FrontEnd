@@ -27,7 +27,7 @@ const tablePage = ref(1)
 const tablePageSize = ref(10)
 const treeLoading = ref(false)
 
-const columns: ProColumn[] = [
+const columns: ProColumn<BomExplosionVo>[] = [
   { label: '物料编码', prop: 'materialCode', width: 240 },
   { label: '物料名称', prop: 'materialName', minWidth: 200 },
   { label: '需求数量', prop: 'quantity', width: 160 },
@@ -197,8 +197,10 @@ onMounted(loadBomTree)
 <template>
   <div class="bom-tree-container round">
     <PageHeader title="BOM 树形查询" description="按层级查看产品物料组成与用量">
-      <template #search><Selector :query-data="queryData" @query="handleQuery" @reset="handleReset"
-        @update:query-data="(params) => Object.assign(queryData, params)" /></template>
+      <template #search>
+        <Selector :query-data="queryData" @query="handleQuery" @reset="handleReset"
+          @update:query-data="(params) => Object.assign(queryData, params)" />
+      </template>
     </PageHeader>
     <div class="page-body">
       <div class="tree round">

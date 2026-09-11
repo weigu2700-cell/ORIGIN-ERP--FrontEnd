@@ -17,19 +17,19 @@ export function getMenuTree(roleId?: string) {
 }
 
 // 菜单分页列表
-export function getMenuList(data: MenuListRequest): Promise<MenuListResponse> {
+export function getPageMenuList(data: MenuListRequest): Promise<MenuListResponse> {
   return service.get<MenuListResponse>('system/menu/list', {
     params: data
   })
 }
 
 // 菜单详情
-export function getMenuDetail(id: string): Promise<MenuListVO> {
+export function getDetailMenu(id: string): Promise<MenuListVO> {
   return service.get<MenuListVO>(`system/menu/${id}`)
 }
 
 // 新增菜单
-export function createMenu(data: MenuCreateRequest): Promise<unknown> {
+export function addMenu(data: MenuCreateRequest): Promise<unknown> {
   return service.post<unknown>('system/menu/create', data)
 }
 
@@ -42,6 +42,6 @@ export function updateMenu(data: MenuSaveRequest): Promise<unknown> {
 }
 
 // 删除菜单
-export function deleteMenu(id: string): Promise<unknown> {
+export function removeMenu(id: string): Promise<unknown> {
   return service.del<unknown>(`system/menu/${id}`)
 }
