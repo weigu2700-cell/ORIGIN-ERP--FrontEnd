@@ -1,13 +1,25 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { ArrowDown, Bell, Check, FullScreen, Moon, Refresh, Search, Setting, Sunny } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import {
+  ArrowDown,
+  Bell,
+  Check,
+  FullScreen,
+  Menu as MenuIcon,
+  Moon,
+  Refresh,
+  Search,
+  Setting,
+  Sunny,
+} from '@element-plus/icons-vue'
+import { ClickOutside as vClickOutside, ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user.ts'
 import useAppStore, { type ColorScheme } from '@/stores/app.ts'
 import Breadcrumb from '@/layout/components/breadcrumb.vue'
 import { usePermissionStore } from '@/stores/permission'
 import type { MenuItem, MenuSearchItem } from '@/types/system/menu'
+import { isClassIcon } from '@/utils/icon'
 
 defineOptions({ name: 'AppHeader' })
 
@@ -51,6 +63,10 @@ const handleMenuSelect = (menu: MenuSearchItem) => {
   router.push(menu.path)
 }
 
+const closeSearch = () => {
+  searchVisible.value = false
+}
+
 const handleRefresh = () => {
   window.location.reload()
 }
@@ -83,35 +99,50 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
       <Breadcrumb />
     </div>
     <div class="right">
-      <el-popover
-        v-model:visible="searchVisible"
-        placement="bottom-end"
-        :width="320"
-        trigger="click"
-        :teleported="false"
-      >
-        <template #reference>
-          <el-input v-model="searchKey" class="header-search" placeholder="搜索已授权菜单" clearable>
-            <template #suffix>
-              <el-icon><Search /></el-icon>
-            </template>
-          </el-input>
-        </template>
-        <div class="menu-search-results">
-          <button
-            v-for="item in searchResults"
-            :key="item.id"
-            type="button"
-            class="menu-search-item"
-            @click="handleMenuSelect(item)"
-          >
-            <span class="menu-search-title">{{ item.title }}</span>
-            <span v-if="item.parentTitle" class="menu-search-parent">{{ item.parentTitle }}</span>
-          </button>
-          <div v-if="!searchKey.trim()" class="menu-search-empty">输入菜单名称开始搜索</div>
-          <div v-else-if="searchResults.length === 0" class="menu-search-empty">未找到已授权菜单</div>
-        </div>
-      </el-popover>
+      <div v-click-outside="closeSearch" class="header-search">
+        <el-popover
+          v-model:visible="searchVisible"
+          placement="bottom-end"
+          :width="320"
+          trigger="manual"
+          :teleported="false"
+        >
+          <template #reference>
+            <el-input
+              v-model="searchKey"
+              placeholder="搜索已授权菜单"
+              clearable
+              @focus="searchVisible = true"
+              @click="searchVisible = true"
+            >
+              <template #suffix>
+                <el-icon><Search /></el-icon>
+              </template>
+            </el-input>
+          </template>
+          <div class="menu-search-results">
+            <button
+              v-for="item in searchResults"
+              :key="item.id"
+              type="button"
+              class="menu-search-item"
+              @click="handleMenuSelect(item)"
+            >
+              <span class="menu-search-title">
+                <el-icon v-if="item.icon && !isClassIcon(item.icon)" class="menu-search-icon">
+                  <component :is="item.icon" />
+                </el-icon>
+                <i v-else-if="item.icon" :class="['menu-search-icon', item.icon]" />
+                <el-icon v-else class="menu-search-icon"><MenuIcon /></el-icon>
+                <span>{{ item.title }}</span>
+              </span>
+              <span v-if="item.parentTitle" class="menu-search-parent">{{ item.parentTitle }}</span>
+            </button>
+            <div v-if="!searchKey.trim()" class="menu-search-empty">输入菜单名称开始搜索</div>
+            <div v-else-if="searchResults.length === 0" class="menu-search-empty">未找到已授权菜单</div>
+          </div>
+        </el-popover>
+      </div>
       <el-tooltip :content="appStore.themeMode === 'light' ? '切换深色' : '切换浅色'" placement="bottom">
         <el-button
           class="header-icon-button theme-toggle"
@@ -293,10 +324,25 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
   outline: none;
 }
 .menu-search-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
   overflow: hidden;
   font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.menu-search-title span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.menu-search-icon {
+  flex: 0 0 auto;
+  color: var(--color-primary);
+  font-size: 16px;
 }
 .menu-search-parent {
   flex: 0 0 auto;
