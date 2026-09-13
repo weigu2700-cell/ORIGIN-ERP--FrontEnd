@@ -22,6 +22,7 @@ import DetailDialog from './components/detailDialog.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { formatDecimal } from '@/composables/useFormat'
 import ProPageHeader, { type ProPageHeaderCard } from '@/components/ProPageHeader.vue'
+import { SalesOrderStatus } from '@/constants/enumCode'
 
 defineOptions({ name: 'SalesOrderPage' })
 
@@ -61,18 +62,17 @@ const columns = ref<ProColumn<SalesOrderVo>[]>([
   { label: '备注', prop: 'remark', minWidth: 150 },
 ])
 
-const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
-  DRAFT: { label: '草稿', type: 'info' },
-  CONFIRMED: { label: '已确认', type: 'success' },
-  IN_PROGRESS: { label: '执行中', type: 'warning' },
-  COMPLETED: { label: '已完成', type: 'success' },
-  CANCELLED: { label: '已取消', type: 'danger' },
+const statusMap: Record<number, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
+  [SalesOrderStatus.DRAFT]: { label: '草稿', type: 'info' },
+  [SalesOrderStatus.CONFIRMED]: { label: '已确认', type: 'success' },
+  [SalesOrderStatus.COMPLETED]: { label: '已完成', type: 'success' },
+  [SalesOrderStatus.CANCELLED]: { label: '已取消', type: 'danger' },
 }
 const statusOptions = [
-  { label: '草稿', value: 'DRAFT', tone: 'info' },
-  { label: '已确认', value: 'CONFIRMED', tone: 'primary' },
-  { label: '已完成', value: 'COMPLETED', tone: 'success' },
-  { label: '已取消', value: 'CANCELLED', tone: 'danger' },
+  { label: '草稿', value: SalesOrderStatus.DRAFT, tone: 'info' },
+  { label: '已确认', value: SalesOrderStatus.CONFIRMED, tone: 'primary' },
+  { label: '已完成', value: SalesOrderStatus.COMPLETED, tone: 'success' },
+  { label: '已取消', value: SalesOrderStatus.CANCELLED, tone: 'danger' },
 ] as const
 const cards = computed<ProPageHeaderCard[]>(() =>
   statusOptions.map((option) => ({
@@ -82,8 +82,8 @@ const cards = computed<ProPageHeaderCard[]>(() =>
   })),
 )
 const workflow = computed(() => {
-  if (selectedRow.value?.status === 'DRAFT') return { label: '确认订单', action: confirmSalesOrder }
-  if (selectedRow.value?.status === 'CONFIRMED') return { label: '取消订单', action: cancelSalesOrder }
+  if (selectedRow.value?.status === SalesOrderStatus.DRAFT) return { label: '确认订单', action: confirmSalesOrder }
+  if (selectedRow.value?.status === SalesOrderStatus.CONFIRMED) return { label: '取消订单', action: cancelSalesOrder }
   return null
 })
 
@@ -102,7 +102,7 @@ const handleReset = () => {
 }
 
 const handleQuickStatus = (status: string | number) => {
-  queryData.status = String(status) as GetPageSalesOrderQuery['status']
+  queryData.status = Number(status) as GetPageSalesOrderQuery['status']
   handleQuery()
 }
 
@@ -116,7 +116,7 @@ const handleEdit = () => {
     ElMessage.warning('请选择一条数据进行编辑')
     return
   }
-  if (selectedRow.value?.status !== 'DRAFT') {
+  if (selectedRow.value?.status !== SalesOrderStatus.DRAFT) {
     ElMessage.warning('仅草稿销售订单可编辑')
     return
   }
@@ -131,7 +131,7 @@ const handleDelete = async () => {
   }
 
   try {
-    if (selectedRow.value?.status !== 'DRAFT') {
+    if (selectedRow.value?.status !== SalesOrderStatus.DRAFT) {
       ElMessage.warning('仅草稿销售订单可删除')
       return
     }
@@ -208,8 +208,8 @@ onMounted(() => {
       </template>
       <template #toolbar>
         <ProToolbar
-          :show-edit="selectedRow?.status === 'DRAFT'"
-          :show-delete="selectedRow?.status === 'DRAFT'"
+          :show-edit="selectedRow?.status === SalesOrderStatus.DRAFT"
+          :show-delete="selectedRow?.status === SalesOrderStatus.DRAFT"
           :show-export="false"
           :show-status="!!workflow"
           :status-label="workflow?.label"

@@ -1,7 +1,9 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { EnableStatus, WarehouseType as WarehouseTypeCode } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type WarehouseStatus = 'ENABLE' | 'DISABLE'
-export type WarehouseType = 'FINISHED' | 'MATERIAL' | 'SEMI_FINISHED' | 'SCRAP' | 'OTHER'
+export type WarehouseStatus = EnumCodeOf<typeof EnableStatus> | string
+export type WarehouseType = EnumCodeOf<typeof WarehouseTypeCode> | string
 
 export interface WarehouseListRequest {
   page: number
@@ -22,10 +24,10 @@ export interface WarehouseVO {
   remark?: string
   factoryId: string
   factoryName?: string
-  status?: number
+  status?: WarehouseStatus
 }
 
-export interface WarehouseListResponse extends PageResult<WarehouseVO> {}
+export type WarehouseListResponse = PageResult<WarehouseVO>
 
 export interface WarehouseCreateRequest {
   name: string

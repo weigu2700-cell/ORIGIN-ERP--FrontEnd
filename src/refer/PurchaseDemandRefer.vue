@@ -2,6 +2,7 @@
 import ReferPicker from '@/components/ReferPicker.vue'
 import { getPagePurchaseDemand } from '@/api/purchase/purchaseDemand'
 import type { PurchaseDemandQuery } from '@/types/purchase/purchaseDemand'
+import { PurchaseDemandStatus } from '@/constants/enumCode'
 
 defineProps<{ modelValue?: string | number | null; displayText?: string }>()
 const emit = defineEmits<{
@@ -18,8 +19,19 @@ const fetcher = (params: Record<string, unknown>) => getPagePurchaseDemand(param
 </script>
 
 <template>
-  <ReferPicker :model-value="modelValue" :display-text="displayText" title="采购需求参照" placeholder="请选择采购需求"
-    search-field="sourceNo" search-placeholder="请输入来源单号" value-key="id" label-key="purchaseDemandNo"
-    :extra-params="{ status: 'APPROVED' }" :columns="columns" :fetcher="fetcher"
-    @update:model-value="value => emit('update:modelValue', value)" @change="row => emit('change', row)" />
+  <ReferPicker
+    :model-value="modelValue"
+    :display-text="displayText"
+    title="采购需求参照"
+    placeholder="请选择采购需求"
+    search-field="sourceNo"
+    search-placeholder="请输入来源单号"
+    value-key="id"
+    label-key="purchaseDemandNo"
+    :extra-params="{ status: PurchaseDemandStatus.APPROVED }"
+    :columns="columns"
+    :fetcher="fetcher"
+    @update:model-value="(value) => emit('update:modelValue', value)"
+    @change="(row) => emit('change', row)"
+  />
 </template>

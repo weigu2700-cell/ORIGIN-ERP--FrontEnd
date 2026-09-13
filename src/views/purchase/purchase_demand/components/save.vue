@@ -5,6 +5,7 @@ import { ElMessage } from 'element-plus'
 import BaseSaveDialog from '@/components/BaseSaveDialog.vue'
 import MaterialRefer from '@/refer/MaterialRefer.vue'
 import type { PurchaseDemandAdd } from '@/types/purchase/purchaseDemand'
+import { PurchaseDemandSourceType } from '@/constants/enumCode'
 
 const props = defineProps<{ visible: boolean }>()
 const emit = defineEmits<{
@@ -13,7 +14,10 @@ const emit = defineEmits<{
 }>()
 const formRef = ref<FormInstance>()
 const form = reactive<PurchaseDemandAdd>({
-  materialId: '', sourceType: 'OTHER', sourceNo: '', purchaseQuantity: 1,
+  materialId: '',
+  sourceType: PurchaseDemandSourceType.OTHER,
+  sourceNo: '',
+  purchaseQuantity: 1,
 })
 const rules: FormRules = {
   materialId: [{ required: true, message: '请选择物料', trigger: 'change' }],
@@ -22,14 +26,22 @@ const rules: FormRules = {
   purchaseQuantity: [{ required: true, message: '请输入采购数量', trigger: 'blur' }],
 }
 
-watch(() => props.visible, visible => {
-  if (!visible) return
-  Object.assign(form, { materialId: '', sourceType: 'OTHER', sourceNo: '', purchaseQuantity: 1 })
-  formRef.value?.clearValidate()
-})
+watch(
+  () => props.visible,
+  (visible) => {
+    if (!visible) return
+    Object.assign(form, {
+      materialId: '',
+      sourceType: PurchaseDemandSourceType.OTHER,
+      sourceNo: '',
+      purchaseQuantity: 1,
+    })
+    formRef.value?.clearValidate()
+  },
+)
 
 const submit = async () => {
-  if (!await formRef.value?.validate().catch(() => false)) {
+  if (!(await formRef.value?.validate().catch(() => false))) {
     ElMessage.warning('请完善必填项后再保存')
     return
   }

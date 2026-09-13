@@ -163,7 +163,7 @@ const handleDelete = async () => {
     })
     await cancelProductionOrder(selectedRowId.value)
     ElMessage.success('取消成功')
-    loadData()
+    await loadData()
   } catch {
     // 用户取消或请求失败
   }
@@ -183,7 +183,7 @@ const handleSubmit = async (data: ProductionOrderAdd) => {
     await createProductionOrder(data)
     ElMessage.success(model.value === 'edit' ? '修改成功' : '新增成功')
     visible.value = false
-    loadData()
+    await loadData()
   } catch {
     ElMessage.error('保存失败')
   }
@@ -249,7 +249,9 @@ onMounted(() => {
         @selectionChange="handleSelectionChange"
         @rowDblclick="handleRowDblclick"
       >
-        <template #plannedQuantity="{ row }">{{ formatDecimal.default(row.plannedQuantity, 0) }}</template>
+        <template #plannedQuantity="{ row }">
+          {{ formatDecimal.default(row.plannedQuantity, 0) }}
+        </template>
         <template #completedQuantity="{ row }">{{ formatDecimal.default(row.completedQuantity, 0) }}</template>
         <template #plannedStartTime="{ row }">{{ formatDate.DateTime(row.plannedStartTime) }}</template>
         <template #plannedEndTime="{ row }">{{ formatDate.DateTime(row.plannedEndTime) }}</template>
@@ -264,6 +266,7 @@ onMounted(() => {
     </section>
   </div>
   <SaveDialog :visible="visible" :mode="model" :row="selectedRow" @cancel="handleCancel" @submit="handleSubmit" />
+
   <DetailDialog :visible="detailVisible" :order-id="currentDetailId" @cancel="detailVisible = false" />
 </template>
 

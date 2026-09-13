@@ -1,6 +1,8 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { MaterialSupplierStatus as MaterialSupplierStatusCode } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type MaterialSupplierStatus = 'ACTIVE' | 'INACTIVE'
+export type MaterialSupplierStatus = EnumCodeOf<typeof MaterialSupplierStatusCode> | string
 
 export interface MaterialSupplierListRequest {
   page: number
@@ -25,7 +27,7 @@ export interface MaterialSupplierVO {
   status?: number
 }
 
-export interface MaterialSupplierListResponse extends PageResult<MaterialSupplierVO> {}
+export type MaterialSupplierListResponse = PageResult<MaterialSupplierVO>
 
 export interface MaterialSupplierCreateRequest {
   materialId: string

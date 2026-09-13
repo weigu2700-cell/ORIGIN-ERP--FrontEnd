@@ -5,6 +5,7 @@ import BusinessDocumentDialog from '@/components/BusinessDocumentDialog.vue'
 import { getDetailPurchaseInStock } from '@/api/purchase/purchaseInStock'
 import type { PurchaseInStock } from '@/types/purchase/purchaseInStock'
 import { formatDate, formatDecimal } from '@/composables/useFormat'
+import { PurchaseInStockStatus, PurchaseInStockType } from '@/constants/enumCode'
 
 defineOptions({ name: 'PurchaseInStockDetail' })
 
@@ -12,20 +13,20 @@ const props = defineProps<{ visible: boolean; recordId?: string }>()
 const emit = defineEmits<{ (e: 'cancel'): void }>()
 const detail = ref<PurchaseInStock | null>(null)
 const loading = ref(false)
-const statusMap = {
-  DRAFT: { label: '草稿', type: 'info' },
-  APPROVED: { label: '已审核', type: 'warning' },
-  UPLOADED: { label: '已上架', type: 'success' },
-} as const
+const statusMap: Record<number, { label: string; type: 'info' | 'warning' | 'success' }> = {
+  [PurchaseInStockStatus.DRAFT]: { label: '草稿', type: 'info' },
+  [PurchaseInStockStatus.APPROVED]: { label: '已审核', type: 'warning' },
+  [PurchaseInStockStatus.UPLOADED]: { label: '已上架', type: 'success' },
+}
 const statusMeta = computed(() =>
   detail.value
-    ? (statusMap[detail.value.status] ?? { label: detail.value.status, type: 'info' as const })
+    ? (statusMap[detail.value.status] ?? { label: String(detail.value.status), type: 'info' as const })
     : { label: '', type: 'info' as const },
 )
-const inTypeMap: Record<string, string> = {
-  PURCHASE_NORMAL: '采购入库',
-  PURCHASE_RETURN: '采购退货',
-  PURCHASE_GIFT: '赠品入库',
+const inTypeMap: Record<number, string> = {
+  [PurchaseInStockType.PURCHASE_NORMAL]: '采购入库',
+  [PurchaseInStockType.PURCHASE_RETURN]: '采购退货',
+  [PurchaseInStockType.PURCHASE_GIFT]: '赠品入库',
 }
 
 watch(

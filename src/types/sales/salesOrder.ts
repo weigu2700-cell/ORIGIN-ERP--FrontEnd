@@ -1,4 +1,6 @@
 import type { PageResult } from '../common'
+import { SalesOrderStatus as SalesOrderStatusCode } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
 export interface SalesOrderVo {
   id: string
@@ -13,7 +15,7 @@ export interface SalesOrderVo {
   items: SalesOrderItemVo[]
 }
 
-export type SalesOrderStatus = 'DRAFT' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
+export type SalesOrderStatus = EnumCodeOf<typeof SalesOrderStatusCode>
 
 export interface SalesOrderItemVo {
   id: string
@@ -32,8 +34,8 @@ export interface SalesOrderItemVo {
 export type PageSalesOrder = PageResult<SalesOrderVo>
 
 export interface PostOrPutSalesOrderItem {
-  materialId: number
-  warehouseId: number
+  materialId: string
+  warehouseId: string
   quantity: number
   unitPrice: number
 }

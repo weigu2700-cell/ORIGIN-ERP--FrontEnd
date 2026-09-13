@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
-import { ElMessage } from 'element-plus';
-import type { FormInstance, FormRules } from 'element-plus';
-import type { PostSaleDelivery, PostSaleDeliveryItem } from '@/types/sales/salesDelivery';
-import SalesOrderRefer from '@/refer/SalesOrderRefer.vue';
-import WarehouseRefer from '@/refer/WarehouseRefer.vue';
-import MaterialRefer from '@/refer/MaterialRefer.vue';
-import BaseSaveDialog from '@/components/BaseSaveDialog.vue';
+import { reactive, ref, watch } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
+import type { PostSaleDelivery } from '@/types/sales/salesDelivery'
+import SalesOrderRefer from '@/refer/SalesOrderRefer.vue'
+import WarehouseRefer from '@/refer/WarehouseRefer.vue'
+import MaterialRefer from '@/refer/MaterialRefer.vue'
+import BaseSaveDialog from '@/components/BaseSaveDialog.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -22,21 +21,21 @@ const emit = defineEmits<{
 const formRef = ref<FormInstance>()
 
 const form = reactive<PostSaleDelivery>({
-  salesOrderId: 0,
+  salesOrderId: '',
   deliveryDate: '',
   items: [],
-  remark: ''
+  remark: '',
 })
 
 const rules: FormRules = {
   salesOrderId: [{ required: true, message: '请选择销售订单', trigger: 'change' }],
-  deliveryDate: [{ required: true, message: '请选择交货日期', trigger: 'change' }]
+  deliveryDate: [{ required: true, message: '请选择交货日期', trigger: 'change' }],
 }
 
 const addItem = () => {
   form.items.push({
     salesOrderItemId: 0,
-    quantity: 0
+    quantity: 0,
   })
 }
 
@@ -45,7 +44,7 @@ const removeItem = (index: number) => {
 }
 
 const handleSalesOrderChange = (value: string | number | null) => {
-  form.salesOrderId = Number(value ?? 0)
+  form.salesOrderId = String(value ?? '')
 }
 
 const handleSubmit = () => {
@@ -59,21 +58,29 @@ const handleCancel = () => {
   emit('cancel')
 }
 
-watch(() => props.visible, (val) => {
-  if (!val) return
-  if (props.mode === 'add') {
-    form.salesOrderId = 0
-    form.deliveryDate = ''
-    form.items = []
-    form.remark = ''
-  }
-  formRef.value?.clearValidate()
-})
+watch(
+  () => props.visible,
+  (val) => {
+    if (!val) return
+    if (props.mode === 'add') {
+      form.salesOrderId = ''
+      form.deliveryDate = ''
+      form.items = []
+      form.remark = ''
+    }
+    formRef.value?.clearValidate()
+  },
+)
 </script>
 
 <template>
-  <BaseSaveDialog :visible="props.visible" :title="props.title ?? '新增销售交货单'" width="900px" @cancel="handleCancel"
-    @submit="handleSubmit">
+  <BaseSaveDialog
+    :visible="props.visible"
+    :title="props.title ?? '新增销售交货单'"
+    width="900px"
+    @cancel="handleCancel"
+    @submit="handleSubmit"
+  >
     <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-row :gutter="20">
         <el-col :span="12">
@@ -83,8 +90,14 @@ watch(() => props.visible, (val) => {
         </el-col>
         <el-col :span="12">
           <el-form-item label="交货日期" prop="deliveryDate">
-            <el-date-picker v-model="form.deliveryDate" type="datetime" placeholder="请选择交货日期"
-              format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ss" style="width: 100%" />
+            <el-date-picker
+              v-model="form.deliveryDate"
+              type="datetime"
+              placeholder="请选择交货日期"
+              format="YYYY-MM-DD HH:mm:ss"
+              value-format="YYYY-MM-DDTHH:mm:ss"
+              style="width: 100%"
+            />
           </el-form-item>
         </el-col>
       </el-row>

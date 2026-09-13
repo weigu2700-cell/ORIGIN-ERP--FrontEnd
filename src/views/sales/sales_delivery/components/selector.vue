@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import ProSearch from '@/components/ProSearch.vue';
-import CustomerRefer from '@/refer/CustomerRefer.vue';
-import type { GetPageSalesDelivery } from '@/types/sales/salesDelivery';
+import ProSearch from '@/components/ProSearch.vue'
+import CustomerRefer from '@/refer/CustomerRefer.vue'
+import type { GetPageSalesDelivery } from '@/types/sales/salesDelivery'
+import { SalesDeliveryStatus } from '@/constants/enumCode'
+import { reactive, watch } from 'vue'
 
 const props = defineProps<{
   queryData: GetPageSalesDelivery
@@ -12,8 +14,16 @@ const emit = defineEmits<{
   (e: 'reset'): void
 }>()
 
+const localQuery = reactive<GetPageSalesDelivery>({ ...props.queryData })
+
+watch(
+  () => props.queryData,
+  (queryData) => Object.assign(localQuery, queryData),
+  { deep: true },
+)
+
 const handleQuery = () => {
-  emit('query', props.queryData)
+  emit('query', { ...localQuery })
 }
 
 const handleReset = () => {
@@ -21,19 +31,19 @@ const handleReset = () => {
 }
 
 const statusOptions = [
-  { label: '草稿', value: 'DRAFT' },
-  { label: '已确认', value: 'CONFIRMED' },
-  { label: '已完成', value: 'COMPLETED' },
-  { label: '已取消', value: 'CANCELLED' }
+  { label: '草稿', value: SalesDeliveryStatus.DRAFT },
+  { label: '已确认', value: SalesDeliveryStatus.CONFIRMED },
+  { label: '已完成', value: SalesDeliveryStatus.COMPLETED },
+  { label: '已取消', value: SalesDeliveryStatus.CANCELLED },
 ]
 </script>
 
 <template>
   <ProSearch @search="handleQuery" @reset="handleReset">
     <div class="search-container">
-      <el-input v-model="props.queryData.deliveryNo" placeholder="请输入交货单号" clearable />
-      <CustomerRefer class="customer" v-model="props.queryData.customerId" />
-      <el-select v-model="props.queryData.status" placeholder="请选择状态" clearable>
+      <el-input v-model="localQuery.deliveryNo" placeholder="请输入交货单号" clearable />
+      <CustomerRefer class="customer" v-model="localQuery.customerId" />
+      <el-select v-model="localQuery.status" placeholder="请选择状态" clearable>
         <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
     </div>

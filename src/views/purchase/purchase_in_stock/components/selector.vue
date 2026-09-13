@@ -4,6 +4,7 @@ import MaterialRefer from '@/refer/MaterialRefer.vue'
 import SupplierRefer from '@/refer/SupplierRefer.vue'
 import WarehouseRefer from '@/refer/WarehouseRefer.vue'
 import type { PurchaseInStockQuery } from '@/types/purchase/purchaseInStock'
+import { PurchaseInStockStatus } from '@/constants/enumCode'
 import { reactive, watch } from 'vue'
 
 const props = defineProps<{
@@ -48,9 +49,9 @@ const handleReset = () => {
         <el-option label="赠品入库" value="PURCHASE_GIFT" />
       </el-select>
       <el-select v-model="localQuery.status" placeholder="请选择状态" clearable>
-        <el-option label="草稿" value="DRAFT" />
-        <el-option label="已审核" value="APPROVED" />
-        <el-option label="已上架" value="UPLOADED" />
+        <el-option label="草稿" :value="PurchaseInStockStatus.DRAFT" />
+        <el-option label="已审核" :value="PurchaseInStockStatus.APPROVED" />
+        <el-option label="已上架" :value="PurchaseInStockStatus.UPLOADED" />
       </el-select>
       <el-date-picker v-model="localQuery.productionDate" type="date" placeholder="请选择生产日期" clearable />
       <el-date-picker v-model="localQuery.deliveryDate" type="date" placeholder="请选择到货日期" clearable />

@@ -7,12 +7,25 @@ import ProTable, { type ProColumn } from '@/components/ProTable.vue'
 import Selector from './components/selector.vue'
 import SaveDialog from './components/save.vue'
 import DetailDialog from './components/detail.vue'
-import { approvePurchaseDemand, closePurchaseDemand, createPurchaseDemand, getPagePurchaseDemand } from '@/api/purchase/purchaseDemand'
+import {
+  approvePurchaseDemand,
+  closePurchaseDemand,
+  createPurchaseDemand,
+  getPagePurchaseDemand,
+} from '@/api/purchase/purchaseDemand'
 import type { PurchaseDemandAdd, PurchaseDemandQuery, PurchaseDemandVo } from '@/types/purchase/purchaseDemand'
 import type { PageResult } from '@/types/common'
 import { formatDate, formatDecimal } from '@/composables/useFormat'
+import { PurchaseDemandSourceType, PurchaseDemandStatus } from '@/constants/enumCode'
 
-const queryData = reactive<PurchaseDemandQuery>({ pageNum: 1, pageSize: 10, materialId: '', sourceType: '', sourceNo: '', status: '' })
+const queryData = reactive<PurchaseDemandQuery>({
+  pageNum: 1,
+  pageSize: 10,
+  materialId: '',
+  sourceType: '',
+  sourceNo: '',
+  status: '',
+})
 const tableData = ref<PageResult<PurchaseDemandVo>>()
 const selectedRow = ref<PurchaseDemandVo | null>(null)
 const saveVisible = ref(false)
@@ -20,18 +33,22 @@ const detailVisible = ref(false)
 const detailId = ref<string>()
 
 const statusOptions = [
-  { label: '草稿', value: 'DRAFT', tone: 'info' },
-  { label: '已审批', value: 'APPROVED', tone: 'success' },
-  { label: '已关闭', value: 'CLOSED', tone: 'danger' },
+  { label: '草稿', value: PurchaseDemandStatus.DRAFT, tone: 'info' },
+  { label: '已审批', value: PurchaseDemandStatus.APPROVED, tone: 'success' },
+  { label: '已关闭', value: PurchaseDemandStatus.CLOSED, tone: 'danger' },
 ] as const
-const cards = computed<ProPageHeaderCard[]>(() => statusOptions.map(option => ({
-  ...option,
-  count: (tableData.value?.records ?? []).filter(row => row.status === option.value).length,
-  hint: '条 · 当前页',
-})))
+const cards = computed<ProPageHeaderCard[]>(() =>
+  statusOptions.map((option) => ({
+    ...option,
+    count: (tableData.value?.records ?? []).filter((row) => row.status === option.value).length,
+    hint: '条 · 当前页',
+  })),
+)
 const workflow = computed(() => {
-  if (selectedRow.value?.status === 'DRAFT') return { label: '审批需求', next: 'APPROVED' }
-  if (selectedRow.value?.status === 'APPROVED') return { label: '关闭需求', next: 'CLOSED' }
+  if (selectedRow.value?.status === PurchaseDemandStatus.DRAFT)
+    return { label: '审批需求', next: PurchaseDemandStatus.APPROVED }
+  if (selectedRow.value?.status === PurchaseDemandStatus.APPROVED)
+    return { label: '关闭需求', next: PurchaseDemandStatus.CLOSED }
   return null
 })
 const columns: ProColumn<PurchaseDemandVo>[] = [
@@ -43,16 +60,40 @@ const columns: ProColumn<PurchaseDemandVo>[] = [
   { label: '来源单号', prop: 'sourceNo', minWidth: 180 },
   { label: '创建时间', prop: 'createTime', width: 170, slot: 'createTime' },
 ]
-const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'danger' }> = {
-  DRAFT: { label: '草稿', type: 'info' }, APPROVED: { label: '已审批', type: 'success' }, CLOSED: { label: '已关闭', type: 'danger' },
+const statusMap: Record<number, { label: string; type: 'info' | 'success' | 'danger' }> = {
+  [PurchaseDemandStatus.DRAFT]: { label: '草稿', type: 'info' },
+  [PurchaseDemandStatus.APPROVED]: { label: '已审批', type: 'success' },
+  [PurchaseDemandStatus.CLOSED]: { label: '已关闭', type: 'danger' },
 }
-const sourceMap: Record<string, string> = { PRODUCTION_ORDER: '生产订单', OTHER: '其他' }
+const sourceMap: Record<number, string> = {
+  [PurchaseDemandSourceType.PRODUCTION_ORDER]: '生产订单',
+  [PurchaseDemandSourceType.OTHER]: '其他',
+}
 
-const loadData = async () => { selectedRow.value = null; tableData.value = await getPagePurchaseDemand(queryData) }
-const query = () => { queryData.pageNum = 1; loadData() }
-const reset = () => { Object.assign(queryData, { pageNum: 1, materialId: '', sourceType: '', sourceNo: '', status: '' }); loadData() }
-const changeStatusFilter = (status: string | number) => { queryData.status = String(status); query() }
-const openDetail = (row: PurchaseDemandVo) => { detailId.value = String(row.id); detailVisible.value = true }
+const loadData = async () => {
+  selectedRow.value = null
+  tableData.value = await getPagePurchaseDemand(queryData)
+}
+
+const query = () => {
+  queryData.pageNum = 1
+  loadData()
+}
+
+const reset = () => {
+  Object.assign(queryData, { pageNum: 1, materialId: '', sourceType: '', sourceNo: '', status: '' })
+  loadData()
+}
+
+const changeStatusFilter = (status: string | number) => {
+  queryData.status = Number(status) as PurchaseDemandQuery['status']
+  query()
+}
+
+const openDetail = (row: PurchaseDemandVo) => {
+  detailId.value = String(row.id)
+  detailVisible.value = true
+}
 
 const submit = async (data: PurchaseDemandAdd) => {
   await createPurchaseDemand(data)
@@ -69,11 +110,13 @@ const advanceWorkflow = async () => {
   const action = workflow.value
   try {
     await ElMessageBox.confirm(`确定${action.label}吗？`, '状态流转', { type: 'warning' })
-    if (action.next === 'APPROVED') await approvePurchaseDemand(selectedRow.value.id)
+    if (action.next === PurchaseDemandStatus.APPROVED) await approvePurchaseDemand(selectedRow.value.id)
     else await closePurchaseDemand(selectedRow.value.id)
     ElMessage.success(`${action.label}成功`)
     loadData()
-  } catch { /* 用户取消或请求失败 */ }
+  } catch {
+    /* 用户取消或请求失败 */
+  }
 }
 
 onMounted(loadData)
@@ -81,25 +124,58 @@ onMounted(loadData)
 
 <template>
   <div class="container">
-    <ProPageHeader title="采购需求" description="汇总物料采购需求，跟踪审批与关闭状态"
-      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`" :cards="cards" :model-value="queryData.status"
-      @change="changeStatusFilter">
+    <ProPageHeader
+      title="采购需求"
+      description="汇总物料采购需求，跟踪审批与关闭状态"
+      :summary="`符合筛选条件 ${(tableData?.total ?? 0).toLocaleString()} 条`"
+      :cards="cards"
+      :model-value="queryData.status"
+      @change="changeStatusFilter"
+    >
       <template #search>
         <Selector :query-data="queryData" @query="query" @reset="reset" />
       </template>
       <template #toolbar>
-        <ProToolbar :show-edit="false" :show-delete="false" :show-export="false" :show-status="!!workflow"
-          :status-label="workflow?.label" @add="saveVisible = true" @status="advanceWorkflow" @refresh="loadData" />
+        <ProToolbar
+          :show-edit="false"
+          :show-delete="false"
+          :show-export="false"
+          :show-status="!!workflow"
+          :status-label="workflow?.label"
+          @add="saveVisible = true"
+          @status="advanceWorkflow"
+          @refresh="loadData"
+        />
       </template>
     </ProPageHeader>
     <section class="table">
-      <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
-        :page="queryData.pageNum" :page-size="queryData.pageSize"
-        @update:page="(page: number) => { queryData.pageNum = page; loadData() }"
-        @update:page-size="(size: number) => { queryData.pageSize = size; queryData.pageNum = 1; loadData() }"
-        @selection-change="(rows: PurchaseDemandVo[]) => selectedRow = rows[0] ?? null" @row-dblclick="openDetail">
-        <template #status="{ row }"><el-tag :type="statusMap[row.status]?.type ?? 'info'">{{
-          statusMap[row.status]?.label ?? row.status }}</el-tag></template>
+      <ProTable
+        :data="tableData?.records ?? []"
+        :columns="columns"
+        :total="tableData?.total ?? 0"
+        :page="queryData.pageNum"
+        :page-size="queryData.pageSize"
+        @update:page="
+          (page: number) => {
+            queryData.pageNum = page
+            loadData()
+          }
+        "
+        @update:page-size="
+          (size: number) => {
+            queryData.pageSize = size
+            queryData.pageNum = 1
+            loadData()
+          }
+        "
+        @selection-change="(rows: PurchaseDemandVo[]) => (selectedRow = rows[0] ?? null)"
+        @row-dblclick="openDetail"
+      >
+        <template #status="{ row }">
+          <el-tag :type="statusMap[row.status]?.type ?? 'info'">
+            {{ statusMap[row.status]?.label ?? row.status }}
+          </el-tag>
+        </template>
         <template #quantity="{ row }">{{ formatDecimal.default(row.purchaseQuantity, 4) }}</template>
         <template #sourceType="{ row }">{{ sourceMap[row.sourceType] ?? row.sourceType }}</template>
         <template #createTime="{ row }">{{ formatDate.DateTime(row.createTime) }}</template>

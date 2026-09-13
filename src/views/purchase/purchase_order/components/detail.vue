@@ -5,6 +5,7 @@ import BusinessDocumentDialog from '@/components/BusinessDocumentDialog.vue'
 import { getDetailPurchaseOrder } from '@/api/purchase/purchaseOrder'
 import type { PurchaseOrderVo } from '@/types/purchase/purchaseOrder'
 import { formatDate, formatDecimal } from '@/composables/useFormat'
+import { PurchaseOrderStatus } from '@/constants/enumCode'
 
 defineOptions({ name: 'PurchaseOrderDetail' })
 
@@ -12,17 +13,17 @@ const props = defineProps<{ visible: boolean; orderId?: string }>()
 const emit = defineEmits<{ (e: 'cancel'): void }>()
 const detail = ref<PurchaseOrderVo | null>(null)
 const loading = ref(false)
-const statusMap = {
-  DRAFT: { label: '草稿', type: 'info' },
-  APPROVED: { label: '已审批', type: 'primary' },
-  SHIPPED: { label: '已发货', type: 'warning' },
-  RECEIVED: { label: '已收货', type: 'success' },
-  CLOSED: { label: '已关闭', type: 'danger' },
-} as const
+const statusMap: Record<number, { label: string; type: 'info' | 'primary' | 'warning' | 'success' | 'danger' }> = {
+  [PurchaseOrderStatus.DRAFT]: { label: '草稿', type: 'info' },
+  [PurchaseOrderStatus.APPROVED]: { label: '已审批', type: 'primary' },
+  [PurchaseOrderStatus.SHIPPED]: { label: '已发货', type: 'warning' },
+  [PurchaseOrderStatus.RECEIVED]: { label: '已收货', type: 'success' },
+  [PurchaseOrderStatus.CLOSED]: { label: '已关闭', type: 'danger' },
+}
 const statusMeta = computed(() =>
   detail.value
-    ? (statusMap[detail.value.status as keyof typeof statusMap] ?? {
-        label: detail.value.status,
+    ? (statusMap[detail.value.status] ?? {
+        label: String(detail.value.status),
         type: 'info' as const,
       })
     : { label: '', type: 'info' as const },

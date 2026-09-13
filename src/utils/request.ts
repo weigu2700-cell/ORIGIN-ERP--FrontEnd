@@ -2,33 +2,31 @@ import axios, {
   type AxiosInstance,
   type InternalAxiosRequestConfig,
   type AxiosError,
-  type AxiosRequestConfig
+  type AxiosRequestConfig,
 } from 'axios'
-import {ElMessage} from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { getToken, removeToken } from '@/utils/auth'
 
-const http:AxiosInstance = axios.create({
+const http: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json'
-  }
-
+    'Content-Type': 'application/json',
+  },
 })
 
 http.interceptors.request.use(
-  (config:InternalAxiosRequestConfig) => {
-  const token:string | null = getToken()
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
+  (config: InternalAxiosRequestConfig) => {
+    const token: string | null = getToken()
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
   },
-  (error:AxiosError) => {
+  (error: AxiosError) => {
     return Promise.reject(error)
-  }
+  },
 )
-
 
 http.interceptors.response.use(
   (response) => {
@@ -43,7 +41,7 @@ http.interceptors.response.use(
     }
     return result.data
   },
-  (error:AxiosError) => {
+  (error: AxiosError) => {
     switch (error.response?.status) {
       case 401:
         removeToken()
@@ -65,46 +63,27 @@ http.interceptors.response.use(
         }
     }
     return Promise.reject(error)
-  }
+  },
 )
 
-
-function request<T>(
-  config: AxiosRequestConfig
-): Promise<T>
-function request(
-  config: AxiosRequestConfig
-): Promise<unknown> {
+function request<T>(config: AxiosRequestConfig): Promise<T>
+function request(config: AxiosRequestConfig): Promise<unknown> {
   return http.request(config)
 }
 
-export function get<T>(
-  url:string,
-  config?:AxiosRequestConfig
-):Promise<T>{
+export function get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   return request<T>({ ...config, method: 'GET', url })
 }
 
-export function post<T>(
-  url:string,
-  data?:unknown,
-  config?:AxiosRequestConfig
-):Promise<T>{
+export function post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
   return request<T>({ ...config, method: 'POST', url, data })
 }
 
-export function put<T>(
-  url:string,
-  data?:unknown,
-  config?:AxiosRequestConfig
-):Promise<T>{
+export function put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
   return request<T>({ ...config, method: 'PUT', url, data })
 }
 
-export function del<T>(
-  url:string,
-  config?:AxiosRequestConfig
-):Promise<T>{
+export function del<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
   return request<T>({ ...config, method: 'DELETE', url })
 }
 
@@ -112,7 +91,7 @@ const service = {
   get,
   post,
   put,
-  del
+  del,
 }
 
 export default service

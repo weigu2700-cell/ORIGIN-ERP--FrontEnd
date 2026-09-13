@@ -2,6 +2,7 @@
 import ReferPicker from '@/components/ReferPicker.vue'
 import { getPageBom } from '@/api/product/Bom'
 import type { BomQuery } from '@/types/product/Bom'
+import { BomStatus } from '@/constants/enumCode'
 
 const props = defineProps<{
   modelValue?: string | number | null
@@ -25,14 +26,24 @@ const fetcher = async (params: Record<string, unknown>) => {
     pageSize: Number(params.pageSize ?? 10),
     bomNo: (params.bomNo as string | undefined) ?? null,
     materialId: null,
-    status: 'ACTIVE',
+    status: BomStatus.ACTIVE,
   } as BomQuery)
   return { ...result, total: Number(result.total ?? 0) }
 }
 </script>
 
 <template>
-  <ReferPicker :model-value="props.modelValue" :display-text="props.displayText" title="选择BOM" placeholder="请选择BOM"
-    search-field="bomNo" search-placeholder="请输入BOM编号" value-key="materialId" label-key="materialName"
-    :columns="columns" :fetcher="fetcher" @update:model-value="emit('update:modelValue', $event)" />
+  <ReferPicker
+    :model-value="props.modelValue"
+    :display-text="props.displayText"
+    title="选择BOM"
+    placeholder="请选择BOM"
+    search-field="bomNo"
+    search-placeholder="请输入BOM编号"
+    value-key="materialId"
+    label-key="materialName"
+    :columns="columns"
+    :fetcher="fetcher"
+    @update:model-value="emit('update:modelValue', $event)"
+  />
 </template>

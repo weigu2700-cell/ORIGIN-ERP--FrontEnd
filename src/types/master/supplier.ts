@@ -1,6 +1,8 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { SupplierStatus as SupplierStatusCode } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type SupplierStatus = 'ACTIVE' | 'INACTIVE'
+export type SupplierStatus = EnumCodeOf<typeof SupplierStatusCode> | string
 
 export interface SupplierListRequest {
   page: number
@@ -28,7 +30,7 @@ export interface SupplierVO {
   createdTime?: string
 }
 
-export interface SupplierListResponse extends PageResult<SupplierVO> {}
+export type SupplierListResponse = PageResult<SupplierVO>
 
 export interface SupplierCreateRequest {
   name: string
@@ -41,4 +43,4 @@ export interface SupplierCreateRequest {
   remark?: string
 }
 
-export interface SupplierUpdateRequest extends SupplierCreateRequest {}
+export type SupplierUpdateRequest = SupplierCreateRequest

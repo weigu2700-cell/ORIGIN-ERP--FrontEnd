@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
-import { ElMessage } from 'element-plus';
-import type { FormInstance, FormRules } from 'element-plus';
-import type { PostOrPutSalesOrder, PostOrPutSalesOrderItem, SalesOrderVo } from '@/types/sales/salesOrder';
-import CustomerRefer from '@/refer/CustomerRefer.vue';
-import MaterialRefer from '@/refer/MaterialRefer.vue';
-import WarehouseRefer from '@/refer/WarehouseRefer.vue';
-import BaseSaveDialog from '@/components/BaseSaveDialog.vue';
+import { reactive, ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import type { FormInstance, FormRules } from 'element-plus'
+import type { PostOrPutSalesOrder, PostOrPutSalesOrderItem, SalesOrderVo } from '@/types/sales/salesOrder'
+import CustomerRefer from '@/refer/CustomerRefer.vue'
+import MaterialRefer from '@/refer/MaterialRefer.vue'
+import WarehouseRefer from '@/refer/WarehouseRefer.vue'
+import BaseSaveDialog from '@/components/BaseSaveDialog.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -27,21 +27,21 @@ const form = reactive<PostOrPutSalesOrder>({
   orderDate: '',
   deliveryDate: '',
   remark: '',
-  items: []
+  items: [],
 })
 
 const rules: FormRules = {
   customerId: [{ required: true, message: '请选择客户', trigger: 'change' }],
   orderDate: [{ required: true, message: '请选择订单日期', trigger: 'change' }],
-  deliveryDate: [{ required: true, message: '请选择交货日期', trigger: 'change' }]
+  deliveryDate: [{ required: true, message: '请选择交货日期', trigger: 'change' }],
 }
 
 const addItem = () => {
   form.items.push({
-    materialId: 0,
-    warehouseId: 0,
+    materialId: '',
+    warehouseId: '',
     quantity: 0,
-    unitPrice: 0
+    unitPrice: 0,
   })
 }
 
@@ -55,41 +55,44 @@ const calculateAmount = (item: PostOrPutSalesOrderItem) => {
 
 const handleCustomerChange = (v: string | number | null) => {
   form.customerId = v == null ? '' : String(v)
-  formRef.value?.validateField('customerId').catch(() => { })
+  formRef.value?.validateField('customerId').catch(() => {})
 }
 
 const handleMaterialChange = (index: number, v: string | number | null) => {
   if (form.items[index]) {
-    form.items[index].materialId = v == null ? 0 : Number(v)
+    form.items[index].materialId = v == null ? '' : String(v)
   }
 }
 
 const handleWarehouseChange = (index: number, v: string | number | null) => {
   if (form.items[index]) {
-    form.items[index].warehouseId = v == null ? 0 : Number(v)
+    form.items[index].warehouseId = v == null ? '' : String(v)
   }
 }
 
 const resetForm = () => {
   const isEdit = props.mode === 'edit' && !!props.row
-  form.customerId = isEdit ? props.row?.customerId ?? '' : ''
+  form.customerId = isEdit ? (props.row?.customerId ?? '') : ''
   form.orderDate = isEdit ? String(props.row?.orderDate ?? '') : ''
   form.deliveryDate = isEdit ? String(props.row?.deliveryDate ?? '') : ''
-  form.remark = isEdit ? props.row?.remark ?? '' : ''
+  form.remark = isEdit ? (props.row?.remark ?? '') : ''
   form.items = isEdit
     ? (props.row?.items ?? []).map((item) => ({
-      materialId: Number(item.materialId),
-      warehouseId: Number(item.warehouseId),
-      quantity: item.quantity,
-      unitPrice: item.unitPrice
-    }))
+        materialId: item.materialId,
+        warehouseId: item.warehouseId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      }))
     : []
   formRef.value?.clearValidate()
 }
 
-watch(() => props.visible, (val) => {
-  if (val) resetForm()
-})
+watch(
+  () => props.visible,
+  (val) => {
+    if (val) resetForm()
+  },
+)
 
 const handleSubmit = async () => {
   const valid = await formRef.value?.validate().catch(() => false)
@@ -110,8 +113,13 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <BaseSaveDialog :visible="props.visible" :title="props.title ?? (props.mode === 'edit' ? '修改销售订单' : '新增销售订单')"
-    width="1000px" @cancel="handleCancel" @submit="handleSubmit">
+  <BaseSaveDialog
+    :visible="props.visible"
+    :title="props.title ?? (props.mode === 'edit' ? '修改销售订单' : '新增销售订单')"
+    width="1000px"
+    @cancel="handleCancel"
+    @submit="handleSubmit"
+  >
     <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
       <el-row :gutter="20">
         <el-col :span="8">
@@ -121,14 +129,26 @@ const handleCancel = () => {
         </el-col>
         <el-col :span="8">
           <el-form-item label="订单日期" prop="orderDate">
-            <el-date-picker v-model="form.orderDate" type="datetime" placeholder="请选择订单日期" format="YYYY-MM-DD HH:mm:ss"
-              value-format="YYYY-MM-DDTHH:mm:ss" style="width: 100%" />
+            <el-date-picker
+              v-model="form.orderDate"
+              type="datetime"
+              placeholder="请选择订单日期"
+              format="YYYY-MM-DD HH:mm:ss"
+              value-format="YYYY-MM-DDTHH:mm:ss"
+              style="width: 100%"
+            />
           </el-form-item>
         </el-col>
         <el-col :span="8">
           <el-form-item label="交货日期" prop="deliveryDate">
-            <el-date-picker v-model="form.deliveryDate" type="datetime" placeholder="请选择交货日期"
-              format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DDTHH:mm:ss" style="width: 100%" />
+            <el-date-picker
+              v-model="form.deliveryDate"
+              type="datetime"
+              placeholder="请选择交货日期"
+              format="YYYY-MM-DD HH:mm:ss"
+              value-format="YYYY-MM-DDTHH:mm:ss"
+              style="width: 100%"
+            />
           </el-form-item>
         </el-col>
       </el-row>
@@ -177,7 +197,6 @@ const handleCancel = () => {
         </el-table-column>
       </el-table>
     </el-form>
-
   </BaseSaveDialog>
 </template>
 

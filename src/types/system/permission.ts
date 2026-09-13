@@ -1,7 +1,9 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { EnableStatus, PermissionType as PermissionTypeCode } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type PermissionType = 'MENU' | 'BUTTON'
-export type PermissionStatus = 'ENABLE' | 'DISABLE'
+export type PermissionType = EnumCodeOf<typeof PermissionTypeCode> | string
+export type PermissionStatus = EnumCodeOf<typeof EnableStatus> | string
 
 // 权限记录 / 树节点（PermissionTreeVO）
 export interface PermissionNode {
@@ -29,7 +31,7 @@ export interface PermissionListRequest {
 }
 
 // 分页列表响应（PagePermissionTreeVO）
-export interface PermissionListResponse extends PageResult<PermissionNode> {}
+export type PermissionListResponse = PageResult<PermissionNode>
 
 // 新增参数（PermissionCreateDTO）
 export interface PermissionCreateRequest {

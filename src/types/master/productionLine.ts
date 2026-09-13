@@ -1,6 +1,8 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { EnableStatus } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type ProductionLineStatus = 'ENABLE' | 'DISABLE'
+export type ProductionLineStatus = EnumCodeOf<typeof EnableStatus> | string
 
 export interface ProductionLineListRequest {
   page: number
@@ -21,7 +23,7 @@ export interface ProductionLineVO {
   createTime?: string
 }
 
-export interface ProductionLineListResponse extends PageResult<ProductionLineVO> {}
+export type ProductionLineListResponse = PageResult<ProductionLineVO>
 
 export interface ProductionLineCreateRequest {
   name: string
@@ -31,4 +33,4 @@ export interface ProductionLineCreateRequest {
   remark?: string
 }
 
-export interface ProductionLineUpdateRequest extends ProductionLineCreateRequest {}
+export type ProductionLineUpdateRequest = ProductionLineCreateRequest

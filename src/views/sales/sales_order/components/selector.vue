@@ -2,6 +2,7 @@
 import ProSearch from '@/components/ProSearch.vue'
 import CustomerRefer from '@/refer/CustomerRefer.vue'
 import type { GetPageSalesOrderQuery } from '@/types/sales/salesOrder'
+import { SalesOrderStatus } from '@/constants/enumCode'
 import { reactive, watch } from 'vue'
 
 const props = defineProps<{
@@ -30,10 +31,10 @@ const handleReset = () => {
 }
 
 const statusOptions = [
-  { label: '草稿', value: 'DRAFT' },
-  { label: '已确认', value: 'CONFIRMED' },
-  { label: '已完成', value: 'COMPLETED' },
-  { label: '已取消', value: 'CANCELLED' },
+  { label: '草稿', value: SalesOrderStatus.DRAFT },
+  { label: '已确认', value: SalesOrderStatus.CONFIRMED },
+  { label: '已完成', value: SalesOrderStatus.COMPLETED },
+  { label: '已取消', value: SalesOrderStatus.CANCELLED },
 ]
 </script>
 

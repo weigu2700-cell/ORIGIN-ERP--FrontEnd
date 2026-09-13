@@ -1,6 +1,8 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { EnableStatus } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type FactoryStatus = 'ENABLE' | 'DISABLE'
+export type FactoryStatus = EnumCodeOf<typeof EnableStatus> | string
 
 export interface FactoryListRequest {
   page: number
@@ -21,8 +23,7 @@ export interface FactoryVO {
   remark?: string
 }
 
-export interface FactoryListResponse extends PageResult<FactoryVO> {}
-
+export type FactoryListResponse = PageResult<FactoryVO>
 
 export interface FactoryAdd {
   name: string

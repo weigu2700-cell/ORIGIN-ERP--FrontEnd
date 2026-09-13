@@ -1,4 +1,5 @@
-
+import { BomStatus } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
 export interface BomAdd {
   materialId: string
@@ -15,56 +16,56 @@ export interface BomAddItem {
 }
 
 export interface BomQuery {
-  pageNum: number;
-  pageSize: number;
-  bomNo?: string | null;
-  materialId?: string| null;
-  status?: string| null;
+  pageNum: number
+  pageSize: number
+  bomNo?: string | null
+  materialId?: string | null
+  status?: EnumCodeOf<typeof BomStatus> | null
 }
 
 export interface BomItemVo {
-  id: number;
-  bomId: number;
-  lineNo: number;
-  componentMaterialId: string;
-  componentMaterialCode: string;
-  componentMaterialName: string;
-  quantity: number;
-  lossRate: number;
-  remark: string;
+  id: number
+  bomId: number
+  lineNo: number
+  componentMaterialId: string
+  componentMaterialCode: string
+  componentMaterialName: string
+  quantity: number
+  lossRate: number
+  remark: string
 }
 
 export interface BomVo {
-  id: string;
-  bomNo: string;
-  materialId: string;
-  materialCode: string;
-  materialName: string;
-  status: string;
-  version: number;
-  remark: string;
-  createTime: string;
-  updateTime: string;
-  bomItems: BomItemVo[];
+  id: string
+  bomNo: string
+  materialId: string
+  materialCode: string
+  materialName: string
+  status: EnumCodeOf<typeof BomStatus>
+  version: number
+  remark: string
+  createTime: string
+  updateTime: string
+  bomItems: BomItemVo[]
 }
 
 export interface BomExplosionVo {
-  materialId: string;
-  materialCode: string;
-  materialName: string;
-  quantity: number;
-  level: number;
-  children: BomExplosionVo[];
+  materialId: string
+  materialCode: string
+  materialName: string
+  quantity: number
+  level: number
+  children: BomExplosionVo[]
 }
 
 export interface MaterialRequirementVo {
-  materialId: string;
-  materialCode: string;
-  materialName: string;
+  materialId: string
+  materialCode: string
+  materialName: string
   // 毛需求量
-  grossQuantity: number;
+  grossQuantity: number
   // 可用量
-  stockUsedAvailableQuantity: number;
+  stockUsedAvailableQuantity: number
   // 缺口量
-  shortageQuantity: number;
+  shortageQuantity: number
 }

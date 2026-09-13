@@ -1,4 +1,7 @@
-export type ProductionPickingStatus = 'DRAFT' | 'APPROVED' | 'PICKED' | 'CANCELLED'
+import { ProductionPickingStatus as ProductionPickingStatusCode } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
+
+export type ProductionPickingStatus = EnumCodeOf<typeof ProductionPickingStatusCode>
 
 export interface ProductionPicking {
   id: string
@@ -14,8 +17,7 @@ export interface ProductionPicking {
   warehouseName?: string | null
   plannedQuantity: number
   actualQuantity: number
-  /** 后端当前可能返回枚举名、编码或中文描述，页面统一做兼容展示。 */
-  status: ProductionPickingStatus | string | number
+  status: ProductionPickingStatus
   pickingTime?: string | null
   createTime?: string | null
   updateTime?: string | null

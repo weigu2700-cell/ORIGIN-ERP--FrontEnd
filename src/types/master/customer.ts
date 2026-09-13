@@ -1,13 +1,15 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { CustomerStatus as CustomerStatusCode } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type CustomerStatus = 'ACTIVE' | 'INACTIVE'
+export type CustomerStatus = EnumCodeOf<typeof CustomerStatusCode> | string
 
 export interface CustomerListRequest {
   page: number
   pageSize: number
   name?: string | null
   code?: string | null
-  status?: number | null
+  status?: CustomerStatus | null
 }
 
 export interface CustomerVO {
@@ -21,11 +23,11 @@ export interface CustomerVO {
   phone?: string
   email?: string
   remark?: string
-  status?: number
+  status?: CustomerStatus
   createdTime?: string
 }
 
-export interface CustomerListResponse extends PageResult<CustomerVO> {}
+export type CustomerListResponse = PageResult<CustomerVO>
 
 export interface CustomerCreateRequest {
   name: string
@@ -34,15 +36,15 @@ export interface CustomerCreateRequest {
   address?: string
   phone?: string
   email?: string
-  status?: number
+  status?: CustomerStatus
   remark?: string
 }
 
 export interface CustomerUpdateRequest extends CustomerCreateRequest {
   id?: string
-  status?: number
+  status?: CustomerStatus
 }
 
 export interface CustomerStatusChangeRequest {
-  status: number
+  status: CustomerStatus
 }

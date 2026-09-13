@@ -1,3 +1,6 @@
+import { PurchaseInStockStatus, PurchaseInStockType } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
+
 export interface PurchaseInStock {
   id: string
   purchaseInStockNo: string
@@ -14,8 +17,8 @@ export interface PurchaseInStock {
   warehouseCode: string
   storageLocation: string
   batchNo?: string
-  inType: string
-  status: 'DRAFT' | 'APPROVED' | 'UPLOADED'
+  inType: EnumCodeOf<typeof PurchaseInStockType>
+  status: EnumCodeOf<typeof PurchaseInStockStatus>
   remark: string
   inQuantity: number
   unitPrice: number
@@ -49,10 +52,10 @@ export interface PurchaseInStockQuery {
   warehouseId: string
   storageLocation: string
   operator: string
-  inType: string
+  inType: EnumCodeOf<typeof PurchaseInStockType> | ''
   productionDate: string
   deliveryDate: string
-  status: '' | 'DRAFT' | 'APPROVED' | 'UPLOADED'
+  status: EnumCodeOf<typeof PurchaseInStockStatus> | ''
 }
 
 export interface PurchaseInStockUpload {

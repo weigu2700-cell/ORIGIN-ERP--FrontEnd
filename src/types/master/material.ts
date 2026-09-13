@@ -1,7 +1,9 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { MaterialStatus as MaterialStatusCode, MaterialType as MaterialTypeCode } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type MaterialStatus = 'ENABLE' | 'DISABLE'
-export type MaterialType = 'RAW_MATERIAL' | 'SEMI_FINISHED' | 'PACKAGING' | 'CONSUMABLE' | 'OTHER'
+export type MaterialStatus = EnumCodeOf<typeof MaterialStatusCode> | string
+export type MaterialType = EnumCodeOf<typeof MaterialTypeCode> | string
 
 export interface MaterialListRequest {
   page: number
@@ -18,21 +20,21 @@ export interface MaterialVO {
   code: string
   name: string
   spec?: string
-  type?: string
-  status?: number
+  type?: MaterialType
+  status?: MaterialStatus
   unit?: string
   safetyStock?: number
   remark?: string
 }
 
-export interface MaterialListResponse extends PageResult<MaterialVO> {}
+export type MaterialListResponse = PageResult<MaterialVO>
 
 export interface MaterialCreateRequest {
   name: string
   unit?: string
   spec?: string
   type: MaterialType
-  status?: number
+  status?: MaterialStatus
   safetyStock?: number
   remark?: string
 }

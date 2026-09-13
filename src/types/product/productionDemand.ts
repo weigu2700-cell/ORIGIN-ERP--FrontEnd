@@ -1,12 +1,14 @@
 import type { PageResult } from '../common'
+import { ProductionDemandStatus, ProductionSourceType } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
 export interface ProductionDemandQuery {
   pageNum: number
   pageSize: number
-  sourceType?: 'SALES_ORDER' | string
+  sourceType?: EnumCodeOf<typeof ProductionSourceType> | ''
   demandNo?: string
   materialId?: number | string
-  status?: 'PENDING' | string
+  status?: EnumCodeOf<typeof ProductionDemandStatus> | ''
 }
 
 export interface ProductionDemandVo {
@@ -16,9 +18,9 @@ export interface ProductionDemandVo {
   materialCode: string
   materialName: string
   quantity: number
-  sourceType: 'SALES_ORDER' | string
+  sourceType: EnumCodeOf<typeof ProductionSourceType>
   sourceNo: string
-  status: 'PENDING' | string
+  status: EnumCodeOf<typeof ProductionDemandStatus>
 }
 
 export type PageProductionDemandVo = PageResult<ProductionDemandVo>

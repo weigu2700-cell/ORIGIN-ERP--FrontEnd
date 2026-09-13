@@ -1,6 +1,8 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { EnableStatus } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type RoleStatus = 'ENABLE' | 'DISABLE'
+export type RoleStatus = EnumCodeOf<typeof EnableStatus> | string
 
 // 列表记录 / 详情（RoleInfoVO）
 export interface RoleInfo {
@@ -23,7 +25,7 @@ export interface RoleListRequest {
 }
 
 // 分页列表响应（PageRoleInfoVO）
-export interface RoleListResponse extends PageResult<RoleInfo> {}
+export type RoleListResponse = PageResult<RoleInfo>
 
 export type RoleDetailResponse = RoleInfo
 

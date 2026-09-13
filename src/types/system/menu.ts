@@ -1,4 +1,6 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { EnableStatus } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
 export interface MenuItem {
   title: string
@@ -19,7 +21,7 @@ export interface MenuSearchItem {
   parentTitle?: string | null
 }
 
-export type MenuStatus = 'ENABLE' | 'DISABLE'
+export type MenuStatus = EnumCodeOf<typeof EnableStatus> | string
 
 // 菜单分页查询参数（MenuGetDTO）
 export interface MenuListRequest {

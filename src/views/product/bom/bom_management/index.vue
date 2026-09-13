@@ -12,6 +12,7 @@ import saveDialog from './components/save.vue'
 import type { BomVo } from '@/types/product/Bom'
 import PageHeader from '@/components/PageHeader.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { BomStatus } from '@/constants/enumCode'
 
 defineOptions({ name: 'BomManagementPage' })
 
@@ -23,20 +24,17 @@ const model = ref<'add' | 'edit'>('add')
 const selectedRow = computed(
   () => tableData.value.records.find((row) => String(row.id) === String(SelectionId.value)) ?? null,
 )
-const normalizeStatus = (status?: string) =>
-  (({ 草稿: 'DRAFT', 使用: 'ACTIVE', 启用: 'ACTIVE', 停用: 'INACTIVE' }) as Record<string, string>)[status ?? ''] ??
-  status
 const workflow = computed(() =>
-  normalizeStatus(selectedRow.value?.status) === 'ACTIVE'
+  selectedRow.value?.status === BomStatus.ACTIVE
     ? { label: '停用 BOM', action: disableBom }
     : selectedRow.value
       ? { label: '启用 BOM', action: activateBom }
       : null,
 )
-const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'danger' }> = {
-  DRAFT: { label: '草稿', type: 'info' },
-  ACTIVE: { label: '启用', type: 'success' },
-  INACTIVE: { label: '停用', type: 'danger' },
+const statusMap: Record<number, { label: string; type: 'info' | 'success' | 'danger' }> = {
+  [BomStatus.DRAFT]: { label: '草稿', type: 'info' },
+  [BomStatus.ACTIVE]: { label: '启用', type: 'success' },
+  [BomStatus.INACTIVE]: { label: '停用', type: 'danger' },
 }
 
 const queryData = ref<BomQuery>({
@@ -202,8 +200,8 @@ onMounted(() => {
         @rowDblclick="handleRowDblclick"
       >
         <template #status="{ row }">
-          <el-tag :type="statusMap[normalizeStatus(row.status) ?? '']?.type ?? 'info'">
-            {{ statusMap[normalizeStatus(row.status) ?? '']?.label ?? row.status }}
+          <el-tag :type="statusMap[row.status]?.type ?? 'info'">
+            {{ statusMap[row.status]?.label ?? row.status }}
           </el-tag>
         </template>
       </ProTable>

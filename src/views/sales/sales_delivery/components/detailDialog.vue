@@ -5,19 +5,22 @@ import BusinessDocumentDialog from '@/components/BusinessDocumentDialog.vue'
 import type { SalesDeliveryVo } from '@/types/sales/salesDelivery'
 import { getDetailSalesDelivery } from '@/api/sales/salesDelivery'
 import { formatDate, formatDecimal } from '@/composables/useFormat'
+import { SalesDeliveryStatus } from '@/constants/enumCode'
 
 const props = defineProps<{ visible: boolean; deliveryId?: string | null }>()
 const emit = defineEmits<{ (e: 'cancel'): void }>()
 const loading = ref(false)
 const detail = ref<SalesDeliveryVo | null>(null)
-const statusMap = {
-  DRAFT: { label: '草稿', type: 'info' },
-  CONFIRMED: { label: '已确认', type: 'primary' },
-  COMPLETED: { label: '已完成出库', type: 'success' },
-  CANCELLED: { label: '已取消', type: 'danger' },
+const statusMap: Record<number, { label: string; type: 'info' | 'primary' | 'success' | 'danger' }> = {
+  [SalesDeliveryStatus.DRAFT]: { label: '草稿', type: 'info' },
+  [SalesDeliveryStatus.CONFIRMED]: { label: '已确认', type: 'primary' },
+  [SalesDeliveryStatus.COMPLETED]: { label: '已完成出库', type: 'success' },
+  [SalesDeliveryStatus.CANCELLED]: { label: '已取消', type: 'danger' },
 } as const
 const statusMeta = computed(() =>
-  detail.value ? statusMap[detail.value.status] : { label: '', type: 'info' as const },
+  detail.value
+    ? (statusMap[detail.value.status] ?? { label: '', type: 'info' as const })
+    : { label: '', type: 'info' as const },
 )
 
 const loadDetail = async (id: string) => {

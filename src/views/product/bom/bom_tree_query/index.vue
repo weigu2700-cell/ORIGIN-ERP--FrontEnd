@@ -7,6 +7,7 @@ import ProTree from '@/components/ProTree.vue'
 import type { BomExplosionVo, BomVo } from '@/types/product/Bom'
 import Selector, { type BomTreeQuery } from './components/selector.vue'
 import PageHeader from '@/components/PageHeader.vue'
+import { BomStatus } from '@/constants/enumCode'
 
 defineOptions({ name: 'BomTreeQuery' })
 
@@ -40,15 +41,16 @@ const tableData = computed(() => {
   return childMaterials.value.slice(start, start + tablePageSize.value)
 })
 
-const buildTree = (nodes: BomExplosionVo[], parentPath = 'root'): BomTreeNode[] => nodes.map((node, index) => {
-  const id = `${parentPath}-${index}-${node.materialId}`
-  return {
-    ...node,
-    id,
-    label: node.materialName || node.materialCode,
-    children: buildTree(node.children ?? [], id),
-  }
-})
+const buildTree = (nodes: BomExplosionVo[], parentPath = 'root'): BomTreeNode[] =>
+  nodes.map((node, index) => {
+    const id = `${parentPath}-${index}-${node.materialId}`
+    return {
+      ...node,
+      id,
+      label: node.materialName || node.materialCode,
+      children: buildTree(node.children ?? [], id),
+    }
+  })
 
 const buildFlatTree = (nodes: BomExplosionVo[], parentPath: string): BomTreeNode[] => {
   const roots: BomTreeNode[] = []
@@ -105,22 +107,25 @@ const loadBomTree = async () => {
       pageSize: 100,
       bomNo: null,
       materialId: null,
-      status: 'ACTIVE',
+      status: BomStatus.ACTIVE,
     })
     const total = Number(firstPage.total ?? 0)
     const pageCount = Math.ceil(total / 100)
-    const remainingPages = pageCount > 1
-      ? await Promise.all(Array.from({ length: pageCount - 1 }, (_, index) => getPageBom({
-        pageNum: index + 2,
-        pageSize: 100,
-        bomNo: null,
-        materialId: null,
-        status: 'ACTIVE',
-      })))
-      : []
-    treeData.value = [firstPage, ...remainingPages]
-      .flatMap(page => page.records ?? [])
-      .map(buildBomRoot)
+    const remainingPages =
+      pageCount > 1
+        ? await Promise.all(
+            Array.from({ length: pageCount - 1 }, (_, index) =>
+              getPageBom({
+                pageNum: index + 2,
+                pageSize: 100,
+                bomNo: null,
+                materialId: null,
+                status: BomStatus.ACTIVE,
+              }),
+            ),
+          )
+        : []
+    treeData.value = [firstPage, ...remainingPages].flatMap((page) => page.records ?? []).map(buildBomRoot)
   } catch {
     treeData.value = []
   } finally {
@@ -131,14 +136,14 @@ const loadBomTree = async () => {
 const loadBomChildren = async (materialId: string, quantity: number) => {
   const result = await getBomExplosion(materialId, quantity)
   const children = getExplosionChildren(result, materialId)
-  const root = treeData.value.find(node => node.materialId === materialId)
+  const root = treeData.value.find((node) => node.materialId === materialId)
   if (root) {
     const updatedRoot: BomTreeNode = {
       ...root,
       quantity,
       children,
     }
-    treeData.value = treeData.value.map(node => node.materialId === materialId ? updatedRoot : node)
+    treeData.value = treeData.value.map((node) => (node.materialId === materialId ? updatedRoot : node))
     selectedNode.value = updatedRoot
   } else {
     const resultRoot = buildTree(result, `material-${materialId}`)[0]
@@ -198,23 +203,47 @@ onMounted(loadBomTree)
   <div class="bom-tree-container round">
     <PageHeader title="BOM 树形查询" description="按层级查看产品物料组成与用量">
       <template #search>
-        <Selector :query-data="queryData" @query="handleQuery" @reset="handleReset"
-          @update:query-data="(params) => Object.assign(queryData, params)" />
+        <Selector
+          :query-data="queryData"
+          @query="handleQuery"
+          @reset="handleReset"
+          @update:query-data="(params) => Object.assign(queryData, params)"
+        />
       </template>
     </PageHeader>
     <div class="page-body">
       <div class="tree round">
         <div v-loading="treeLoading" class="tree-content">
-          <ProTree :data="treeData" :tree-props="{ label: 'label', children: 'children' }" :default-expand-all="true"
-            @node-click="handleTreeClick" />
+          <ProTree
+            :data="treeData"
+            :tree-props="{ label: 'label', children: 'children' }"
+            :default-expand-all="true"
+            @node-click="handleTreeClick"
+          />
         </div>
       </div>
 
       <div class="content">
         <div class="table round">
-          <ProTable :data="tableData" :columns="columns" :total="childMaterials.length" :page="tablePage"
-            :page-size="tablePageSize" :show-selection="false" @update:page="(page) => { tablePage = page }"
-            @update:page-size="(size) => { tablePageSize = size; tablePage = 1 }" />
+          <ProTable
+            :data="tableData"
+            :columns="columns"
+            :total="childMaterials.length"
+            :page="tablePage"
+            :page-size="tablePageSize"
+            :show-selection="false"
+            @update:page="
+              (page) => {
+                tablePage = page
+              }
+            "
+            @update:page-size="
+              (size) => {
+                tablePageSize = size
+                tablePage = 1
+              }
+            "
+          />
         </div>
       </div>
     </div>

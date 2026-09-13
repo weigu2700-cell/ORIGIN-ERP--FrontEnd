@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { BomVo } from '@/types/product/Bom'
 import { formatDecimal } from '@/composables/useFormat'
+import { BomStatus } from '@/constants/enumCode'
 
 const props = defineProps<{
   visible: boolean
@@ -21,7 +22,7 @@ const handleClose = () => emit('cancel')
       <el-descriptions-item label="物料编码">{{ props.row.materialCode || '-' }}</el-descriptions-item>
       <el-descriptions-item label="物料名称">{{ props.row.materialName || '-' }}</el-descriptions-item>
       <el-descriptions-item label="状态">
-        {{ props.row.status === 'ENABLE' ? '启用' : props.row.status === 'DISABLE' ? '停用' : props.row.status }}
+        {{ BomStatus.labelOf(props.row.status) }}
       </el-descriptions-item>
       <el-descriptions-item label="版本">{{ props.row.version }}</el-descriptions-item>
       <el-descriptions-item label="创建时间">{{ props.row.createTime }}</el-descriptions-item>

@@ -18,6 +18,7 @@ import type {
 } from '@/types/product/productionPicking'
 import type { PageResult } from '@/types/common'
 import { formatDate, formatDecimal } from '@/composables/useFormat'
+import { ProductionPickingStatus as ProductionPickingStatusCode } from '@/constants/enumCode'
 
 defineOptions({ name: 'ProductionPickingPage' })
 
@@ -26,52 +27,31 @@ const tableData = ref<PageResult<ProductionPicking>>()
 const selectedRow = ref<ProductionPicking | null>(null)
 const detailRow = ref<ProductionPicking | null>(null)
 const detailVisible = ref(false)
-const pickingStatusAliases: Record<string, ProductionPickingStatus> = {
-  DRAFT: 'DRAFT',
-  '0': 'DRAFT',
-  草稿: 'DRAFT',
-  APPROVED: 'APPROVED',
-  '1': 'APPROVED',
-  已审批: 'APPROVED',
-  PICKED: 'PICKED',
-  '2': 'PICKED',
-  已领料: 'PICKED',
-  CANCELLED: 'CANCELLED',
-  '3': 'CANCELLED',
-  已取消: 'CANCELLED',
-}
-
-const normalizeStatus = (status: ProductionPicking['status']): ProductionPickingStatus | 'UNKNOWN' => {
-  const value = String(status ?? '')
-  return pickingStatusAliases[value] ?? 'UNKNOWN'
-}
-
 const statusOptions = [
-  { label: '草稿', value: 'DRAFT', tone: 'info' },
-  { label: '已审批', value: 'APPROVED', tone: 'warning' },
-  { label: '已领料', value: 'PICKED', tone: 'success' },
-  { label: '已取消', value: 'CANCELLED', tone: 'danger' },
+  { label: '草稿', value: ProductionPickingStatusCode.DRAFT, tone: 'info' },
+  { label: '已审批', value: ProductionPickingStatusCode.APPROVED, tone: 'warning' },
+  { label: '已领料', value: ProductionPickingStatusCode.PICKED, tone: 'success' },
+  { label: '已取消', value: ProductionPickingStatusCode.CANCELLED, tone: 'danger' },
 ] as const
 
-const statusMap = {
-  DRAFT: { label: '草稿', type: 'info' },
-  APPROVED: { label: '已审批', type: 'warning' },
-  PICKED: { label: '已领料', type: 'success' },
-  CANCELLED: { label: '已取消', type: 'danger' },
-  UNKNOWN: { label: '未知', type: 'info' },
+const statusMap: Record<ProductionPickingStatus, { label: string; type: 'info' | 'warning' | 'success' | 'danger' }> = {
+  [ProductionPickingStatusCode.DRAFT]: { label: '草稿', type: 'info' },
+  [ProductionPickingStatusCode.APPROVED]: { label: '已审批', type: 'warning' },
+  [ProductionPickingStatusCode.PICKED]: { label: '已领料', type: 'success' },
+  [ProductionPickingStatusCode.CANCELLED]: { label: '已取消', type: 'danger' },
 } as const
 
 const cards = computed<ProPageHeaderCard[]>(() =>
   statusOptions.map((option) => ({
     ...option,
-    count: (tableData.value?.records ?? []).filter((row) => normalizeStatus(row.status) === option.value).length,
+    count: (tableData.value?.records ?? []).filter((row) => row.status === option.value).length,
     hint: '条 · 当前页',
   })),
 )
 const workflow = computed(() => {
-  const status = selectedRow.value ? normalizeStatus(selectedRow.value.status) : 'UNKNOWN'
-  if (status === 'DRAFT') return { label: '审核领料单', action: 'approve' as const }
-  if (status === 'APPROVED') return { label: '确认领料', action: 'confirm' as const }
+  const status = selectedRow.value?.status
+  if (status === ProductionPickingStatusCode.DRAFT) return { label: '审核领料单', action: 'approve' as const }
+  if (status === ProductionPickingStatusCode.APPROVED) return { label: '确认领料', action: 'confirm' as const }
   return null
 })
 
@@ -98,11 +78,13 @@ const loadData = async () => {
   selectedRow.value = null
   tableData.value = await getPageProductionPicking(queryData)
 }
+
 const query = (params?: ProductionPickingQuery) => {
   if (params) Object.assign(queryData, params)
   queryData.pageNum = 1
   loadData()
 }
+
 const reset = () => {
   Object.assign(queryData, {
     pageNum: 1,
@@ -117,14 +99,17 @@ const reset = () => {
   })
   loadData()
 }
+
 const changeStatusFilter = (status: string | number) => {
-  queryData.status = String(status) as ProductionPickingStatus | ''
+  queryData.status = Number(status) as ProductionPickingStatus
   query()
 }
+
 const openDetail = (row: ProductionPicking) => {
   detailRow.value = row
   detailVisible.value = true
 }
+
 const advanceWorkflow = async () => {
   if (!selectedRow.value || !workflow.value) return void ElMessage.warning('请选择可操作的领料单')
   const action = workflow.value
@@ -192,8 +177,8 @@ onMounted(loadData)
         @row-dblclick="openDetail"
       >
         <template #status="{ row }">
-          <el-tag :type="statusMap[normalizeStatus(row.status)].type">
-            {{ statusMap[normalizeStatus(row.status)].label }}
+          <el-tag :type="statusMap[row.status as ProductionPickingStatus].type">
+            {{ statusMap[row.status as ProductionPickingStatus].label }}
           </el-tag>
         </template>
         <template #purchaseDemandNo="{ row }">{{ row.purchaseDemandNo || '库存领料' }}</template>

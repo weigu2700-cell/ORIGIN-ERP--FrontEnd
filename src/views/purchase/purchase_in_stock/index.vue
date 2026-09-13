@@ -11,6 +11,7 @@ import { approvePurchaseInStock, getPagePurchaseInStock, uploadPurchaseInStock }
 import type { PurchaseInStock, PurchaseInStockQuery, PurchaseInStockUpload } from '@/types/purchase/purchaseInStock'
 import type { PageResult } from '@/types/common'
 import { formatDate, formatDecimal } from '@/composables/useFormat'
+import { PurchaseInStockStatus, PurchaseInStockType } from '@/constants/enumCode'
 
 defineOptions({ name: 'PurchaseInStockPage' })
 
@@ -44,9 +45,9 @@ const selectedRow = computed(
 )
 
 const statusOptions = [
-  { label: '草稿', value: 'DRAFT', tone: 'info' },
-  { label: '已审核', value: 'APPROVED', tone: 'warning' },
-  { label: '已上架', value: 'UPLOADED', tone: 'success' },
+  { label: '草稿', value: PurchaseInStockStatus.DRAFT, tone: 'info' },
+  { label: '已审核', value: PurchaseInStockStatus.APPROVED, tone: 'warning' },
+  { label: '已上架', value: PurchaseInStockStatus.UPLOADED, tone: 'success' },
 ] as const
 const cards = computed<ProPageHeaderCard[]>(() =>
   statusOptions.map((option) => ({
@@ -55,19 +56,21 @@ const cards = computed<ProPageHeaderCard[]>(() =>
     hint: '条 · 当前页',
   })),
 )
-const statusMap: Record<string, { label: string; type: 'info' | 'warning' | 'success' }> = {
-  DRAFT: { label: '草稿', type: 'info' },
-  APPROVED: { label: '已审核', type: 'warning' },
-  UPLOADED: { label: '已上架', type: 'success' },
+const statusMap: Record<number, { label: string; type: 'info' | 'warning' | 'success' }> = {
+  [PurchaseInStockStatus.DRAFT]: { label: '草稿', type: 'info' },
+  [PurchaseInStockStatus.APPROVED]: { label: '已审核', type: 'warning' },
+  [PurchaseInStockStatus.UPLOADED]: { label: '已上架', type: 'success' },
 }
-const inTypeMap: Record<string, string> = {
-  PURCHASE_NORMAL: '采购入库',
-  PURCHASE_RETURN: '采购退货',
-  PURCHASE_GIFT: '赠品入库',
+const inTypeMap: Record<number, string> = {
+  [PurchaseInStockType.PURCHASE_NORMAL]: '采购入库',
+  [PurchaseInStockType.PURCHASE_RETURN]: '采购退货',
+  [PurchaseInStockType.PURCHASE_GIFT]: '赠品入库',
 }
 const workflow = computed(() => {
-  if (selectedRow.value?.status === 'DRAFT') return { label: '审核入库单', kind: 'approve' as const }
-  if (selectedRow.value?.status === 'APPROVED') return { label: '上架入库', kind: 'upload' as const }
+  if (selectedRow.value?.status === PurchaseInStockStatus.DRAFT)
+    return { label: '审核入库单', kind: 'approve' as const }
+  if (selectedRow.value?.status === PurchaseInStockStatus.APPROVED)
+    return { label: '上架入库', kind: 'upload' as const }
   return null
 })
 
@@ -92,10 +95,12 @@ const loadData = async () => {
   const res = await getPagePurchaseInStock(queryData)
   tableData.value = { ...res, pages: res.pages ?? Math.ceil(res.total / Math.max(res.size, 1)) }
 }
+
 const search = (params: PurchaseInStockQuery) => {
   Object.assign(queryData, params, { pageNum: 1 })
   loadData()
 }
+
 const reset = () => {
   Object.assign(queryData, {
     pageNum: 1,
@@ -114,11 +119,13 @@ const reset = () => {
   })
   loadData()
 }
+
 const changeStatus = (status: string | number) => {
-  queryData.status = String(status) as PurchaseInStockQuery['status']
+  queryData.status = Number(status) as PurchaseInStockQuery['status']
   queryData.pageNum = 1
   loadData()
 }
+
 const openDetail = (row: PurchaseInStock) => {
   selectedId.value = row.id
   detailVisible.value = true
@@ -141,6 +148,7 @@ const advanceWorkflow = async () => {
     /* 用户取消或请求失败 */
   }
 }
+
 const submitUpload = async (data: PurchaseInStockUpload) => {
   if (!selectedRow.value) return
   await uploadPurchaseInStock(selectedRow.value.id, data)

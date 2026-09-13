@@ -9,6 +9,7 @@ import Selector from './components/selector.vue'
 import DetailDialog from './components/detailDialog.vue'
 import { formatDecimal } from '@/composables/useFormat'
 import ProPageHeader, { type ProPageHeaderCard } from '@/components/ProPageHeader.vue'
+import { ProductionDemandStatus, ProductionSourceType } from '@/constants/enumCode'
 
 const queryData = reactive<ProductionDemandQuery>({
   pageNum: 1,
@@ -42,26 +43,24 @@ const columns = ref<ProColumn<ProductionDemandVo>[]>([
   { label: '来源单号', prop: 'sourceNo', width: 180 },
 ])
 
-const sourceTypeMap: Record<string, string> = {
-  SALES_ORDER: '销售订单',
-  FORECAST: '预测',
-  MANUAL: '手工创建',
+const sourceTypeMap: Record<number, string> = {
+  [ProductionSourceType.SALES_ORDER]: '销售订单',
 }
 
-const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
-  PENDING: { label: '待生产', type: 'info' },
-  PLANNED: { label: '已计划', type: 'success' },
-  CANCELLED: { label: '已取消', type: 'danger' },
+const statusMap: Record<number, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
+  [ProductionDemandStatus.PENDING]: { label: '待生产', type: 'info' },
+  [ProductionDemandStatus.PLANNED]: { label: '已计划', type: 'success' },
+  [ProductionDemandStatus.CANCELLED]: { label: '已取消', type: 'danger' },
 }
 
 const quickStatusOptions = [
-  { label: '待生产', value: 'PENDING', tone: 'warning' },
-  { label: '已计划', value: 'PLANNED', tone: 'success' },
-  { label: '已取消', value: 'CANCELLED', tone: 'danger' },
+  { label: '待生产', value: ProductionDemandStatus.PENDING, tone: 'warning' },
+  { label: '已计划', value: ProductionDemandStatus.PLANNED, tone: 'success' },
+  { label: '已取消', value: ProductionDemandStatus.CANCELLED, tone: 'danger' },
 ] as const
 
 const statusCards = computed<ProPageHeaderCard[]>(() => {
-  const counts = new Map<string, number>()
+  const counts = new Map<number, number>()
   for (const record of tableData.value?.records ?? []) {
     counts.set(record.status, (counts.get(record.status) ?? 0) + 1)
   }
@@ -78,7 +77,7 @@ const handleQuery = () => {
 }
 
 const handleQuickStatus = (status: string | number | null) => {
-  queryData.status = typeof status === 'string' ? status : ''
+  queryData.status = typeof status === 'number' ? (status as ProductionDemandQuery['status']) : ''
   handleQuery()
 }
 

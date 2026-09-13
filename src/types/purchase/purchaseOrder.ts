@@ -1,4 +1,6 @@
 import type { PageResult } from '../common'
+import { PurchaseOrderStatus } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
 export interface PurchaseOrderVo {
   id: string
@@ -18,7 +20,7 @@ export interface PurchaseOrderVo {
   orderDate?: string
   expectedDeliveryDate?: string
   actualDeliveryDate?: string
-  status: string
+  status: EnumCodeOf<typeof PurchaseOrderStatus>
 }
 
 export type PagePurchaseOrderVo = PageResult<PurchaseOrderVo>
@@ -29,7 +31,7 @@ export interface PurchaseOrderQuery {
   purchaseOrderNo?: string
   materialId?: string
   supplierId?: string
-  status?: string
+  status?: EnumCodeOf<typeof PurchaseOrderStatus> | ''
 }
 
 export interface PurchaseOrderAdd {

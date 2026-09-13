@@ -1,6 +1,8 @@
-import type {PageResult} from '../common'
+import type { PageResult } from '../common'
+import { EnableStatus } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type WorkshopStatus = 'ENABLE' | 'DISABLE'
+export type WorkshopStatus = EnumCodeOf<typeof EnableStatus> | string
 
 export interface WorkshopVO {
   id: string
@@ -41,4 +43,4 @@ export interface WorkshopStatusChangeRequest {
   status: number
 }
 
-export interface WorkshopListResponse extends PageResult<WorkshopVO> {}
+export type WorkshopListResponse = PageResult<WorkshopVO>

@@ -1,11 +1,13 @@
 import type { PageResult } from '../common'
+import { SalesDeliveryStatus as SalesDeliveryStatusCode } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
 
 export interface SalesDeliveryVo {
-  id: number
+  id: string
   deliveryNo: string
-  salesOrderId: number
+  salesOrderId: string
   salesOrderNo: string
-  customerId: number
+  customerId: string
   customerName: string
   deliveryDate: string
   status: SalesDeliveryStatus
@@ -13,17 +15,17 @@ export interface SalesDeliveryVo {
   remark: string
 }
 
-export type SalesDeliveryStatus = 'DRAFT' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
+export type SalesDeliveryStatus = EnumCodeOf<typeof SalesDeliveryStatusCode>
 
 export interface SalesDeliveryItemVo {
   id: number
-  deliveryId: number
+  deliveryId: string
   lineNo: number
-  salesOrderItemId: number
-  materialId: number
+  salesOrderItemId: string
+  materialId: string
   materialName: string
   materialCode: string
-  warehouseId: number
+  warehouseId: string
   warehouseName: string
   quantity: number
 }
@@ -45,7 +47,7 @@ export interface PostSaleDeliveryItem {
 }
 
 export interface PostSaleDelivery {
-  salesOrderId: number
+  salesOrderId: string
   deliveryDate: string
   items: PostSaleDeliveryItem[]
   remark: string

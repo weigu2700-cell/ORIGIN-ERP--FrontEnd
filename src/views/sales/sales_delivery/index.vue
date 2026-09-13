@@ -20,6 +20,7 @@ import SaveDialog from './components/saveDialog.vue'
 import DetailDialog from './components/detailDialog.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import ProPageHeader, { type ProPageHeaderCard } from '@/components/ProPageHeader.vue'
+import { SalesDeliveryStatus } from '@/constants/enumCode'
 
 defineOptions({ name: 'SalesDeliveryPage' })
 
@@ -42,17 +43,17 @@ const selectedRow = computed(
   () => tableData.value?.records?.find((item) => String(item.id) === String(selectedRowId.value)) ?? null,
 )
 
-const statusMap: Record<string, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
-  DRAFT: { label: '草稿', type: 'info' },
-  CONFIRMED: { label: '已确认', type: 'success' },
-  COMPLETED: { label: '已完成', type: 'warning' },
-  CANCELLED: { label: '已取消', type: 'danger' },
+const statusMap: Record<number, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
+  [SalesDeliveryStatus.DRAFT]: { label: '草稿', type: 'info' },
+  [SalesDeliveryStatus.CONFIRMED]: { label: '已确认', type: 'success' },
+  [SalesDeliveryStatus.COMPLETED]: { label: '已完成', type: 'warning' },
+  [SalesDeliveryStatus.CANCELLED]: { label: '已取消', type: 'danger' },
 }
 const statusOptions = [
-  { label: '草稿', value: 'DRAFT', tone: 'info' },
-  { label: '已确认', value: 'CONFIRMED', tone: 'primary' },
-  { label: '已完成', value: 'COMPLETED', tone: 'success' },
-  { label: '已取消', value: 'CANCELLED', tone: 'danger' },
+  { label: '草稿', value: SalesDeliveryStatus.DRAFT, tone: 'info' },
+  { label: '已确认', value: SalesDeliveryStatus.CONFIRMED, tone: 'primary' },
+  { label: '已完成', value: SalesDeliveryStatus.COMPLETED, tone: 'success' },
+  { label: '已取消', value: SalesDeliveryStatus.CANCELLED, tone: 'danger' },
 ] as const
 const cards = computed<ProPageHeaderCard[]>(() =>
   statusOptions.map((option) => ({
@@ -62,8 +63,10 @@ const cards = computed<ProPageHeaderCard[]>(() =>
   })),
 )
 const workflow = computed(() => {
-  if (selectedRow.value?.status === 'DRAFT') return { label: '确认发货单', action: confirmSalesDelivery }
-  if (selectedRow.value?.status === 'CONFIRMED') return { label: '完成出库', action: completeSalesDelivery }
+  if (selectedRow.value?.status === SalesDeliveryStatus.DRAFT)
+    return { label: '确认发货单', action: confirmSalesDelivery }
+  if (selectedRow.value?.status === SalesDeliveryStatus.CONFIRMED)
+    return { label: '完成出库', action: completeSalesDelivery }
   return null
 })
 
@@ -99,7 +102,7 @@ const handleReset = () => {
 }
 
 const handleQuickStatus = (status: string | number) => {
-  queryData.status = String(status) as GetPageSalesDelivery['status']
+  queryData.status = Number(status) as GetPageSalesDelivery['status']
   handleQuery()
 }
 
@@ -115,7 +118,10 @@ const handleDelete = async () => {
   }
 
   try {
-    if (selectedRow.value?.status === 'COMPLETED' || selectedRow.value?.status === 'CANCELLED') {
+    if (
+      selectedRow.value?.status === SalesDeliveryStatus.COMPLETED ||
+      selectedRow.value?.status === SalesDeliveryStatus.CANCELLED
+    ) {
       ElMessage.warning('当前发货单不可取消')
       return
     }
@@ -188,7 +194,9 @@ onMounted(() => {
       <template #toolbar>
         <ProToolbar
           :show-edit="false"
-          :show-delete="selectedRow?.status === 'DRAFT' || selectedRow?.status === 'CONFIRMED'"
+          :show-delete="
+            selectedRow?.status === SalesDeliveryStatus.DRAFT || selectedRow?.status === SalesDeliveryStatus.CONFIRMED
+          "
           delete-label="取消发货单"
           :show-export="false"
           :show-status="!!workflow"
