@@ -2,8 +2,8 @@ import type { PageResult } from '../common'
 import { MaterialStatus as MaterialStatusCode, MaterialType as MaterialTypeCode } from '@/constants/enumCode'
 import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type MaterialStatus = EnumCodeOf<typeof MaterialStatusCode> | string
-export type MaterialType = EnumCodeOf<typeof MaterialTypeCode> | string
+export type MaterialStatus = EnumCodeOf<typeof MaterialStatusCode>
+export type MaterialType = EnumCodeOf<typeof MaterialTypeCode>
 
 export interface MaterialListRequest {
   page: number

@@ -1,38 +1,39 @@
 <script setup lang="ts">
-  import {reactive} from "vue";
-  import ProSearch from "@/components/ProSearch.vue";
-  import type {RoleListRequest, RoleStatus} from "@/types/system/role.ts";
+import { reactive } from 'vue'
+import ProSearch from '@/components/ProSearch.vue'
+import type { RoleListRequest, RoleStatus } from '@/types/system/role.ts'
+import { EnableStatus } from '@/constants/enumCode'
 
-  const queryData = reactive<Omit<RoleListRequest, 'page' | 'pageSize'>>({
-    name: null,
-    code: null,
-    status: null,
+const queryData = reactive<Omit<RoleListRequest, 'page' | 'pageSize'>>({
+  name: null,
+  code: null,
+  status: null,
+})
+
+const emit = defineEmits<{
+  (e: 'query', params: Omit<RoleListRequest, 'page' | 'pageSize'>): void
+  (e: 'reset'): void
+}>()
+
+const statusOptions: { label: string; value: RoleStatus }[] = [
+  { label: '启用', value: EnableStatus.ENABLE },
+  { label: '禁用', value: EnableStatus.DISABLE },
+]
+
+const handleQuery = () => {
+  emit('query', {
+    name: queryData.name || null,
+    code: queryData.code || null,
+    status: queryData.status,
   })
+}
 
-  const emit = defineEmits<{
-    (e: 'query', params: Omit<RoleListRequest, 'page' | 'pageSize'>): void
-    (e: 'reset'): void
-  }>()
-
-  const statusOptions: {label: string, value: RoleStatus}[] = [
-    {label: '启用', value: 'ENABLE'},
-    {label: '禁用', value: 'DISABLE'},
-  ]
-
-  const handleQuery = () => {
-    emit('query', {
-      name: queryData.name || null,
-      code: queryData.code || null,
-      status: queryData.status,
-    })
-  }
-
-  const handleReset = () => {
-    queryData.name = null
-    queryData.code = null
-    queryData.status = null
-    emit('reset')
-  }
+const handleReset = () => {
+  queryData.name = null
+  queryData.code = null
+  queryData.status = null
+  emit('reset')
+}
 </script>
 
 <template>

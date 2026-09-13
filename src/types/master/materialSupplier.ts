@@ -2,7 +2,7 @@ import type { PageResult } from '../common'
 import { MaterialSupplierStatus as MaterialSupplierStatusCode } from '@/constants/enumCode'
 import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type MaterialSupplierStatus = EnumCodeOf<typeof MaterialSupplierStatusCode> | string
+export type MaterialSupplierStatus = EnumCodeOf<typeof MaterialSupplierStatusCode>
 
 export interface MaterialSupplierListRequest {
   page: number
@@ -10,7 +10,7 @@ export interface MaterialSupplierListRequest {
   materialSupplierCode?: string | null
   materialId?: string | null
   supplierId?: string | null
-  status?: number | null
+  status?: MaterialSupplierStatus | null
   preferred?: number | null
 }
 
@@ -24,7 +24,7 @@ export interface MaterialSupplierVO {
   preferred?: number
   minOrderQty?: number
   remark?: string
-  status?: number
+  status?: MaterialSupplierStatus
 }
 
 export type MaterialSupplierListResponse = PageResult<MaterialSupplierVO>
@@ -37,7 +37,7 @@ export interface MaterialSupplierCreateRequest {
   leadTimeDays?: number
   preferred?: number
   minOrderQty?: number
-  status?: number
+  status?: MaterialSupplierStatus
   remark?: string
 }
 

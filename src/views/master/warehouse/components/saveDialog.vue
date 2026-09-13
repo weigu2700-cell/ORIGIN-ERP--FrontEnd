@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from "vue";
-import { ElMessage } from "element-plus";
-import type { FormInstance, FormRules } from "element-plus";
-import FactoryRefer from "@/refer/FactoryRefer.vue";
-import type { WarehouseCreateRequest, WarehouseType, WarehouseUpdateRequest, WarehouseVO } from "@/types/master/warehouse.ts";
-import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
+import { reactive, ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import type { FormInstance, FormRules } from 'element-plus'
+import FactoryRefer from '@/refer/FactoryRefer.vue'
+import type {
+  WarehouseCreateRequest,
+  WarehouseType,
+  WarehouseUpdateRequest,
+  WarehouseVO,
+} from '@/types/master/warehouse.ts'
+import { EnableStatus, WarehouseType as WarehouseTypeCode } from '@/constants/enumCode'
+import BaseSaveDialog from '@/components/BaseSaveDialog.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -20,19 +26,19 @@ const emit = defineEmits<{
 
 const formRef = ref<FormInstance>()
 
-const typeOptions: { label: string, value: WarehouseType }[] = [
-  { label: '成品仓', value: 'FINISHED' },
-  { label: '原料仓', value: 'MATERIAL' },
-  { label: '半成品仓', value: 'SEMI_FINISHED' },
-  { label: '废品仓', value: 'SCRAP' },
-  { label: '其他', value: 'OTHER' },
+const typeOptions: { label: string; value: WarehouseType }[] = [
+  { label: '成品仓', value: WarehouseTypeCode.FINISHED },
+  { label: '原料仓', value: WarehouseTypeCode.MATERIAL },
+  { label: '半成品仓', value: WarehouseTypeCode.SEMI_FINISHED },
+  { label: '废品仓', value: WarehouseTypeCode.SCRAP },
+  { label: '其他', value: WarehouseTypeCode.OTHER },
 ]
 
 const form = reactive<WarehouseCreateRequest>({
   name: '',
-  type: 'FINISHED',
+  type: WarehouseTypeCode.FINISHED,
   factoryId: '',
-  status: 'ENABLE',
+  status: EnableStatus.ENABLE,
   address: '',
   remark: '',
 })
@@ -49,20 +55,20 @@ watch(
     if (!val) return
     if (props.mode === 'edit' && props.row) {
       form.name = props.row.name
-      form.type = props.row.type ?? 'FINISHED'
+      form.type = props.row.type ?? WarehouseTypeCode.FINISHED
       form.factoryId = props.row.factoryId ?? ''
       form.address = props.row.address ?? ''
       form.remark = props.row.remark ?? ''
     } else {
       form.name = ''
-      form.type = 'FINISHED'
+      form.type = WarehouseTypeCode.FINISHED
       form.factoryId = ''
-      form.status = 'ENABLE'
+      form.status = EnableStatus.ENABLE
       form.address = ''
       form.remark = ''
     }
     formRef.value?.clearValidate()
-  }
+  },
 )
 
 const handleSubmit = async () => {
@@ -99,8 +105,12 @@ const handleCancel = () => {
       <template v-if="mode === 'add'">
         <el-form-item label="仓库类型" prop="type">
           <el-select v-model="form.type" placeholder="请选择仓库类型" style="width: 100%">
-            <el-option v-for="item in typeOptions" :key="item.value" :label="item.label"
-              :value="item.value"></el-option>
+            <el-option
+              v-for="item in typeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="所属工厂" prop="factoryId">

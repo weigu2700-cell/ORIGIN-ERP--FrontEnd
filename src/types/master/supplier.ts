@@ -2,7 +2,7 @@ import type { PageResult } from '../common'
 import { SupplierStatus as SupplierStatusCode } from '@/constants/enumCode'
 import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type SupplierStatus = EnumCodeOf<typeof SupplierStatusCode> | string
+export type SupplierStatus = EnumCodeOf<typeof SupplierStatusCode>
 
 export interface SupplierListRequest {
   page: number
@@ -13,7 +13,7 @@ export interface SupplierListRequest {
   contactName?: string | null
   phone?: string | null
   email?: string | null
-  status?: number | null
+  status?: SupplierStatus | null
 }
 
 export interface SupplierVO {
@@ -26,7 +26,7 @@ export interface SupplierVO {
   phone?: string
   email?: string
   remark?: string
-  status?: number
+  status?: SupplierStatus
   createdTime?: string
 }
 
@@ -39,7 +39,7 @@ export interface SupplierCreateRequest {
   address?: string
   phone?: string
   email?: string
-  status?: number
+  status?: SupplierStatus
   remark?: string
 }
 

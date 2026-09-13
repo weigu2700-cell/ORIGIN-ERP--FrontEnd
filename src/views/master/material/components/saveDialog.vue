@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from "vue";
-import { ElMessage } from "element-plus";
-import type { FormInstance, FormRules } from "element-plus";
-import type { MaterialCreateRequest, MaterialType, MaterialUpdateRequest, MaterialVO } from "@/types/master/material.ts";
-import BaseSaveDialog from "@/components/BaseSaveDialog.vue";
+import { reactive, ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import type { FormInstance, FormRules } from 'element-plus'
+import type { MaterialCreateRequest, MaterialType, MaterialUpdateRequest, MaterialVO } from '@/types/master/material.ts'
+import { MaterialStatus, MaterialType as MaterialTypeCode } from '@/constants/enumCode'
+import BaseSaveDialog from '@/components/BaseSaveDialog.vue'
 
 const props = defineProps<{
   visible: boolean
@@ -19,20 +20,20 @@ const emit = defineEmits<{
 
 const formRef = ref<FormInstance>()
 
-const typeOptions: { label: string, value: MaterialType }[] = [
-  { label: '原材料', value: 'RAW_MATERIAL' },
-  { label: '半成品', value: 'SEMI_FINISHED' },
-  { label: '包装材料', value: 'PACKAGING' },
-  { label: '耗材', value: 'CONSUMABLE' },
-  { label: '其他', value: 'OTHER' },
+const typeOptions: { label: string; value: MaterialType }[] = [
+  { label: '原材料', value: MaterialTypeCode.RAW_MATERIAL },
+  { label: '半成品', value: MaterialTypeCode.SEMI_FINISHED },
+  { label: '包装材料', value: MaterialTypeCode.PACKAGING },
+  { label: '耗材', value: MaterialTypeCode.CONSUMABLE },
+  { label: '其他', value: MaterialTypeCode.OTHER },
 ]
 
 const form = reactive<MaterialCreateRequest>({
   name: '',
   unit: '',
   spec: '',
-  type: 'RAW_MATERIAL',
-  status: 1,
+  type: MaterialTypeCode.RAW_MATERIAL,
+  status: MaterialStatus.ENABLE,
   safetyStock: 0,
   remark: '',
 })
@@ -50,20 +51,20 @@ watch(
       form.name = props.row.name
       form.unit = props.row.unit ?? ''
       form.spec = props.row.spec ?? ''
-      form.type = (props.row.type as MaterialType) ?? 'RAW_MATERIAL'
+      form.type = props.row.type ?? MaterialTypeCode.RAW_MATERIAL
       form.safetyStock = props.row.safetyStock ?? 0
       form.remark = props.row.remark ?? ''
     } else {
       form.name = ''
       form.unit = ''
       form.spec = ''
-      form.type = 'RAW_MATERIAL'
-      form.status = 1
+      form.type = MaterialTypeCode.RAW_MATERIAL
+      form.status = MaterialStatus.ENABLE
       form.safetyStock = 0
       form.remark = ''
     }
     formRef.value?.clearValidate()
-  }
+  },
 )
 
 const handleSubmit = async () => {
@@ -102,8 +103,12 @@ const handleCancel = () => {
       <template v-if="mode === 'add'">
         <el-form-item label="物料类型" prop="type">
           <el-select v-model="form.type" placeholder="请选择物料类型" style="width: 100%">
-            <el-option v-for="item in typeOptions" :key="item.value" :label="item.label"
-              :value="item.value"></el-option>
+            <el-option
+              v-for="item in typeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
           </el-select>
         </el-form-item>
       </template>
@@ -114,7 +119,13 @@ const handleCancel = () => {
         <el-input v-model="form.unit" placeholder="请输入单位" clearable />
       </el-form-item>
       <el-form-item label="安全库存" prop="safetyStock">
-        <el-input-number v-model="form.safetyStock" :min="0" :precision="0" placeholder="请输入安全库存" style="width: 100%" />
+        <el-input-number
+          v-model="form.safetyStock"
+          :min="0"
+          :precision="0"
+          placeholder="请输入安全库存"
+          style="width: 100%"
+        />
       </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input v-model="form.remark" type="textarea" :rows="3" placeholder="请输入备注" />

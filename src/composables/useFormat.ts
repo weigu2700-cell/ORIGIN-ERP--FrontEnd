@@ -1,3 +1,4 @@
+import { EnableStatus, SupplierStatus } from '@/constants/enumCode'
 
 // ==================== 日期格式化 ====================
 export const formatDate = {
@@ -17,15 +18,17 @@ export const formatDate = {
   DateTime: (date: Date | string | null | undefined) => {
     if (!date) return '-'
     const d = typeof date === 'string' ? new Date(date) : date
-    return d.toLocaleString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    }).replace(/\//g, '-')
+    return d
+      .toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      })
+      .replace(/\//g, '-')
   },
   /** 自定义格式：YYYY-MM-DD HH:mm:ss */
   custom: (date: Date | string | null | undefined, pattern: string) => {
@@ -38,7 +41,7 @@ export const formatDate = {
       .replace('HH', String(d.getHours()).padStart(2, '0'))
       .replace('mm', String(d.getMinutes()).padStart(2, '0'))
       .replace('ss', String(d.getSeconds()).padStart(2, '0'))
-  }
+  },
 }
 
 // ==================== 数字格式化 ====================
@@ -66,24 +69,22 @@ export const formatDecimal = {
     if (num === null || num === undefined) return '-'
     const n = typeof num === 'string' ? parseFloat(num) : num
     return Math.round(n).toString()
-  }
+  },
 }
 
 // ==================== 状态格式化 ====================
 export const formatStatus = {
   /** 启用/禁用状态 */
-  enable: (status: 'ENABLE' | 'DISABLE' | string) => {
-    const map: Record<string, string> = { ENABLE: '启用', DISABLE: '停用' }
-    return map[status] || status
+  enable: (status: number | null | undefined) => {
+    return EnableStatus.labelOf(status)
   },
   /** 激活/停用状态 */
-  active: (status: 'ACTIVE' | 'INACTIVE' | string) => {
-    const map: Record<string, string> = { ACTIVE: '合作中', INACTIVE: '停用' }
-    return map[status] || status
+  active: (status: number | null | undefined) => {
+    return SupplierStatus.labelOf(status)
   },
   /** 是/否状态 */
   yesNo: (value: number | boolean | null | undefined) => {
     if (value === null || value === undefined) return '-'
     return value ? '是' : '否'
-  }
+  },
 }

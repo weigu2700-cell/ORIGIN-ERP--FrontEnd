@@ -2,7 +2,7 @@ import type { PageResult } from '../common'
 import { CustomerStatus as CustomerStatusCode } from '@/constants/enumCode'
 import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type CustomerStatus = EnumCodeOf<typeof CustomerStatusCode> | string
+export type CustomerStatus = EnumCodeOf<typeof CustomerStatusCode>
 
 export interface CustomerListRequest {
   page: number

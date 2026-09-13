@@ -21,7 +21,7 @@ export interface MenuSearchItem {
   parentTitle?: string | null
 }
 
-export type MenuStatus = EnumCodeOf<typeof EnableStatus> | string
+export type MenuStatus = EnumCodeOf<typeof EnableStatus>
 
 // 菜单分页查询参数（MenuGetDTO）
 export interface MenuListRequest {

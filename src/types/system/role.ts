@@ -2,7 +2,7 @@ import type { PageResult } from '../common'
 import { EnableStatus } from '@/constants/enumCode'
 import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type RoleStatus = EnumCodeOf<typeof EnableStatus> | string
+export type RoleStatus = EnumCodeOf<typeof EnableStatus>
 
 // 列表记录 / 详情（RoleInfoVO）
 export interface RoleInfo {

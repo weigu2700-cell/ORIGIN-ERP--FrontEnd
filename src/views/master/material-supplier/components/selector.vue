@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import ProSearch from "@/components/ProSearch.vue";
-import MaterialRefer from "@/refer/MaterialRefer.vue";
-import SupplierRefer from "@/refer/SupplierRefer.vue";
-import type { MaterialSupplierListRequest, MaterialSupplierStatus } from "@/types/master/materialSupplier.ts";
+/* eslint-disable vue/no-mutating-props */
+import ProSearch from '@/components/ProSearch.vue'
+import MaterialRefer from '@/refer/MaterialRefer.vue'
+import SupplierRefer from '@/refer/SupplierRefer.vue'
+import type { MaterialSupplierListRequest, MaterialSupplierStatus } from '@/types/master/materialSupplier.ts'
+import { MaterialSupplierStatus as MaterialSupplierStatusCode } from '@/constants/enumCode'
 
 const props = defineProps<{
   queryData: MaterialSupplierListRequest
 }>()
 
-const statusOptions: { label: string, value: MaterialSupplierStatus }[] = [
-  { label: '启用', value: 'ACTIVE' },
-  { label: '停用', value: 'INACTIVE' },
+const statusOptions: { label: string; value: MaterialSupplierStatus }[] = [
+  { label: '启用', value: MaterialSupplierStatusCode.ACTIVE },
+  { label: '停用', value: MaterialSupplierStatusCode.INACTIVE },
 ]
 
 const emit = defineEmits<{

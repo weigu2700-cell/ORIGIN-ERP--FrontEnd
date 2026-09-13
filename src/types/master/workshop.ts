@@ -2,7 +2,7 @@ import type { PageResult } from '../common'
 import { EnableStatus } from '@/constants/enumCode'
 import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type WorkshopStatus = EnumCodeOf<typeof EnableStatus> | string
+export type WorkshopStatus = EnumCodeOf<typeof EnableStatus>
 
 export interface WorkshopVO {
   id: string
@@ -11,7 +11,7 @@ export interface WorkshopVO {
   factoryId: string
   factoryName?: string
   remark?: string
-  status: number
+  status: WorkshopStatus
 }
 
 export interface WorkshopListRequest {
@@ -20,14 +20,14 @@ export interface WorkshopListRequest {
   name?: string | null
   code?: string | null
   factoryId?: string | null
-  status?: number | null
+  status?: WorkshopStatus | null
 }
 
 export interface WorkshopCreateRequest {
   name: string
   factoryId: string
   shortName?: string
-  status?: number
+  status?: WorkshopStatus
   remark?: string
 }
 
@@ -40,7 +40,7 @@ export interface WorkshopUpdateRequest {
 
 export interface WorkshopStatusChangeRequest {
   id: string
-  status: number
+  status: WorkshopStatus
 }
 
 export type WorkshopListResponse = PageResult<WorkshopVO>

@@ -1,69 +1,70 @@
 <script setup lang="ts">
-  import {reactive, ref} from "vue";
-  import ProSearch from "@/components/ProSearch.vue";
-  import ParentPermissionSelector from "@/views/system/permission/components/parentPermissionSelector.vue";
-  import {CircleClose, Search} from "@element-plus/icons-vue";
-  import type {PermissionListRequest, PermissionType, PermissionStatus} from "@/types/system/permission.ts";
+import { reactive, ref } from 'vue'
+import ProSearch from '@/components/ProSearch.vue'
+import ParentPermissionSelector from '@/views/system/permission/components/parentPermissionSelector.vue'
+import { CircleClose, Search } from '@element-plus/icons-vue'
+import type { PermissionListRequest, PermissionType, PermissionStatus } from '@/types/system/permission.ts'
+import { EnableStatus, PermissionType as PermissionTypeCode } from '@/constants/enumCode'
 
-  const parentSelectorVisible = ref(false)
+const parentSelectorVisible = ref(false)
 
-  const queryData = reactive<Omit<PermissionListRequest, 'page' | 'pageSize'> & {parentName: string | null}>({
-    name: null,
-    code: null,
-    type: null,
-    status: null,
-    parentId: null,
-    parentName: '',
+const queryData = reactive<Omit<PermissionListRequest, 'page' | 'pageSize'> & { parentName: string | null }>({
+  name: null,
+  code: null,
+  type: null,
+  status: null,
+  parentId: null,
+  parentName: '',
+})
+
+const emit = defineEmits<{
+  (e: 'query', params: Omit<PermissionListRequest, 'page' | 'pageSize'>): void
+  (e: 'reset'): void
+}>()
+
+const typeOptions: { label: string; value: PermissionType }[] = [
+  { label: '菜单', value: PermissionTypeCode.MENU },
+  { label: '按钮', value: PermissionTypeCode.BUTTON },
+]
+const statusOptions: { label: string; value: PermissionStatus }[] = [
+  { label: '启用', value: EnableStatus.ENABLE },
+  { label: '禁用', value: EnableStatus.DISABLE },
+]
+
+const openParentSelector = () => {
+  parentSelectorVisible.value = true
+}
+
+const clearParent = () => {
+  queryData.parentId = null
+  queryData.parentName = null
+}
+
+const handleParentSelect = (permission: { id: string; name: string }) => {
+  queryData.parentId = permission.id
+  queryData.parentName = permission.name
+  parentSelectorVisible.value = false
+}
+
+const handleQuery = () => {
+  emit('query', {
+    name: queryData.name || null,
+    code: queryData.code || null,
+    type: queryData.type,
+    status: queryData.status,
+    parentId: queryData.parentId,
   })
+}
 
-  const emit = defineEmits<{
-    (e: 'query', params: Omit<PermissionListRequest, 'page' | 'pageSize'>): void
-    (e: 'reset'): void
-  }>()
-
-  const typeOptions: {label: string, value: PermissionType}[] = [
-    {label: '菜单', value: 'MENU'},
-    {label: '按钮', value: 'BUTTON'},
-  ]
-  const statusOptions: {label: string, value: PermissionStatus}[] = [
-    {label: '启用', value: 'ENABLE'},
-    {label: '禁用', value: 'DISABLE'},
-  ]
-
-  const openParentSelector = () => {
-    parentSelectorVisible.value = true
-  }
-
-  const clearParent = () => {
-    queryData.parentId = null
-    queryData.parentName = null
-  }
-
-  const handleParentSelect = (permission: {id: string, name: string}) => {
-    queryData.parentId = permission.id
-    queryData.parentName = permission.name
-    parentSelectorVisible.value = false
-  }
-
-  const handleQuery = () => {
-    emit('query', {
-      name: queryData.name || null,
-      code: queryData.code || null,
-      type: queryData.type,
-      status: queryData.status,
-      parentId: queryData.parentId,
-    })
-  }
-
-  const handleReset = () => {
-    queryData.name = null
-    queryData.code = null
-    queryData.type = null
-    queryData.status = null
-    queryData.parentId = null
-    queryData.parentName = null
-    emit('reset')
-  }
+const handleReset = () => {
+  queryData.name = null
+  queryData.code = null
+  queryData.type = null
+  queryData.status = null
+  queryData.parentId = null
+  queryData.parentName = null
+  emit('reset')
+}
 </script>
 
 <template>
@@ -97,10 +98,9 @@
 </template>
 
 <style scoped>
-  .permission-selector {
-
-    .field-icon {
-      cursor: pointer;
-    }
+.permission-selector {
+  .field-icon {
+    cursor: pointer;
   }
+}
 </style>

@@ -3,40 +3,24 @@ import { computed } from 'vue'
 import BusinessDocumentDialog from '@/components/BusinessDocumentDialog.vue'
 import type { ProductionPicking } from '@/types/product/productionPicking'
 import { formatDate, formatDecimal } from '@/composables/useFormat'
+import { ProductionPickingStatus } from '@/constants/enumCode'
 
 const props = defineProps<{ visible: boolean; row?: ProductionPicking | null }>()
 const emit = defineEmits<{ (e: 'cancel'): void }>()
 
-const normalizedStatus = computed(() => {
-  const value = String(props.row?.status ?? '')
-  return (
-    (
-      {
-        '0': 'DRAFT',
-        草稿: 'DRAFT',
-        '1': 'APPROVED',
-        已审批: 'APPROVED',
-        '2': 'PICKED',
-        已领料: 'PICKED',
-        '3': 'CANCELLED',
-        已取消: 'CANCELLED',
-      } as Record<string, string>
-    )[value] ?? value
-  )
-})
 const statusMeta = computed(
   () =>
-    (
-      ({
-        DRAFT: { label: '草稿', type: 'info' },
-        APPROVED: { label: '已审批 / 可领料', type: 'warning' },
-        PICKED: { label: '已领料', type: 'success' },
-        CANCELLED: { label: '已取消', type: 'danger' },
-      }) as const
-    )[normalizedStatus.value] ?? {
-      label: String(props.row?.status ?? '未知'),
-      type: 'info' as const,
-    },
+    ({
+      label: ProductionPickingStatus.labelOf(props.row?.status),
+      type:
+        props.row?.status === ProductionPickingStatus.PICKED
+          ? 'success'
+          : props.row?.status === ProductionPickingStatus.APPROVED
+            ? 'warning'
+            : props.row?.status === ProductionPickingStatus.CANCELLED
+              ? 'danger'
+              : 'info',
+    }) as const,
 )
 </script>
 

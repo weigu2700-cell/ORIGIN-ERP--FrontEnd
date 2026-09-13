@@ -1,7 +1,9 @@
 <script setup lang="ts">
+/* eslint-disable vue/no-mutating-props */
 import ProSearch from '@/components/ProSearch.vue'
 import MaterialRefer from '@/refer/MaterialRefer.vue'
 import type { PurchaseDemandQuery } from '@/types/purchase/purchaseDemand'
+import { PurchaseDemandSourceType } from '@/constants/enumCode'
 
 const props = defineProps<{ queryData: PurchaseDemandQuery }>()
 const emit = defineEmits<{
@@ -10,8 +12,8 @@ const emit = defineEmits<{
 }>()
 
 const sourceOptions = [
-  { label: '生产订单', value: 'PRODUCTION_ORDER' },
-  { label: '其他', value: 'OTHER' },
+  { label: '生产订单', value: PurchaseDemandSourceType.PRODUCTION_ORDER },
+  { label: '其他', value: PurchaseDemandSourceType.OTHER },
 ]
 </script>
 
@@ -35,8 +37,8 @@ const sourceOptions = [
   gap: 10px;
 }
 
-.search-container> :deep(.el-input),
-.search-container> :deep(.el-select) {
+.search-container > :deep(.el-input),
+.search-container > :deep(.el-select) {
   flex: 0 1 200px;
   min-width: 0;
   width: 200px;

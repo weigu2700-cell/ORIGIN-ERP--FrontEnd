@@ -1,15 +1,15 @@
-import service from "@/utils/request.ts"
+import service from '@/utils/request.ts'
 import type {
   MaterialCreateRequest,
   MaterialListRequest,
   MaterialListResponse,
   MaterialStatus,
   MaterialUpdateRequest,
-  MaterialVO
-} from "@/types/master/material.ts";
+  MaterialVO,
+} from '@/types/master/material.ts'
 
 export function getPageMaterialList(data: MaterialListRequest) {
-  return service.get<MaterialListResponse>('master/material', {params: data})
+  return service.get<MaterialListResponse>('master/material', { params: data })
 }
 
 export function getDetailMaterial(id: string) {
@@ -24,7 +24,7 @@ export function updateMaterial(id: string, data: MaterialUpdateRequest) {
   return service.put<void>(`master/material/${id}`, data)
 }
 
-// 注意：物料状态变更 body 是原始字符串 "ENABLE"/"DISABLE"
+// 状态变更 body 为枚举 Code（1=启用，2=停用），不是 JSON 对象。
 export function changeMaterialStatus(id: string, status: MaterialStatus) {
   return service.put<void>(`master/material/${id}/status`, status)
 }

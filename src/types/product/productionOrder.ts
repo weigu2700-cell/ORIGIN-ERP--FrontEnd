@@ -1,4 +1,8 @@
 import type { PageResult } from '../common'
+import { ProductionOrderStatus } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
+
+export type ProductionOrderStatusCode = EnumCodeOf<typeof ProductionOrderStatus>
 
 export interface ProductionOrderQuery {
   pageNum: number
@@ -6,7 +10,7 @@ export interface ProductionOrderQuery {
   productionOrderNo?: string
   productionDemandNo?: string
   materialId?: string
-  status?: number
+  status?: ProductionOrderStatusCode
   plannedStartTime?: string
   plannedEndTime?: string
   actualStartTime?: string
@@ -36,7 +40,7 @@ export interface ProductionOrderVo {
   plannedEndTime: string
   actualStartTime: string
   actualEndTime: string
-  status: number
+  status: ProductionOrderStatusCode
   remark?: string
 }
 

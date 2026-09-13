@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import Selector from "@/views/master/supplier/components/selector.vue";
-import ProToolbar from "@/components/ProToolbar.vue";
-import ProTable, { type ProColumn } from "@/components/ProTable.vue"
+import Selector from '@/views/master/supplier/components/selector.vue'
+import ProToolbar from '@/components/ProToolbar.vue'
+import ProTable, { type ProColumn } from '@/components/ProTable.vue'
 import { onMounted, ref, reactive } from 'vue'
-import { changeSupplierStatus, addSupplier, getPageSupplierList, updateSupplier } from "@/api/master/supplier.ts";
+import { changeSupplierStatus, addSupplier, getPageSupplierList, updateSupplier } from '@/api/master/supplier.ts'
 import type {
   SupplierCreateRequest,
   SupplierListRequest,
   SupplierListResponse,
   SupplierUpdateRequest,
-  SupplierVO
-} from "@/types/master/supplier.ts";
-import SaveDialog from "@/views/master/supplier/components/saveDialog.vue";
-import DetailDialog from "@/views/master/supplier/components/detailDialog.vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+  SupplierVO,
+} from '@/types/master/supplier.ts'
+import SaveDialog from '@/views/master/supplier/components/saveDialog.vue'
+import DetailDialog from '@/views/master/supplier/components/detailDialog.vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import PageHeader from '@/components/PageHeader.vue'
+import { SupplierStatus } from '@/constants/enumCode'
 
 const queryData = reactive<SupplierListRequest>({
   page: 1,
@@ -76,7 +77,7 @@ const handleAdd = () => {
 }
 
 const handleEdit = () => {
-  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  const row = tableData.value?.records?.find((item) => String(item.id) === selectedRowId.value)
   if (!row) {
     ElMessage.warning('请选择要编辑的供应商')
     return
@@ -86,28 +87,24 @@ const handleEdit = () => {
 }
 
 const handleStatus = async () => {
-  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  const row = tableData.value?.records?.find((item) => String(item.id) === selectedRowId.value)
   if (!row) {
     ElMessage.warning('请选择要切换状态的供应商')
     return
   }
-  const target = row.status === 1 ? 'INACTIVE' : 'ACTIVE'
-  const action = target === 'ACTIVE' ? '启用' : '停用'
+  const target = row.status === SupplierStatus.ACTIVE ? SupplierStatus.INACTIVE : SupplierStatus.ACTIVE
+  const action = target === SupplierStatus.ACTIVE ? '启用' : '停用'
   try {
-    await ElMessageBox.confirm(
-      `确定要${action}供应商 ${row.name} 吗？`,
-      '状态确认',
-      {
-        type: 'warning',
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-      }
-    )
+    await ElMessageBox.confirm(`确定要${action}供应商 ${row.name} 吗？`, '状态确认', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+    })
   } catch {
     return // 用户取消
   }
   try {
-    // 供应商状态变更 body 是原始字符串
+    // 状态变更 body 为数值 Code。
     await changeSupplierStatus(String(row.id), target)
     ElMessage.success(`${action}成功`)
     tableRef.value?.clearSelection()
@@ -156,31 +153,62 @@ const handleCancel = () => {
         <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
       </template>
       <template #toolbar>
-        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
-          @refresh="handleRefresh" />
+        <ProToolbar
+          :show-delete="false"
+          show-status
+          @add="handleAdd"
+          @edit="handleEdit"
+          @status="handleStatus"
+          @refresh="handleRefresh"
+        />
       </template>
     </PageHeader>
     <div class="table round">
-      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
-        :page="queryData.page" :page-size="queryData.pageSize"
-        @update:page="(p: number) => { queryData.page = p; loadData() }"
-        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
+      <ProTable
+        ref="tableRef"
+        :data="tableData?.records ?? []"
+        :columns="columns"
+        :total="tableData?.total ?? 0"
+        :page="queryData.page"
+        :page-size="queryData.pageSize"
+        @update:page="
+          (p: number) => {
+            queryData.page = p
+            loadData()
+          }
+        "
+        @update:pageSize="
+          (s: number) => {
+            queryData.pageSize = s
+            queryData.page = 1
+            loadData()
+          }
+        "
+        @selectionChange="handleSelectionChange"
+        @rowDblclick="handleRowDblclick"
+      >
         <template #status="{ row }">
-          <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
-            {{ row.status === 1 ? '启用' : '停用' }}
+          <el-tag :type="row.status === SupplierStatus.ACTIVE ? 'success' : 'info'" size="small">
+            {{ SupplierStatus.labelOf(row.status) }}
           </el-tag>
         </template>
       </ProTable>
     </div>
   </div>
 
-  <SaveDialog :visible="visible" :title="model === 'add' ? '新增供应商' : '修改供应商'" :mode="model"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
-    @submit="handleSubmit" />
-  <DetailDialog :visible="detailVisible"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
-    @cancel="detailVisible = false" />
+  <SaveDialog
+    :visible="visible"
+    :title="model === 'add' ? '新增供应商' : '修改供应商'"
+    :mode="model"
+    :row="tableData?.records?.find((item) => String(item.id) === String(selectedRowId))"
+    @cancel="handleCancel"
+    @submit="handleSubmit"
+  />
+  <DetailDialog
+    :visible="detailVisible"
+    :row="tableData?.records?.find((item) => String(item.id) === String(selectedRowId))"
+    @cancel="detailVisible = false"
+  />
 </template>
 
 <style scoped>

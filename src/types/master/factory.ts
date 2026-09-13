@@ -2,7 +2,7 @@ import type { PageResult } from '../common'
 import { EnableStatus } from '@/constants/enumCode'
 import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type FactoryStatus = EnumCodeOf<typeof EnableStatus> | string
+export type FactoryStatus = EnumCodeOf<typeof EnableStatus>
 
 export interface FactoryListRequest {
   page: number
@@ -10,7 +10,7 @@ export interface FactoryListRequest {
   name?: string | null
   code?: string | null
   shortName?: string | null
-  status?: number | null
+  status?: FactoryStatus | null
 }
 
 export interface FactoryVO {
@@ -18,7 +18,7 @@ export interface FactoryVO {
   name: string
   code: string
   shortName: string
-  status: number
+  status: FactoryStatus
   address?: string
   remark?: string
 }
@@ -28,7 +28,7 @@ export type FactoryListResponse = PageResult<FactoryVO>
 export interface FactoryAdd {
   name: string
   shortName: string
-  status?: number
+  status?: FactoryStatus
   address?: string
   remark?: string
 }

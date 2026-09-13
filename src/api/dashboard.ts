@@ -5,7 +5,12 @@ import { getPageSalesOrder } from '@/api/sales/salesOrder'
 import type { PageResult } from '@/types/common'
 import type { ProductionOrderVo } from '@/types/product/productionOrder'
 import type { PurchaseOrderVo } from '@/types/purchase/purchaseOrder'
-import { ProductionDemandStatus, PurchaseOrderStatus, SalesOrderStatus } from '@/constants/enumCode'
+import {
+  ProductionDemandStatus,
+  ProductionOrderStatus,
+  PurchaseOrderStatus,
+  SalesOrderStatus,
+} from '@/constants/enumCode'
 
 export interface DashboardOverview {
   metrics: {
@@ -34,7 +39,9 @@ const totalOf = (result: PromiseSettledResult<{ total: number }>) =>
 export async function getDashboardOverview(): Promise<DashboardOverview> {
   const requests = [
     getPageProductionDemand({ pageNum: 1, pageSize: 1, status: ProductionDemandStatus.PENDING }),
-    ...[0, 1, 2, 3, 4].map((status) => getPageProductionOrder({ pageNum: 1, pageSize: 1, status })),
+    ...ProductionOrderStatus.options.map(({ value: status }) =>
+      getPageProductionOrder({ pageNum: 1, pageSize: 1, status }),
+    ),
     getPagePurchaseOrder({ pageNum: 1, pageSize: 1, status: PurchaseOrderStatus.DRAFT }),
     getPagePurchaseOrder({ pageNum: 1, pageSize: 1, status: PurchaseOrderStatus.SHIPPED }),
     getPageSalesOrder({

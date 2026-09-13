@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import ProSearch from '@/components/ProSearch.vue';
-import MaterialRefer from '@/refer/MaterialRefer.vue';
-import type { ProductionDemandQuery } from '@/types/product/productionDemand';
+/* eslint-disable vue/no-mutating-props */
+import ProSearch from '@/components/ProSearch.vue'
+import MaterialRefer from '@/refer/MaterialRefer.vue'
+import type { ProductionDemandQuery } from '@/types/product/productionDemand'
+import { ProductionSourceType } from '@/constants/enumCode'
 
 const props = defineProps<{
   queryData: ProductionDemandQuery
@@ -20,12 +22,7 @@ const handleReset = () => {
   emit('reset')
 }
 
-const sourceTypeOptions = [
-  { label: '销售订单', value: 'SALES_ORDER' },
-  { label: '预测', value: 'FORECAST' },
-  { label: '手工创建', value: 'MANUAL' }
-]
-
+const sourceTypeOptions = ProductionSourceType.options
 </script>
 
 <template>
@@ -48,11 +45,10 @@ const sourceTypeOptions = [
   flex-wrap: wrap;
   width: auto;
   gap: 10px;
-
 }
 
-.search-container> :deep(.el-input),
-.search-container> :deep(.el-select) {
+.search-container > :deep(.el-input),
+.search-container > :deep(.el-select) {
   flex: 0 1 200px;
   min-width: 0;
   width: 200px;

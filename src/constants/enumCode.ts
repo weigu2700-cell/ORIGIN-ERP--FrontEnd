@@ -93,7 +93,23 @@ export const ProductionPickingStatus = defineEnum({ DRAFT: 0, APPROVED: 1, PICKE
   2: '已领料',
   3: '已取消',
 })
+export const ProductionReportStatus = defineEnum(
+  { DRAFT: 0, APPROVED: 1, CANCEL: 2, REJECT: 3, FINISHED: 4 } as const,
+  {
+    0: '草稿',
+    1: '已审批',
+    2: '已取消',
+    3: '已驳回',
+    4: '已完成',
+  },
+)
 export const BomStatus = defineEnum({ DRAFT: 0, ACTIVE: 1, INACTIVE: 2 } as const, { 0: '草稿', 1: '使用', 2: '停用' })
+export const FinishWarehousingStatus = defineEnum({ DRAFT: 0, APPROVED: 1, WAREHOUSING: 2, CANCEL: 3 } as const, {
+  0: '草稿',
+  1: '已审批',
+  2: '已入库',
+  3: '已取消',
+})
 export const TransactionType = defineEnum({ INBOUND: 1, RESERVE: 2, RELEASE: 3, OUTBOUND: 4 } as const, {
   1: '入库',
   2: '预占',

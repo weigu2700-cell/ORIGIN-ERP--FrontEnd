@@ -4,7 +4,7 @@ import MaterialRefer from '@/refer/MaterialRefer.vue'
 import SupplierRefer from '@/refer/SupplierRefer.vue'
 import WarehouseRefer from '@/refer/WarehouseRefer.vue'
 import type { PurchaseInStockQuery } from '@/types/purchase/purchaseInStock'
-import { PurchaseInStockStatus } from '@/constants/enumCode'
+import { PurchaseInStockStatus, PurchaseInStockType } from '@/constants/enumCode'
 import { reactive, watch } from 'vue'
 
 const props = defineProps<{
@@ -44,9 +44,9 @@ const handleReset = () => {
       <el-input v-model="localQuery.storageLocation" placeholder="请输入储位" clearable />
       <el-input v-model="localQuery.operator" placeholder="请输入操作人" clearable />
       <el-select v-model="localQuery.inType" placeholder="请选择入库类型" clearable>
-        <el-option label="采购入库" value="PURCHASE_NORMAL" />
-        <el-option label="采购退货" value="PURCHASE_RETURN" />
-        <el-option label="赠品入库" value="PURCHASE_GIFT" />
+        <el-option label="采购入库" :value="PurchaseInStockType.PURCHASE_NORMAL" />
+        <el-option label="采购退货" :value="PurchaseInStockType.PURCHASE_RETURN" />
+        <el-option label="赠品入库" :value="PurchaseInStockType.PURCHASE_GIFT" />
       </el-select>
       <el-select v-model="localQuery.status" placeholder="请选择状态" clearable>
         <el-option label="草稿" :value="PurchaseInStockStatus.DRAFT" />

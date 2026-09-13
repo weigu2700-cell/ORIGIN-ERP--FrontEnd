@@ -1,69 +1,70 @@
 <script setup lang="ts">
-  import {reactive, ref} from "vue";
-  import ProSearch from "@/components/ProSearch.vue";
-  import ParentMenuSelector from "@/views/system/menu/components/parentMenuSelector.vue";
-  import {CircleClose, Search} from "@element-plus/icons-vue";
-  import type {MenuListRequest, MenuStatus} from "@/types/system/menu.ts";
+import { reactive, ref } from 'vue'
+import ProSearch from '@/components/ProSearch.vue'
+import ParentMenuSelector from '@/views/system/menu/components/parentMenuSelector.vue'
+import { CircleClose, Search } from '@element-plus/icons-vue'
+import type { MenuListRequest, MenuStatus } from '@/types/system/menu.ts'
+import { EnableStatus } from '@/constants/enumCode'
 
-  const parentSelectorVisible = ref(false)
+const parentSelectorVisible = ref(false)
 
-  const queryData = reactive<Omit<MenuListRequest, 'page' | 'pageSize'> & {parentName: string | null}>({
-    title: null,
-    name: null,
-    parentId: null,
-    parentName: '',
-    visible: null,
-    status: null,
+const queryData = reactive<Omit<MenuListRequest, 'page' | 'pageSize'> & { parentName: string | null }>({
+  title: null,
+  name: null,
+  parentId: null,
+  parentName: '',
+  visible: null,
+  status: null,
+})
+
+const emit = defineEmits<{
+  (e: 'query', params: Omit<MenuListRequest, 'page' | 'pageSize'>): void
+  (e: 'reset'): void
+}>()
+
+const visibleOptions: { label: string; value: number }[] = [
+  { label: '显示', value: 1 },
+  { label: '隐藏', value: 0 },
+]
+const statusOptions: { label: string; value: MenuStatus }[] = [
+  { label: '启用', value: EnableStatus.ENABLE },
+  { label: '禁用', value: EnableStatus.DISABLE },
+]
+
+const openParentSelector = () => {
+  parentSelectorVisible.value = true
+}
+
+const clearParent = () => {
+  queryData.parentId = null
+  queryData.parentName = null
+}
+
+const handleParentSelect = (menu: { id: string; title: string }) => {
+  queryData.parentId = menu.id
+  queryData.parentName = menu.title
+  parentSelectorVisible.value = false
+}
+
+const handleQuery = () => {
+  emit('query', {
+    title: queryData.title || null,
+    name: queryData.name || null,
+    parentId: queryData.parentId,
+    visible: queryData.visible,
+    status: queryData.status,
   })
+}
 
-  const emit = defineEmits<{
-    (e: 'query', params: Omit<MenuListRequest, 'page' | 'pageSize'>): void
-    (e: 'reset'): void
-  }>()
-
-  const visibleOptions: {label: string, value: number}[] = [
-    {label: '显示', value: 1},
-    {label: '隐藏', value: 0},
-  ]
-  const statusOptions: {label: string, value: MenuStatus}[] = [
-    {label: '启用', value: 'ENABLE'},
-    {label: '禁用', value: 'DISABLE'},
-  ]
-
-  const openParentSelector = () => {
-    parentSelectorVisible.value = true
-  }
-
-  const clearParent = () => {
-    queryData.parentId = null
-    queryData.parentName = null
-  }
-
-  const handleParentSelect = (menu: {id: string, title: string}) => {
-    queryData.parentId = menu.id
-    queryData.parentName = menu.title
-    parentSelectorVisible.value = false
-  }
-
-  const handleQuery = () => {
-    emit('query', {
-      title: queryData.title || null,
-      name: queryData.name || null,
-      parentId: queryData.parentId,
-      visible: queryData.visible,
-      status: queryData.status,
-    })
-  }
-
-  const handleReset = () => {
-    queryData.title = null
-    queryData.name = null
-    queryData.parentId = null
-    queryData.parentName = null
-    queryData.visible = null
-    queryData.status = null
-    emit('reset')
-  }
+const handleReset = () => {
+  queryData.title = null
+  queryData.name = null
+  queryData.parentId = null
+  queryData.parentName = null
+  queryData.visible = null
+  queryData.status = null
+  emit('reset')
+}
 </script>
 
 <template>
@@ -97,7 +98,7 @@
 </template>
 
 <style scoped>
-  .menu-selector .field-icon {
-    cursor: pointer;
-  }
+.menu-selector .field-icon {
+  cursor: pointer;
+}
 </style>

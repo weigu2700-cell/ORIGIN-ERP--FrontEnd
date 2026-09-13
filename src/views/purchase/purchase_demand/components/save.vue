@@ -57,8 +57,8 @@ const submit = async () => {
       </el-form-item>
       <el-form-item label="来源类型" prop="sourceType">
         <el-select v-model="form.sourceType" style="width: 100%">
-          <el-option label="生产订单" value="PRODUCTION_ORDER" />
-          <el-option label="其他" value="OTHER" />
+          <el-option label="生产订单" :value="PurchaseDemandSourceType.PRODUCTION_ORDER" />
+          <el-option label="其他" :value="PurchaseDemandSourceType.OTHER" />
         </el-select>
       </el-form-item>
       <el-form-item label="来源单号" prop="sourceNo">

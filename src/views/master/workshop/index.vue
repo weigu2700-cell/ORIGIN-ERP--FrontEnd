@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import Selector from "@/views/master/workshop/components/selector.vue";
-import ProToolbar from "@/components/ProToolbar.vue";
-import ProTable, { type ProColumn } from "@/components/ProTable.vue"
-import { getPageWorkshopList, addWorkshop, updateWorkshop, changeWorkshopStatus } from "@/api/master/workshop.ts";
+import Selector from '@/views/master/workshop/components/selector.vue'
+import ProToolbar from '@/components/ProToolbar.vue'
+import ProTable, { type ProColumn } from '@/components/ProTable.vue'
+import { getPageWorkshopList, addWorkshop, updateWorkshop, changeWorkshopStatus } from '@/api/master/workshop.ts'
 import type {
   WorkshopCreateRequest,
   WorkshopListRequest,
   WorkshopListResponse,
   WorkshopUpdateRequest,
-  WorkshopVO
-} from "@/types/master/workshop.ts";
-import { ElMessage, ElMessageBox } from "element-plus";
-import SaveDialog from "@/views/master/workshop/components/saveDialog.vue";
-import DetailDialog from "@/views/master/workshop/components/detailDialog.vue";
+  WorkshopVO,
+} from '@/types/master/workshop.ts'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import SaveDialog from '@/views/master/workshop/components/saveDialog.vue'
+import DetailDialog from '@/views/master/workshop/components/detailDialog.vue'
 import PageHeader from '@/components/PageHeader.vue'
+import { EnableStatus } from '@/constants/enumCode'
 
 const queryData = reactive<WorkshopListRequest>({
   page: 1,
@@ -39,7 +40,6 @@ const columns = ref<ProColumn<WorkshopVO>[]>([
   { label: '所属工厂', prop: 'factoryName', minWidth: 140 },
   { label: '备注', prop: 'remark', minWidth: 160 },
 ])
-
 
 const loadData = async () => {
   try {
@@ -92,10 +92,10 @@ const handleStatus = async () => {
     ElMessage.warning('请选择要切换状态的车间')
     return
   }
-  const row = tableData.value?.records?.find(item => String(item.id) === String(rowId))
+  const row = tableData.value?.records?.find((item) => String(item.id) === String(rowId))
   if (!row) return
-  const target = row.status === 1 ? 'DISABLE' : 'ENABLE'
-  const action = target === 'ENABLE' ? '启用' : '停用'
+  const target = row.status === EnableStatus.ENABLE ? EnableStatus.DISABLE : EnableStatus.ENABLE
+  const action = target === EnableStatus.ENABLE ? '启用' : '停用'
   try {
     await ElMessageBox.confirm(`确定要${action}选中的车间吗？`, '状态确认', {
       type: 'warning',
@@ -149,7 +149,6 @@ const handleCancel = () => {
 onMounted(() => {
   loadData()
 })
-
 </script>
 
 <template>
@@ -159,16 +158,40 @@ onMounted(() => {
         <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
       </template>
       <template #toolbar>
-        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
-          @refresh="handleRefresh" />
+        <ProToolbar
+          :show-delete="false"
+          show-status
+          @add="handleAdd"
+          @edit="handleEdit"
+          @status="handleStatus"
+          @refresh="handleRefresh"
+        />
       </template>
     </PageHeader>
     <div class="table round">
-      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
-        :page="queryData.page" :page-size="queryData.pageSize"
-        @update:page="(p: number) => { queryData.page = p; loadData() }"
-        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
+      <ProTable
+        ref="tableRef"
+        :data="tableData?.records ?? []"
+        :columns="columns"
+        :total="tableData?.total ?? 0"
+        :page="queryData.page"
+        :page-size="queryData.pageSize"
+        @update:page="
+          (p: number) => {
+            queryData.page = p
+            loadData()
+          }
+        "
+        @update:pageSize="
+          (s: number) => {
+            queryData.pageSize = s
+            queryData.page = 1
+            loadData()
+          }
+        "
+        @selectionChange="handleSelectionChange"
+        @rowDblclick="handleRowDblclick"
+      >
         <template #status="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'danger'">
             {{ row.status === 1 ? '启用' : '停用' }}
@@ -178,11 +201,18 @@ onMounted(() => {
     </div>
   </div>
 
-  <SaveDialog v-model="visible" :model="model" :selectedRowId="selectedRowId" @submit="handleSubmit"
-    @cancel="handleCancel" />
-  <DetailDialog :visible="detailVisible"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
-    @cancel="detailVisible = false" />
+  <SaveDialog
+    v-model="visible"
+    :model="model"
+    :selectedRowId="selectedRowId"
+    @submit="handleSubmit"
+    @cancel="handleCancel"
+  />
+  <DetailDialog
+    :visible="detailVisible"
+    :row="tableData?.records?.find((item) => String(item.id) === String(selectedRowId))"
+    @cancel="detailVisible = false"
+  />
 </template>
 
 <style scoped>

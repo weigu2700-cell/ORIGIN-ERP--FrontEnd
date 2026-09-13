@@ -1,13 +1,15 @@
+<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from "vue";
-import { ElMessage } from "element-plus";
-import type { ElTree } from "element-plus";
-import type { RoleInfo } from "@/types/system/role.ts";
-import type { PermissionNode } from "@/types/system/permission.ts";
-import type { MenuTreeNode, MenuListVO } from "@/types/system/menu.ts";
-import { getPermissionTree } from "@/api/system/permission.ts";
-import { getMenuTree, getPageMenuList } from "@/api/system/menu.ts";
-import { assignRolePermissions, assignRoleMenus, getDetailRole } from "@/api/system/role.ts";
+import { computed, nextTick, ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
+import type { ElTree } from 'element-plus'
+import type { RoleInfo } from '@/types/system/role.ts'
+import type { PermissionNode } from '@/types/system/permission.ts'
+import type { MenuTreeNode, MenuListVO } from '@/types/system/menu.ts'
+import { getPermissionTree } from '@/api/system/permission.ts'
+import { getMenuTree, getPageMenuList } from '@/api/system/menu.ts'
+import { assignRolePermissions, assignRoleMenus, getDetailRole } from '@/api/system/role.ts'
+import { EnableStatus, PermissionType } from '@/constants/enumCode'
 
 const props = defineProps<{
   visible: boolean
@@ -31,14 +33,25 @@ const loading = ref(false)
 
 // 在原权限树顶层包一层"全部"父节点，勾选它即可一键分配全部权限
 const permissionTree = computed<PermissionNode[]>(() => [
-  { id: ALL_NODE_ID, name: '全部', code: '', type: 'MENU', parentId: null, parentName: null, sort: -1, status: 'ENABLE', remark: null, children: permissionNodes.value },
+  {
+    id: ALL_NODE_ID,
+    name: '全部',
+    code: '',
+    type: PermissionType.MENU,
+    parentId: null,
+    parentName: null,
+    sort: -1,
+    status: EnableStatus.ENABLE,
+    remark: null,
+    children: permissionNodes.value,
+  },
 ])
 
 // 递归收集树节点 id（后端 Long 序列化为 string，统一转 string 避免精度丢失）
-const collectIds = (nodes: { id: string | number, children?: any[] }[]): string[] => {
+const collectIds = (nodes: { id: string | number; children?: any[] }[]): string[] => {
   const ids: string[] = []
-  const walk = (list: { id: string | number, children?: { id: string | number, children?: any[] }[] }[]) => {
-    list.forEach(n => {
+  const walk = (list: { id: string | number; children?: { id: string | number; children?: any[] }[] }[]) => {
+    list.forEach((n) => {
       ids.push(String(n.id))
       if (n.children?.length) walk(n.children)
     })
@@ -52,7 +65,7 @@ const fetchAllMenus = async (): Promise<MenuTreeNode[]> => {
   const all: MenuListVO[] = []
   const pageSize = 100
   let page = 1
-  for (; ;) {
+  for (;;) {
     const res = await getPageMenuList({
       page,
       pageSize,
@@ -67,18 +80,20 @@ const fetchAllMenus = async (): Promise<MenuTreeNode[]> => {
     page += 1
   }
   const map = new Map<string, MenuTreeNode>()
-  all.forEach(m => map.set(String(m.id), {
-    id: String(m.id),
-    name: m.name,
-    title: m.title,
-    path: m.path,
-    component: m.component,
-    icon: m.icon,
-    parentId: m.parentId,
-    children: [],
-  }))
+  all.forEach((m) =>
+    map.set(String(m.id), {
+      id: String(m.id),
+      name: m.name,
+      title: m.title,
+      path: m.path,
+      component: m.component,
+      icon: m.icon,
+      parentId: m.parentId,
+      children: [],
+    }),
+  )
   const roots: MenuTreeNode[] = []
-  map.forEach(n => {
+  map.forEach((n) => {
     const parent = n.parentId != null ? map.get(String(n.parentId)) : undefined
     if (parent) parent.children?.push(n)
     else roots.push(n)
@@ -112,21 +127,24 @@ const loadMenuTree = async () => {
   }
 }
 
-watch(() => props.visible, (visible) => {
-  if (visible && props.row) {
-    permissionNodes.value = []
-    menuTree.value = []
-    loading.value = true
-    const done = () => {
-      loading.value = false
+watch(
+  () => props.visible,
+  (visible) => {
+    if (visible && props.row) {
+      permissionNodes.value = []
+      menuTree.value = []
+      loading.value = true
+      const done = () => {
+        loading.value = false
+      }
+      if (props.mode === 'permission') {
+        loadPermissionTree().finally(done)
+      } else {
+        loadMenuTree().finally(done)
+      }
     }
-    if (props.mode === 'permission') {
-      loadPermissionTree().finally(done)
-    } else {
-      loadMenuTree().finally(done)
-    }
-  }
-})
+  },
+)
 
 const handleSave = async () => {
   if (!props.row) {
@@ -140,8 +158,8 @@ const handleSave = async () => {
   }
   // 剔除虚拟的"全部"节点，避免把 __all__ 提交给后端
   const keys = [...tree.getCheckedKeys(false), ...tree.getHalfCheckedKeys()]
-    .map(k => String(k))
-    .filter(k => k !== ALL_NODE_ID)
+    .map((k) => String(k))
+    .filter((k) => k !== ALL_NODE_ID)
   saving.value = true
   try {
     if (props.mode === 'permission') {
@@ -167,18 +185,35 @@ const handleCancel = () => {
 </script>
 
 <template>
-  <el-dialog :model-value="props.visible"
-    :title="`${props.mode === 'permission' ? '分配权限' : '分配菜单'} - ${props.row?.name ?? ''}`" width="640px"
-    @close="handleCancel">
+  <el-dialog
+    :model-value="props.visible"
+    :title="`${props.mode === 'permission' ? '分配权限' : '分配菜单'} - ${props.row?.name ?? ''}`"
+    width="640px"
+    @close="handleCancel"
+  >
     <div v-loading="loading" class="tree-wrap">
-      <el-tree v-if="props.mode === 'permission'" ref="permissionTreeRef" :data="permissionTree"
-        :props="{ label: 'name', children: 'children' }" node-key="id" show-checkbox default-expand-all>
+      <el-tree
+        v-if="props.mode === 'permission'"
+        ref="permissionTreeRef"
+        :data="permissionTree"
+        :props="{ label: 'name', children: 'children' }"
+        node-key="id"
+        show-checkbox
+        default-expand-all
+      >
         <template #default="{ data }">
           <span :class="{ 'all-node': data.id === ALL_NODE_ID }">{{ data.name }}</span>
         </template>
       </el-tree>
-      <el-tree v-else ref="menuTreeRef" :data="menuTree" :props="{ label: 'title', children: 'children' }" node-key="id"
-        show-checkbox default-expand-all />
+      <el-tree
+        v-else
+        ref="menuTreeRef"
+        :data="menuTree"
+        :props="{ label: 'title', children: 'children' }"
+        node-key="id"
+        show-checkbox
+        default-expand-all
+      />
     </div>
     <template #footer>
       <el-button type="primary" :loading="saving" @click="handleSave">保存</el-button>

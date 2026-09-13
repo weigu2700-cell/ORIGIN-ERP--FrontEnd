@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import TreeTableSelector, { type SelectorColumn, type SelectorListParams } from "@/refer/TreeTableSelector.vue"
-import type { PermissionNode } from "@/types/system/permission.ts"
-import { getPermissionTree, getPagePermissionList } from "@/api/system/permission.ts"
+import TreeTableSelector, { type SelectorColumn, type SelectorListParams } from '@/refer/TreeTableSelector.vue'
+import type { PermissionNode } from '@/types/system/permission.ts'
+import { getPermissionTree, getPagePermissionList } from '@/api/system/permission.ts'
+import { PermissionType } from '@/constants/enumCode'
 
 const props = defineProps<{
   visible: boolean
 }>()
 const emit = defineEmits<{
   (e: 'update:visible', visible: boolean): void
-  (e: 'select', permission: { id: string, name: string }): void
+  (e: 'select', permission: { id: string; name: string }): void
 }>()
 
 const columns: SelectorColumn<PermissionNode>[] = [
@@ -18,7 +19,7 @@ const columns: SelectorColumn<PermissionNode>[] = [
     label: '类型',
     prop: 'type',
     minWidth: 80,
-    formatter: (row) => row.type === 'MENU' ? '菜单' : '按钮',
+    formatter: (row) => (row.type === PermissionType.MENU ? '菜单' : '按钮'),
   },
 ]
 
@@ -38,6 +39,13 @@ const handleSelect = (row: PermissionNode) => {
 </script>
 
 <template>
-  <TreeTableSelector :visible="props.visible" title="选择父级权限" :load-tree="loadTree" :load-list="loadList"
-    :columns="columns" @update:visible="(v) => emit('update:visible', v)" @select="handleSelect" />
+  <TreeTableSelector
+    :visible="props.visible"
+    title="选择父级权限"
+    :load-tree="loadTree"
+    :load-list="loadList"
+    :columns="columns"
+    @update:visible="(v) => emit('update:visible', v)"
+    @select="handleSelect"
+  />
 </template>

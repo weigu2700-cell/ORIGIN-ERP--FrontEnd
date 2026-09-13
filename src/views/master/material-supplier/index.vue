@@ -1,21 +1,27 @@
 <script setup lang="ts">
-import Selector from "@/views/master/material-supplier/components/selector.vue";
-import ProToolbar from "@/components/ProToolbar.vue";
-import ProTable, { type ProColumn } from "@/components/ProTable.vue"
+import Selector from '@/views/master/material-supplier/components/selector.vue'
+import ProToolbar from '@/components/ProToolbar.vue'
+import ProTable, { type ProColumn } from '@/components/ProTable.vue'
 import { onMounted, ref, reactive } from 'vue'
-import { changeMaterialSupplierStatus, addMaterialSupplier, getPageMaterialSupplierList, updateMaterialSupplier } from "@/api/master/materialSupplier.ts";
+import {
+  changeMaterialSupplierStatus,
+  addMaterialSupplier,
+  getPageMaterialSupplierList,
+  updateMaterialSupplier,
+} from '@/api/master/materialSupplier.ts'
 import type {
   MaterialSupplierCreateRequest,
   MaterialSupplierListRequest,
   MaterialSupplierListResponse,
   MaterialSupplierUpdateRequest,
-  MaterialSupplierVO
-} from "@/types/master/materialSupplier.ts";
-import SaveDialog from "@/views/master/material-supplier/components/saveDialog.vue";
-import DetailDialog from "@/views/master/material-supplier/components/detailDialog.vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { formatDecimal } from "@/composables/useFormat";
+  MaterialSupplierVO,
+} from '@/types/master/materialSupplier.ts'
+import SaveDialog from '@/views/master/material-supplier/components/saveDialog.vue'
+import DetailDialog from '@/views/master/material-supplier/components/detailDialog.vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { formatDecimal } from '@/composables/useFormat'
 import PageHeader from '@/components/PageHeader.vue'
+import { MaterialSupplierStatus } from '@/constants/enumCode'
 
 const queryData = reactive<MaterialSupplierListRequest>({
   page: 1,
@@ -76,7 +82,7 @@ const handleAdd = () => {
 }
 
 const handleEdit = () => {
-  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  const row = tableData.value?.records?.find((item) => String(item.id) === selectedRowId.value)
   if (!row) {
     ElMessage.warning('请选择要编辑的关联记录')
     return
@@ -86,12 +92,12 @@ const handleEdit = () => {
 }
 
 const handleStatus = async () => {
-  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  const row = tableData.value?.records?.find((item) => String(item.id) === selectedRowId.value)
   if (!row) {
     ElMessage.warning('请选择要切换状态的关联记录')
     return
   }
-  const action = row.status === 1 ? '停用' : '启用'
+  const action = row.status === MaterialSupplierStatus.ACTIVE ? '停用' : '启用'
   try {
     await ElMessageBox.confirm(
       `确定要${action}物料「${row.materialName ?? ''}」与供应商「${row.supplierName ?? ''}」的关联吗？`,
@@ -100,7 +106,7 @@ const handleStatus = async () => {
         type: 'warning',
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-      }
+      },
     )
   } catch {
     return // 用户取消
@@ -155,16 +161,40 @@ const handleCancel = () => {
         <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
       </template>
       <template #toolbar>
-        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
-          @refresh="handleRefresh" />
+        <ProToolbar
+          :show-delete="false"
+          show-status
+          @add="handleAdd"
+          @edit="handleEdit"
+          @status="handleStatus"
+          @refresh="handleRefresh"
+        />
       </template>
     </PageHeader>
     <div class="table round">
-      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
-        :page="queryData.page" :page-size="queryData.pageSize"
-        @update:page="(p: number) => { queryData.page = p; loadData() }"
-        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
+      <ProTable
+        ref="tableRef"
+        :data="tableData?.records ?? []"
+        :columns="columns"
+        :total="tableData?.total ?? 0"
+        :page="queryData.page"
+        :page-size="queryData.pageSize"
+        @update:page="
+          (p: number) => {
+            queryData.page = p
+            loadData()
+          }
+        "
+        @update:pageSize="
+          (s: number) => {
+            queryData.pageSize = s
+            queryData.page = 1
+            loadData()
+          }
+        "
+        @selectionChange="handleSelectionChange"
+        @rowDblclick="handleRowDblclick"
+      >
         <template #purchasePrice="{ row }">
           {{ formatDecimal.default(row.purchasePrice, 2) }}
         </template>
@@ -174,20 +204,27 @@ const handleCancel = () => {
           </el-tag>
         </template>
         <template #status="{ row }">
-          <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
-            {{ row.status === 1 ? '启用' : '停用' }}
+          <el-tag :type="row.status === MaterialSupplierStatus.ACTIVE ? 'success' : 'info'" size="small">
+            {{ MaterialSupplierStatus.labelOf(row.status) }}
           </el-tag>
         </template>
       </ProTable>
     </div>
   </div>
 
-  <SaveDialog :visible="visible" :title="model === 'add' ? '新增物料供应商' : '修改物料供应商'" :mode="model"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
-    @submit="handleSubmit" />
-  <DetailDialog :visible="detailVisible"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
-    @cancel="detailVisible = false" />
+  <SaveDialog
+    :visible="visible"
+    :title="model === 'add' ? '新增物料供应商' : '修改物料供应商'"
+    :mode="model"
+    :row="tableData?.records?.find((item) => String(item.id) === String(selectedRowId))"
+    @cancel="handleCancel"
+    @submit="handleSubmit"
+  />
+  <DetailDialog
+    :visible="detailVisible"
+    :row="tableData?.records?.find((item) => String(item.id) === String(selectedRowId))"
+    @cancel="detailVisible = false"
+  />
 </template>
 
 <style scoped>

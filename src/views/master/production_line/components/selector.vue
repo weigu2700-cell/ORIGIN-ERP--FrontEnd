@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import ProSearch from "@/components/ProSearch.vue";
-import WorkshopRefer from "@/refer/WorkshopRefer.vue";
-import type { ProductionLineListRequest, ProductionLineStatus } from "@/types/master/productionLine.ts";
+/* eslint-disable vue/no-mutating-props */
+import ProSearch from '@/components/ProSearch.vue'
+import WorkshopRefer from '@/refer/WorkshopRefer.vue'
+import type { ProductionLineListRequest, ProductionLineStatus } from '@/types/master/productionLine.ts'
+import { EnableStatus } from '@/constants/enumCode'
 
 const props = defineProps<{
   queryData: ProductionLineListRequest
 }>()
 
-const statusOptions: { label: string, value: ProductionLineStatus }[] = [
-  { label: '启用', value: 'ENABLE' },
-  { label: '停用', value: 'DISABLE' },
+const statusOptions: { label: string; value: ProductionLineStatus }[] = [
+  { label: '启用', value: EnableStatus.ENABLE },
+  { label: '停用', value: EnableStatus.DISABLE },
 ]
 
 const emit = defineEmits<{

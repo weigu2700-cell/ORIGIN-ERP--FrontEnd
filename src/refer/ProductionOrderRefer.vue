@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
 import ReferPicker from '@/components/ReferPicker.vue'
 import { getPageProductionOrder } from '@/api/product/productionOrder'
@@ -6,7 +7,7 @@ import type { ProductionOrderQuery } from '@/types/product/productionOrder'
 defineProps<{ modelValue?: string | number | null; displayText?: string }>()
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string | number | null): void
-  (e: 'change', row: Record<string, unknown> | null): void
+  (e: 'change', row: Record<string, any> | null): void
 }>()
 
 const columns = [
@@ -17,7 +18,7 @@ const columns = [
   { prop: 'status', label: '状态', width: 90 },
 ]
 
-const fetcher = (params: Record<string, unknown>) => getPageProductionOrder(params as unknown as ProductionOrderQuery)
+const fetcher = (params: Record<string, any>) => getPageProductionOrder(params as ProductionOrderQuery)
 </script>
 
 <template>

@@ -1,15 +1,15 @@
-import service from "@/utils/request.ts"
+import service from '@/utils/request.ts'
 import type {
   SupplierCreateRequest,
   SupplierListRequest,
   SupplierListResponse,
   SupplierStatus,
   SupplierUpdateRequest,
-  SupplierVO
-} from "@/types/master/supplier.ts";
+  SupplierVO,
+} from '@/types/master/supplier.ts'
 
 export function getPageSupplierList(data: SupplierListRequest) {
-  return service.get<SupplierListResponse>('master/supplier/list', {params: data})
+  return service.get<SupplierListResponse>('master/supplier/list', { params: data })
 }
 
 export function getDetailSupplier(id: string) {
@@ -24,7 +24,7 @@ export function updateSupplier(id: string, data: SupplierUpdateRequest) {
   return service.put<void>(`master/supplier/${id}`, data)
 }
 
-// 注意：供应商状态变更 body 是原始字符串 "ACTIVE"/"INACTIVE"，不是 JSON 对象
+// 状态变更 body 为枚举 Code（1=有效，0=无效），不是 JSON 对象。
 export function changeSupplierStatus(id: string, status: SupplierStatus) {
   return service.put<void>(`master/supplier/${id}/status`, status)
 }

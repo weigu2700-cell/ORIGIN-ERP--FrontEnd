@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
 import ReferPicker from '@/components/ReferPicker.vue'
 import { getPagePurchaseDemand } from '@/api/purchase/purchaseDemand'
@@ -7,7 +8,7 @@ import { PurchaseDemandStatus } from '@/constants/enumCode'
 defineProps<{ modelValue?: string | number | null; displayText?: string }>()
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string | number | null): void
-  (e: 'change', row: Record<string, unknown> | null): void
+  (e: 'change', row: Record<string, any> | null): void
 }>()
 const columns = [
   { prop: 'purchaseDemandNo', label: '采购需求单号', width: 180 },
@@ -15,7 +16,7 @@ const columns = [
   { prop: 'purchaseQuantity', label: '采购数量', width: 110 },
   { prop: 'status', label: '状态', width: 100 },
 ]
-const fetcher = (params: Record<string, unknown>) => getPagePurchaseDemand(params as unknown as PurchaseDemandQuery)
+const fetcher = (params: Record<string, any>) => getPagePurchaseDemand(params as PurchaseDemandQuery)
 </script>
 
 <template>

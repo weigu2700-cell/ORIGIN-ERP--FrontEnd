@@ -1,20 +1,26 @@
 <script setup lang="ts">
-import Selector from "@/views/master/production_line/components/selector.vue";
-import ProToolbar from "@/components/ProToolbar.vue";
-import ProTable, { type ProColumn } from "@/components/ProTable.vue"
+import Selector from '@/views/master/production_line/components/selector.vue'
+import ProToolbar from '@/components/ProToolbar.vue'
+import ProTable, { type ProColumn } from '@/components/ProTable.vue'
 import { onMounted, ref, reactive } from 'vue'
-import { changeProductionLineStatus, addProductionLine, getPageProductionLineList, updateProductionLine } from "@/api/master/productionLine.ts";
+import {
+  changeProductionLineStatus,
+  addProductionLine,
+  getPageProductionLineList,
+  updateProductionLine,
+} from '@/api/master/productionLine.ts'
 import type {
   ProductionLineCreateRequest,
   ProductionLineListRequest,
   ProductionLineListResponse,
   ProductionLineUpdateRequest,
-  ProductionLineVO
-} from "@/types/master/productionLine.ts";
-import SaveDialog from "@/views/master/production_line/components/saveDialog.vue";
-import DetailDialog from "@/views/master/production_line/components/detailDialog.vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+  ProductionLineVO,
+} from '@/types/master/productionLine.ts'
+import SaveDialog from '@/views/master/production_line/components/saveDialog.vue'
+import DetailDialog from '@/views/master/production_line/components/detailDialog.vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import PageHeader from '@/components/PageHeader.vue'
+import { EnableStatus } from '@/constants/enumCode'
 
 const queryData = reactive<ProductionLineListRequest>({
   page: 1,
@@ -70,7 +76,7 @@ const handleAdd = () => {
 }
 
 const handleEdit = () => {
-  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  const row = tableData.value?.records?.find((item) => String(item.id) === selectedRowId.value)
   if (!row) {
     ElMessage.warning('请选择要编辑的生产线')
     return
@@ -80,23 +86,19 @@ const handleEdit = () => {
 }
 
 const handleStatus = async () => {
-  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  const row = tableData.value?.records?.find((item) => String(item.id) === selectedRowId.value)
   if (!row) {
     ElMessage.warning('请选择要切换状态的生产线')
     return
   }
-  const target = row.status === 1 ? 'DISABLE' : 'ENABLE'
-  const action = target === 'ENABLE' ? '启用' : '停用'
+  const target = row.status === EnableStatus.ENABLE ? EnableStatus.DISABLE : EnableStatus.ENABLE
+  const action = target === EnableStatus.ENABLE ? '启用' : '停用'
   try {
-    await ElMessageBox.confirm(
-      `确定要${action}生产线 ${row.name} 吗？`,
-      '状态确认',
-      {
-        type: 'warning',
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-      }
-    )
+    await ElMessageBox.confirm(`确定要${action}生产线 ${row.name} 吗？`, '状态确认', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+    })
   } catch {
     return // 用户取消
   }
@@ -150,16 +152,40 @@ const handleCancel = () => {
         <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
       </template>
       <template #toolbar>
-        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
-          @refresh="handleRefresh" />
+        <ProToolbar
+          :show-delete="false"
+          show-status
+          @add="handleAdd"
+          @edit="handleEdit"
+          @status="handleStatus"
+          @refresh="handleRefresh"
+        />
       </template>
     </PageHeader>
     <div class="table round">
-      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
-        :page="queryData.page" :page-size="queryData.pageSize"
-        @update:page="(p: number) => { queryData.page = p; loadData() }"
-        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
+      <ProTable
+        ref="tableRef"
+        :data="tableData?.records ?? []"
+        :columns="columns"
+        :total="tableData?.total ?? 0"
+        :page="queryData.page"
+        :page-size="queryData.pageSize"
+        @update:page="
+          (p: number) => {
+            queryData.page = p
+            loadData()
+          }
+        "
+        @update:pageSize="
+          (s: number) => {
+            queryData.pageSize = s
+            queryData.page = 1
+            loadData()
+          }
+        "
+        @selectionChange="handleSelectionChange"
+        @rowDblclick="handleRowDblclick"
+      >
         <template #status="{ row }">
           <el-tag :type="row.status === 1 ? 'success' : 'info'" size="small">
             {{ row.status === 1 ? '启用' : '停用' }}
@@ -169,12 +195,19 @@ const handleCancel = () => {
     </div>
   </div>
 
-  <SaveDialog :visible="visible" :title="model === 'add' ? '新增生产线' : '修改生产线'" :mode="model"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
-    @submit="handleSubmit" />
-  <DetailDialog :visible="detailVisible"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
-    @cancel="detailVisible = false" />
+  <SaveDialog
+    :visible="visible"
+    :title="model === 'add' ? '新增生产线' : '修改生产线'"
+    :mode="model"
+    :row="tableData?.records?.find((item) => String(item.id) === String(selectedRowId))"
+    @cancel="handleCancel"
+    @submit="handleSubmit"
+  />
+  <DetailDialog
+    :visible="detailVisible"
+    :row="tableData?.records?.find((item) => String(item.id) === String(selectedRowId))"
+    @cancel="detailVisible = false"
+  />
 </template>
 
 <style scoped>

@@ -1,24 +1,20 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
-import { ElMessage } from "element-plus";
-import ProToolbar from "@/components/ProToolbar.vue";
-import ProTable, { type ProColumn } from "@/components/ProTable.vue";
-import ProTree from "@/components/ProTree.vue";
-import Selector from "@/views/system/permission/components/selector.vue";
-import SaveDialog from "@/views/system/permission/components/saveDialog.vue";
-import {
-  getPagePermissionList,
-  getPermissionTree,
-  addPermission,
-  updatePermission
-} from "@/api/system/permission.ts";
+import { onMounted, reactive, ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import ProToolbar from '@/components/ProToolbar.vue'
+import ProTable, { type ProColumn } from '@/components/ProTable.vue'
+import ProTree from '@/components/ProTree.vue'
+import Selector from '@/views/system/permission/components/selector.vue'
+import SaveDialog from '@/views/system/permission/components/saveDialog.vue'
+import { getPagePermissionList, getPermissionTree, addPermission, updatePermission } from '@/api/system/permission.ts'
 import type {
   PermissionListRequest,
   PermissionListResponse,
   PermissionNode,
-  PermissionSaveRequest
-} from "@/types/system/permission.ts";
+  PermissionSaveRequest,
+} from '@/types/system/permission.ts'
 import PageHeader from '@/components/PageHeader.vue'
+import { EnableStatus, PermissionType } from '@/constants/enumCode'
 
 type EditRow = PermissionSaveRequest & { parentName?: string }
 
@@ -163,8 +159,13 @@ onMounted(() => {
         <Selector @query="handleSelectorQuery" @reset="handleSelectorReset" />
       </template>
       <template #toolbar>
-        <ProToolbar :show-delete="false" :show-export="false" @add="handleAdd" @edit="handleEdit"
-          @refresh="handleQuery(queryData)" />
+        <ProToolbar
+          :show-delete="false"
+          :show-export="false"
+          @add="handleAdd"
+          @edit="handleEdit"
+          @refresh="handleQuery(queryData)"
+        />
       </template>
     </PageHeader>
     <div class="page-body">
@@ -173,19 +174,35 @@ onMounted(() => {
       </div>
       <div class="content">
         <div class="table round">
-          <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
-            :page="queryData.page" :page-size="queryData.pageSize"
-            @update:page="(p) => { queryData.page = p; handleQuery(queryData) }"
-            @update:pageSize="(s) => { queryData.pageSize = s; queryData.page = 1; handleQuery(queryData) }"
-            @selectionChange="(rows) => selectedData = rows">
+          <ProTable
+            :data="tableData?.records ?? []"
+            :columns="columns"
+            :total="tableData?.total ?? 0"
+            :page="queryData.page"
+            :page-size="queryData.pageSize"
+            @update:page="
+              (p) => {
+                queryData.page = p
+                handleQuery(queryData)
+              }
+            "
+            @update:pageSize="
+              (s) => {
+                queryData.pageSize = s
+                queryData.page = 1
+                handleQuery(queryData)
+              }
+            "
+            @selectionChange="(rows) => (selectedData = rows)"
+          >
             <template #type="{ row }">
-              <el-tag :type="row.type === 'MENU' ? 'primary' : 'warning'" size="small">
-                {{ row.type === 'MENU' ? '菜单' : '按钮' }}
+              <el-tag :type="row.type === PermissionType.MENU ? 'primary' : 'warning'" size="small">
+                {{ PermissionType.labelOf(row.type) }}
               </el-tag>
             </template>
             <template #status="{ row }">
-              <el-tag :type="row.status === 'ENABLE' ? 'success' : 'danger'" size="small">
-                {{ row.status === 'ENABLE' ? '启用' : '禁用' }}
+              <el-tag :type="row.status === EnableStatus.ENABLE ? 'success' : 'danger'" size="small">
+                {{ EnableStatus.labelOf(row.status) }}
               </el-tag>
             </template>
             <template #actions="{ row }">
@@ -197,8 +214,13 @@ onMounted(() => {
     </div>
   </div>
 
-  <SaveDialog :visible="dialogVisible" :mode="dialogMode" :row="editRow" @submit="handleSubmit"
-    @cancel="handleCancel" />
+  <SaveDialog
+    :visible="dialogVisible"
+    :mode="dialogMode"
+    :row="editRow"
+    @submit="handleSubmit"
+    @cancel="handleCancel"
+  />
 </template>
 
 <style scoped>

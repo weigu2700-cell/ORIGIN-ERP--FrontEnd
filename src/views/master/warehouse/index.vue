@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import Selector from "@/views/master/warehouse/components/selector.vue";
-import ProToolbar from "@/components/ProToolbar.vue";
-import ProTable, { type ProColumn } from "@/components/ProTable.vue"
+import Selector from '@/views/master/warehouse/components/selector.vue'
+import ProToolbar from '@/components/ProToolbar.vue'
+import ProTable, { type ProColumn } from '@/components/ProTable.vue'
 import { onMounted, ref, reactive } from 'vue'
-import { changeWarehouseStatus, addWarehouse, getPageWarehouseList, updateWarehouse } from "@/api/master/warehouse.ts";
+import { changeWarehouseStatus, addWarehouse, getPageWarehouseList, updateWarehouse } from '@/api/master/warehouse.ts'
 import type {
   WarehouseCreateRequest,
   WarehouseListRequest,
   WarehouseListResponse,
   WarehouseUpdateRequest,
-  WarehouseVO
-} from "@/types/master/warehouse.ts";
-import SaveDialog from "@/views/master/warehouse/components/saveDialog.vue";
-import DetailDialog from "@/views/master/warehouse/components/detailDialog.vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+  WarehouseVO,
+} from '@/types/master/warehouse.ts'
+import SaveDialog from '@/views/master/warehouse/components/saveDialog.vue'
+import DetailDialog from '@/views/master/warehouse/components/detailDialog.vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import PageHeader from '@/components/PageHeader.vue'
+import { EnableStatus } from '@/constants/enumCode'
 
 const queryData = reactive<WarehouseListRequest>({
   page: 1,
@@ -33,8 +34,7 @@ const model = ref<'add' | 'edit'>('add')
 const selectedRowId = ref<string>()
 const tableRef = ref<{ clearSelection: () => void }>()
 
-// 兼容旧后端返回的枚举名称和新接口返回的状态码，避免启用仓库被误显示为停用。
-const isEnabledStatus = (status: unknown) => status === 1 || status === '1' || status === 'ENABLE'
+const isEnabledStatus = (status: number | undefined) => status === EnableStatus.ENABLE
 
 const handleSelectionChange = (rows: WarehouseVO[]) => {
   selectedRowId.value = rows[0] ? String(rows[0].id) : undefined
@@ -87,7 +87,7 @@ const handleAdd = () => {
 }
 
 const handleEdit = () => {
-  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  const row = tableData.value?.records?.find((item) => String(item.id) === selectedRowId.value)
   if (!row) {
     ElMessage.warning('请选择要编辑的仓库')
     return
@@ -97,23 +97,19 @@ const handleEdit = () => {
 }
 
 const handleStatus = async () => {
-  const row = tableData.value?.records?.find(item => String(item.id) === selectedRowId.value)
+  const row = tableData.value?.records?.find((item) => String(item.id) === selectedRowId.value)
   if (!row) {
     ElMessage.warning('请选择要切换状态的仓库')
     return
   }
-  const target = isEnabledStatus(row.status) ? 'DISABLE' : 'ENABLE'
-  const action = target === 'ENABLE' ? '启用' : '停用'
+  const target = isEnabledStatus(row.status) ? EnableStatus.DISABLE : EnableStatus.ENABLE
+  const action = target === EnableStatus.ENABLE ? '启用' : '停用'
   try {
-    await ElMessageBox.confirm(
-      `确定要${action}仓库 ${row.name} 吗？`,
-      '状态确认',
-      {
-        type: 'warning',
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-      }
-    )
+    await ElMessageBox.confirm(`确定要${action}仓库 ${row.name} 吗？`, '状态确认', {
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+    })
   } catch {
     return // 用户取消
   }
@@ -166,16 +162,40 @@ const handleCancel = () => {
         <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
       </template>
       <template #toolbar>
-        <ProToolbar :show-delete="false" show-status @add="handleAdd" @edit="handleEdit" @status="handleStatus"
-          @refresh="handleRefresh" />
+        <ProToolbar
+          :show-delete="false"
+          show-status
+          @add="handleAdd"
+          @edit="handleEdit"
+          @status="handleStatus"
+          @refresh="handleRefresh"
+        />
       </template>
     </PageHeader>
     <div class="table round">
-      <ProTable ref="tableRef" :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
-        :page="queryData.page" :page-size="queryData.pageSize"
-        @update:page="(p: number) => { queryData.page = p; loadData() }"
-        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.page = 1; loadData() }"
-        @selectionChange="handleSelectionChange" @rowDblclick="handleRowDblclick">
+      <ProTable
+        ref="tableRef"
+        :data="tableData?.records ?? []"
+        :columns="columns"
+        :total="tableData?.total ?? 0"
+        :page="queryData.page"
+        :page-size="queryData.pageSize"
+        @update:page="
+          (p: number) => {
+            queryData.page = p
+            loadData()
+          }
+        "
+        @update:pageSize="
+          (s: number) => {
+            queryData.pageSize = s
+            queryData.page = 1
+            loadData()
+          }
+        "
+        @selectionChange="handleSelectionChange"
+        @rowDblclick="handleRowDblclick"
+      >
         <template #type="{ row }">
           {{ typeLabel[row.type] ?? row.type }}
         </template>
@@ -188,12 +208,19 @@ const handleCancel = () => {
     </div>
   </div>
 
-  <SaveDialog :visible="visible" :title="model === 'add' ? '新增仓库' : '修改仓库'" :mode="model"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))" @cancel="handleCancel"
-    @submit="handleSubmit" />
-  <DetailDialog :visible="detailVisible"
-    :row="tableData?.records?.find(item => String(item.id) === String(selectedRowId))"
-    @cancel="detailVisible = false" />
+  <SaveDialog
+    :visible="visible"
+    :title="model === 'add' ? '新增仓库' : '修改仓库'"
+    :mode="model"
+    :row="tableData?.records?.find((item) => String(item.id) === String(selectedRowId))"
+    @cancel="handleCancel"
+    @submit="handleSubmit"
+  />
+  <DetailDialog
+    :visible="detailVisible"
+    :row="tableData?.records?.find((item) => String(item.id) === String(selectedRowId))"
+    @cancel="detailVisible = false"
+  />
 </template>
 
 <style scoped>

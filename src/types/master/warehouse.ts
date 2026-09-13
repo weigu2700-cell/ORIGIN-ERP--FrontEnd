@@ -2,8 +2,8 @@ import type { PageResult } from '../common'
 import { EnableStatus, WarehouseType as WarehouseTypeCode } from '@/constants/enumCode'
 import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type WarehouseStatus = EnumCodeOf<typeof EnableStatus> | string
-export type WarehouseType = EnumCodeOf<typeof WarehouseTypeCode> | string
+export type WarehouseStatus = EnumCodeOf<typeof EnableStatus>
+export type WarehouseType = EnumCodeOf<typeof WarehouseTypeCode>
 
 export interface WarehouseListRequest {
   page: number

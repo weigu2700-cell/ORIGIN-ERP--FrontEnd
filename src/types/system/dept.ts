@@ -1,10 +1,15 @@
+import { EnableStatus } from '@/constants/enumCode'
+import type { EnumCodeOf } from '@/constants/enumCode'
+
+export type DeptStatus = EnumCodeOf<typeof EnableStatus>
+
 export interface DeptQuery {
   page: number
   pageSize: number
   name?: string | null
   code?: string | null
   parentId?: string | null
-  status?: number | null
+  status?: DeptStatus | null
   sort?: number | null
 }
 
@@ -16,9 +21,9 @@ export interface deptResponse {
     parentName: string
     createTime: string
     updateTime: string
-  }[],
+  }[]
   total: number
-  size:number
+  size: number
   current: number
   optimizeCountSql: string
   searchCount: string
@@ -54,5 +59,5 @@ export interface deptDetail {
   code: string | null
   parentId: string | null
   sort?: number | null
-  status: number | null
+  status: DeptStatus | null
 }

@@ -2,8 +2,8 @@ import type { PageResult } from '../common'
 import { EnableStatus, PermissionType as PermissionTypeCode } from '@/constants/enumCode'
 import type { EnumCodeOf } from '@/constants/enumCode'
 
-export type PermissionType = EnumCodeOf<typeof PermissionTypeCode> | string
-export type PermissionStatus = EnumCodeOf<typeof EnableStatus> | string
+export type PermissionType = EnumCodeOf<typeof PermissionTypeCode>
+export type PermissionStatus = EnumCodeOf<typeof EnableStatus>
 
 // 权限记录 / 树节点（PermissionTreeVO）
 export interface PermissionNode {

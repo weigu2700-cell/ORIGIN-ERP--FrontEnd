@@ -18,6 +18,7 @@ import DetailDialog from './components/detailDialog.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { formatDate, formatDecimal } from '@/composables/useFormat'
 import ProPageHeader, { type ProPageHeaderCard } from '@/components/ProPageHeader.vue'
+import { ProductionOrderStatus } from '@/constants/enumCode'
 
 defineOptions({ name: 'ProductionOrderPage' })
 
@@ -45,9 +46,9 @@ const workflow = computed(
   () =>
     (
       ({
-        0: { label: '下达生产', action: releaseProductionOrder },
-        1: { label: '开始生产', action: startProductionOrder },
-        2: { label: '完成生产', action: completeProductionOrder },
+        [ProductionOrderStatus.DRAFT]: { label: '下达生产', action: releaseProductionOrder },
+        [ProductionOrderStatus.RELEASED]: { label: '开始生产', action: startProductionOrder },
+        [ProductionOrderStatus.IN_PROGRESS]: { label: '完成生产', action: completeProductionOrder },
       }) as const
     )[selectedRow.value?.status as 0 | 1 | 2],
 )
@@ -78,19 +79,51 @@ const columns = ref<ProColumn<ProductionOrderVo>[]>([
 ])
 
 const statusMap: Record<number, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
-  0: { label: '草稿', type: 'info' },
-  1: { label: '已下达', type: 'success' },
-  2: { label: '生产中', type: 'warning' },
-  3: { label: '已完成', type: 'success' },
-  4: { label: '已取消', type: 'danger' },
+  [ProductionOrderStatus.DRAFT]: { label: ProductionOrderStatus.labelOf(ProductionOrderStatus.DRAFT), type: 'info' },
+  [ProductionOrderStatus.RELEASED]: {
+    label: ProductionOrderStatus.labelOf(ProductionOrderStatus.RELEASED),
+    type: 'success',
+  },
+  [ProductionOrderStatus.IN_PROGRESS]: {
+    label: ProductionOrderStatus.labelOf(ProductionOrderStatus.IN_PROGRESS),
+    type: 'warning',
+  },
+  [ProductionOrderStatus.COMPLETED]: {
+    label: ProductionOrderStatus.labelOf(ProductionOrderStatus.COMPLETED),
+    type: 'success',
+  },
+  [ProductionOrderStatus.CANCELLED]: {
+    label: ProductionOrderStatus.labelOf(ProductionOrderStatus.CANCELLED),
+    type: 'danger',
+  },
 }
 
 const quickStatusOptions = [
-  { label: '草稿', value: 0, tone: 'info' },
-  { label: '已下达', value: 1, tone: 'success' },
-  { label: '生产中', value: 2, tone: 'warning' },
-  { label: '已完成', value: 3, tone: 'success' },
-  { label: '已取消', value: 4, tone: 'danger' },
+  {
+    label: ProductionOrderStatus.labelOf(ProductionOrderStatus.DRAFT),
+    value: ProductionOrderStatus.DRAFT,
+    tone: 'info',
+  },
+  {
+    label: ProductionOrderStatus.labelOf(ProductionOrderStatus.RELEASED),
+    value: ProductionOrderStatus.RELEASED,
+    tone: 'success',
+  },
+  {
+    label: ProductionOrderStatus.labelOf(ProductionOrderStatus.IN_PROGRESS),
+    value: ProductionOrderStatus.IN_PROGRESS,
+    tone: 'warning',
+  },
+  {
+    label: ProductionOrderStatus.labelOf(ProductionOrderStatus.COMPLETED),
+    value: ProductionOrderStatus.COMPLETED,
+    tone: 'success',
+  },
+  {
+    label: ProductionOrderStatus.labelOf(ProductionOrderStatus.CANCELLED),
+    value: ProductionOrderStatus.CANCELLED,
+    tone: 'danger',
+  },
 ] as const
 
 const statusCards = computed<ProPageHeaderCard[]>(() => {
@@ -111,7 +144,7 @@ const handleQuery = () => {
 }
 
 const handleQuickStatus = (status: string | number | null) => {
-  queryData.status = status === null || status === '' ? undefined : Number(status)
+  queryData.status = ProductionOrderStatus.options.find((option) => option.value === Number(status))?.value
   handleQuery()
 }
 

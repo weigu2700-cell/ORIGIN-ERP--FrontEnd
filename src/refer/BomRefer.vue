@@ -1,3 +1,4 @@
+<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <script setup lang="ts">
 import ReferPicker from '@/components/ReferPicker.vue'
 import { getPageBom } from '@/api/product/Bom'
@@ -20,7 +21,7 @@ const columns = [
   { prop: 'status', label: '状态', width: 80 },
 ]
 
-const fetcher = async (params: Record<string, unknown>) => {
+const fetcher = async (params: Record<string, any>) => {
   const result = await getPageBom({
     pageNum: Number(params.pageNum ?? 1),
     pageSize: Number(params.pageSize ?? 10),
