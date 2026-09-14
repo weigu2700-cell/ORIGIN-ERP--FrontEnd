@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { usePermissionStore } from "@/stores/permission.ts"
-import { useRouter } from "vue-router"
-import { computed } from "vue";
-import SidebarItems from "./sidebarItems.vue";
-import type { MenuItem } from "@/types/system/menu.ts";
-import useAppStore from "@/stores/app.ts";
+import { usePermissionStore } from '@/stores/permission.ts'
+import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+import SidebarItems from './sidebarItems.vue'
+import type { MenuItem } from '@/types/system/menu.ts'
+import useAppStore from '@/stores/app.ts'
 
 defineOptions({ name: 'AppSidebar' })
 
-const props = withDefaults(defineProps<{
-  menus?: MenuItem[]
-  depth?: number
-}>(), {
-  depth: 0
-})
+const props = withDefaults(
+  defineProps<{
+    menus?: MenuItem[]
+    depth?: number
+  }>(),
+  {
+    depth: 0,
+  },
+)
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -25,10 +28,7 @@ const menuList = computed<MenuItem[]>(() => {
   if (props.depth !== 0) return menus
   const isWorkbench = (menu: MenuItem) => {
     const normalizedPath = menu.path.replace(/^\//, '')
-    return menu.name === 'home'
-      || normalizedPath === 'home'
-      || menu.title === '工作台'
-      || menu.title === '首页'
+    return menu.name === 'home' || normalizedPath === 'home' || menu.title === '工作台' || menu.title === '首页'
   }
   const workbenchIndex = menus.findIndex(isWorkbench)
   if (workbenchIndex <= 0) return menus
@@ -83,6 +83,12 @@ const shouldCollapse = computed(() => appStore.isFold)
 .erp-menu .el-menu-item.is-active,
 .erp-menu-popper .el-menu-item.is-active {
   background: var(--menu-active-bg);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+  color: var(--menu-brand-text);
+}
+
+.erp-menu .el-sub-menu.is-active > .el-sub-menu__title {
+  color: var(--menu-brand-text);
 }
 
 .erp-menu .menu-icon,
@@ -107,6 +113,11 @@ const shouldCollapse = computed(() => appStore.isFold)
   justify-content: center;
   gap: 3px;
   line-height: normal;
+}
+
+.erp-menu.el-menu--collapse .el-menu-item.is-active,
+.erp-menu.el-menu--collapse .el-sub-menu.is-active > .el-sub-menu__title {
+  box-shadow: inset 0 -3px 0 var(--color-accent);
 }
 
 .erp-menu.el-menu--collapse .menu-icon {

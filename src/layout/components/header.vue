@@ -34,7 +34,7 @@ const settingsVisible = ref(false)
 const searchKey = ref('')
 const searchVisible = ref(false)
 const colorOptions: { key: ColorScheme; label: string; color: string }[] = [
-  { key: 'office', label: 'Office 蓝', color: '#0078d4' },
+  { key: 'office', label: '原点蓝', color: '#245b78' },
   { key: 'blue', label: '湖水蓝', color: '#1a73e8' },
   { key: 'teal', label: '商务青', color: '#0f766e' },
   { key: 'violet', label: '雅致紫', color: '#6750a4' },
@@ -110,7 +110,7 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
           <template #reference>
             <el-input
               v-model="searchKey"
-              placeholder="搜索已授权菜单"
+              placeholder="搜索菜单或业务"
               clearable
               @focus="searchVisible = true"
               @click="searchVisible = true"
@@ -238,10 +238,10 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
   .right {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
 
     .header-search {
-      width: 220px;
+      width: 250px;
     }
 
     .theme-toggle {
@@ -252,7 +252,7 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
       display: flex;
       align-items: center;
       gap: 2px;
-      padding-right: 4px;
+      padding-right: 8px;
       border-right: 1px solid var(--border-color);
     }
 
@@ -278,8 +278,8 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
     }
 
     .user-avatar {
-      background: var(--color-primary-soft);
-      color: var(--el-color-primary-dark-2);
+      background: var(--color-accent);
+      color: #18384b;
       font-weight: 600;
     }
 

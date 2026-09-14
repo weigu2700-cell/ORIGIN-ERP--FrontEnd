@@ -113,7 +113,7 @@ const transition = async () => {
     await ElMessageBox.confirm(`确定${workflow.value.label}吗？`, '成品入库状态流转', { type: 'warning' })
     await workflow.value.action()
     ElMessage.success(`${workflow.value.label}成功`)
-    loadData()
+    await loadData()
   } catch {
     /* 用户取消或请求失败 */
   }
@@ -126,7 +126,7 @@ const cancel = async () => {
     await ElMessageBox.confirm('确定取消该成品入库单吗？', '取消成品入库', { type: 'warning' })
     await cancelFinishWarehousing(selectedRow.value.id)
     ElMessage.success('取消成功')
-    loadData()
+    await loadData()
   } catch {
     /* 用户取消或请求失败 */
   }
