@@ -215,8 +215,8 @@ onMounted(() => {
   padding: 34px 40px;
   border-radius: 16px;
   color: #fff;
-  background: linear-gradient(118deg, var(--color-primary), #3483e8 58%, #72aef2);
-  box-shadow: 0 12px 30px rgb(21 84 162 / 18%);
+  background: linear-gradient(118deg, #18384b 0%, #245b78 64%, #2f7084 100%);
+  box-shadow: 0 12px 30px rgb(21 66 86 / 18%);
 }
 
 .hero-orb {
@@ -249,11 +249,15 @@ onMounted(() => {
 }
 
 .profile-avatar {
-  color: var(--color-primary);
-  background: #fff;
+  color: #18384b;
+  background: #f2c16a;
   font-size: 27px;
   font-weight: 700;
   box-shadow: 0 5px 16px rgb(0 0 0 / 12%);
+}
+
+.profile-hero .eyebrow {
+  color: #f2c16a;
 }
 
 .eyebrow,

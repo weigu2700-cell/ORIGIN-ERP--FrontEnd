@@ -42,7 +42,11 @@ const handleLogin = useTrigger.throttle(() => {
   <main class="login-page">
     <section class="intro">
       <p class="intro-eyebrow">制造企业一体化管理平台</p>
-      <h1>从订单到交付<br />全程清晰可控</h1>
+      <h1>
+        从订单到交付
+        <br />
+        全程清晰可控
+      </h1>
       <p class="intro-description">围绕物料、库存、生产与交付，连接制造企业每一个关键环节。</p>
       <p class="intro-tags">计划 · 执行 · 协同 · 追溯</p>
     </section>
@@ -65,22 +69,30 @@ const handleLogin = useTrigger.throttle(() => {
         <el-form ref="formRef" :model="form" :rules="rules" @submit.prevent="handleLogin">
           <el-form-item prop="username">
             <el-input v-model="form.username" placeholder="用户名" autocomplete="username">
-              <template #prefix><el-icon>
+              <template #prefix>
+                <el-icon>
                   <User />
-                </el-icon></template>
+                </el-icon>
+              </template>
             </el-input>
           </el-form-item>
           <el-form-item prop="password">
-            <el-input v-model="form.password" type="password" placeholder="密码" show-password
-              autocomplete="current-password" @keyup.enter="handleLogin">
-              <template #prefix><el-icon>
+            <el-input
+              v-model="form.password"
+              type="password"
+              placeholder="密码"
+              show-password
+              autocomplete="current-password"
+              @keyup.enter="handleLogin"
+            >
+              <template #prefix>
+                <el-icon>
                   <Lock />
-                </el-icon></template>
+                </el-icon>
+              </template>
             </el-input>
           </el-form-item>
-          <el-button class="submit-button" type="primary" native-type="submit" :loading="loading">
-            登录
-          </el-button>
+          <el-button class="submit-button" type="primary" native-type="submit" :loading="loading">登录</el-button>
         </el-form>
 
         <p class="login-help">账号问题请联系系统管理员</p>
@@ -108,8 +120,7 @@ const handleLogin = useTrigger.throttle(() => {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgb(7 14 20 / 56%) 0%, rgb(7 14 20 / 42%) 52%, rgb(7 14 20 / 30%) 100%),
-    rgb(7 14 20 / 12%);
+    linear-gradient(90deg, rgb(7 14 20 / 56%) 0%, rgb(7 14 20 / 42%) 52%, rgb(7 14 20 / 30%) 100%), rgb(7 14 20 / 12%);
   pointer-events: none;
 }
 
@@ -125,7 +136,7 @@ const handleLogin = useTrigger.throttle(() => {
 
 .intro-eyebrow {
   margin: 0 0 18px;
-  color: #efb64c;
+  color: #f2c16a;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 2px;
@@ -177,7 +188,7 @@ const handleLogin = useTrigger.throttle(() => {
 .brand-copy strong {
   color: #183047;
   font-size: 18px;
-  letter-spacing: .3px;
+  letter-spacing: 0.3px;
 }
 
 .brand-copy span {
@@ -198,8 +209,8 @@ const handleLogin = useTrigger.throttle(() => {
   padding: 42px 40px 36px;
   background: rgb(255 255 255 / 96%);
   border: 1px solid rgb(203 210 218 / 85%);
-  border-radius: 8px;
-  box-shadow: 0 16px 42px rgb(36 45 52 / 16%);
+  border-radius: 14px;
+  box-shadow: 0 18px 46px rgb(20 52 67 / 18%);
 }
 
 .login-title {
@@ -237,16 +248,16 @@ const handleLogin = useTrigger.throttle(() => {
   width: 100%;
   height: 44px;
   margin-top: 4px;
-  border-color: #294f68;
-  border-radius: 4px;
-  background: #294f68;
+  border-color: #245b78;
+  border-radius: 8px;
+  background: #245b78;
   font-size: 14px;
 }
 
 .submit-button:hover,
 .submit-button:focus {
-  border-color: #203f54;
-  background: #203f54;
+  border-color: #183f55;
+  background: #183f55;
 }
 
 .login-help {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import type { EChartsCoreOption } from 'echarts/core'
-import { Box, DataAnalysis, Goods, Refresh, ShoppingCart, Van } from '@element-plus/icons-vue'
+import { ArrowRight, Box, DataAnalysis, Goods, Refresh, ShoppingCart, Van } from '@element-plus/icons-vue'
 import BaseChart from '@/components/BaseChart.vue'
 import { getDashboardOverview, type DashboardOverview } from '@/api/dashboard'
 import { formatDate } from '@/composables/useFormat'
@@ -69,14 +69,14 @@ const metrics = computed(() => [
 ])
 
 const taskOption = computed<EChartsCoreOption>(() => ({
-  color: ['#1a73e8'],
+  color: ['#245b78'],
   tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
   grid: { left: 16, right: 24, top: 12, bottom: 8, containLabel: true },
   xAxis: {
     type: 'value',
     minInterval: 1,
     axisLine: { show: false },
-    splitLine: { lineStyle: { color: '#e7ecf2' } },
+    splitLine: { lineStyle: { color: '#dce7eb' } },
   },
   yAxis: {
     type: 'category',
@@ -103,7 +103,7 @@ const taskOption = computed<EChartsCoreOption>(() => ({
 }))
 
 const productionOption = computed<EChartsCoreOption>(() => ({
-  color: ['#94a3b8', '#3b82f6', '#f59e0b', '#10b981', '#ef4444'],
+  color: ['#afc0c7', '#245b78', '#d99a2b', '#27845f', '#b85c58'],
   tooltip: { trigger: 'item', formatter: '{b}<br/>{c} 张（{d}%）' },
   legend: { bottom: 0, itemWidth: 10, itemHeight: 10, textStyle: { color: '#64748b' } },
   series: [
@@ -112,15 +112,19 @@ const productionOption = computed<EChartsCoreOption>(() => ({
       radius: ['48%', '70%'],
       center: ['50%', '43%'],
       itemStyle: { borderColor: '#fff', borderWidth: 2 },
-      label: { formatter: '{b}\n{c}', color: '#475569' },
+      label: { formatter: '{b}\n{c}', color: '#49606d' },
       data: overview.value.productionStatus,
     },
   ],
 }))
 
-const productionEmpty = computed(() =>
-  overview.value.productionStatus.every((item) => item.value === 0),
-)
+const productionEmpty = computed(() => overview.value.productionStatus.every((item) => item.value === 0))
+
+const syncStatus = computed(() => {
+  if (loadError.value) return '同步异常'
+  if (overview.value.failedRequests) return '部分同步异常'
+  return '数据连接正常'
+})
 
 const quickLinks = [
   {
@@ -167,21 +171,44 @@ onMounted(loadData)
 
 <template>
   <div class="home-container" v-loading="loading">
-    <section class="welcome-panel">
+    <section class="welcome-panel" :class="{ 'is-warning': loadError || overview.failedRequests }">
       <div>
         <p class="eyebrow">ORIGIN ERP / 业务工作台</p>
         <h1>今日业务概览</h1>
         <p class="welcome-date">{{ today }} · 数据来自当前业务单据</p>
       </div>
-      <el-button :icon="Refresh" :loading="loading" @click="loadData">刷新数据</el-button>
+      <div class="welcome-actions">
+        <span class="sync-status">
+          <i :class="{ 'is-warning': loadError || overview.failedRequests }" />
+          {{ syncStatus }}
+        </span>
+        <el-button :icon="Refresh" :loading="loading" @click="loadData">刷新数据</el-button>
+      </div>
     </section>
 
-    <el-alert v-if="loadError" title="工作台数据暂时无法加载，请检查后端服务" type="warning" show-icon :closable="false" />
-    <el-alert v-else-if="overview.failedRequests" :title="`${overview.failedRequests} 项数据加载失败，其余数据已正常展示`" type="warning"
-      show-icon :closable="false" />
+    <el-alert
+      v-if="loadError"
+      title="工作台数据暂时无法加载，请检查后端服务"
+      type="warning"
+      show-icon
+      :closable="false"
+    />
+    <el-alert
+      v-else-if="overview.failedRequests"
+      :title="`${overview.failedRequests} 项数据加载失败，其余数据已正常展示`"
+      type="warning"
+      show-icon
+      :closable="false"
+    />
 
     <section class="metric-grid" aria-label="核心待办">
-      <router-link v-for="metric in metrics" :key="metric.label" :to="metric.path" class="metric-card">
+      <router-link
+        v-for="metric in metrics"
+        :key="metric.label"
+        :to="metric.path"
+        class="metric-card"
+        :class="{ 'is-actionable': metric.value > 0 }"
+      >
         <span class="metric-icon" :class="`metric-icon--${metric.tone}`">
           <component :is="metric.icon" />
         </span>
@@ -190,6 +217,9 @@ onMounted(loadData)
           <strong>{{ metric.value.toLocaleString() }}</strong>
           <em>{{ metric.note }}</em>
         </span>
+        <el-icon class="metric-card-arrow">
+          <ArrowRight />
+        </el-icon>
       </router-link>
     </section>
 
@@ -214,8 +244,12 @@ onMounted(loadData)
             </div>
           </div>
         </template>
-        <BaseChart :option="productionOption" :loading="loading" :empty="productionEmpty && !loading"
-          empty-text="暂无生产订单" />
+        <BaseChart
+          :option="productionOption"
+          :loading="loading"
+          :empty="productionEmpty && !loading"
+          empty-text="暂无生产订单"
+        />
       </el-card>
     </section>
 
@@ -271,26 +305,44 @@ onMounted(loadData)
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .welcome-panel {
-  min-height: 92px;
-  padding: 18px 22px;
+  position: relative;
+  min-height: 128px;
+  padding: 24px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  border: 1px solid var(--border-color);
-  border-left: 4px solid var(--color-primary);
-  border-radius: 9px;
-  background: var(--panel-background);
-  box-shadow: var(--shadow-panel);
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(118deg, #18384b 0%, #245b78 72%, #2f7084 100%);
+  box-shadow: 0 12px 28px rgb(21 66 86 / 14%);
+}
+
+.welcome-panel::after {
+  content: '';
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  right: -90px;
+  bottom: -190px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.welcome-panel.is-warning {
+  background: linear-gradient(118deg, #18384b 0%, #245b78 64%, #6e5b32 100%);
 }
 
 .eyebrow {
   margin: 0 0 5px;
-  color: var(--color-primary);
+  color: #f2c16a;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.2px;
@@ -298,41 +350,100 @@ onMounted(loadData)
 
 h1 {
   margin: 0;
-  color: var(--text-primary);
-  font-size: 22px;
-  font-weight: 650;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 700;
 }
 
 .welcome-date {
   margin: 5px 0 0;
-  color: var(--text-secondary);
+  color: rgb(255 255 255 / 70%);
   font-size: 12px;
+}
+
+.welcome-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgb(255 255 255 / 76%);
+  font-size: 12px;
+}
+
+.sync-status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #70c89b;
+}
+
+.sync-status i.is-warning {
+  background: #f2c16a;
+}
+
+.welcome-panel :deep(.el-button) {
+  color: #fff;
+  border-color: rgb(255 255 255 / 34%);
+  background: rgb(255 255 255 / 10%);
+}
+
+.welcome-panel :deep(.el-button:hover),
+.welcome-panel :deep(.el-button:focus-visible) {
+  color: #18384b;
+  border-color: #fff;
+  background: #fff;
 }
 
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
 .metric-card {
+  position: relative;
   min-width: 0;
-  padding: 15px 16px;
+  min-height: 98px;
+  padding: 17px 18px;
   display: flex;
   align-items: center;
   gap: 12px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--panel-background);
   color: inherit;
   text-decoration: none;
   box-shadow: var(--shadow-panel);
-  transition: border-color .15s, transform .15s;
+  transition:
+    border-color 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
 }
 
 .metric-card:hover {
-  border-color: #a7b7ca;
-  transform: translateY(-1px);
+  border-color: #9db8c5;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgb(31 75 95 / 10%);
+}
+
+.metric-card.is-actionable {
+  border-color: #c2d6dd;
+}
+
+.metric-card-arrow {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: #9aadb6;
+  font-size: 14px;
 }
 
 .metric-icon {
@@ -341,23 +452,23 @@ h1 {
   flex: 0 0 38px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
+  border-radius: 11px;
   font-size: 18px;
 }
 
 .metric-icon--blue {
-  color: #1a73e8;
-  background: #e8f0fe;
+  color: #245b78;
+  background: #e6f1f4;
 }
 
 .metric-icon--violet {
-  color: #7c3aed;
-  background: #f3e8ff;
+  color: #245b78;
+  background: #e6f1f4;
 }
 
 .metric-icon--orange {
-  color: #d97706;
-  background: #fff7ed;
+  color: #9a6612;
+  background: #fff4de;
 }
 
 .metric-icon--green {
@@ -367,6 +478,7 @@ h1 {
 
 .metric-content {
   min-width: 0;
+  padding-right: 18px;
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: baseline;
@@ -386,6 +498,10 @@ h1 {
   font-variant-numeric: tabular-nums;
 }
 
+.metric-card.is-actionable .metric-content strong {
+  color: var(--color-primary);
+}
+
 .metric-content em {
   grid-column: 1 / -1;
   white-space: nowrap;
@@ -396,31 +512,31 @@ h1 {
 .chart-grid,
 .lower-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 14px;
 }
 
 .lower-grid {
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
 }
 
 .dashboard-card {
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--panel-background);
   box-shadow: var(--shadow-panel);
 }
 
 .dashboard-card :deep(.el-card__header) {
-  padding: 13px 16px;
+  padding: 15px 18px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .dashboard-card :deep(.el-card__body) {
-  padding: 12px 16px;
+  padding: 14px 18px;
 }
 
-.card-heading>div {
+.card-heading > div {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -428,12 +544,12 @@ h1 {
 
 .card-heading strong {
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .card-heading span {
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .chart-grid .dashboard-card {
@@ -450,7 +566,7 @@ h1 {
 }
 
 .order-item {
-  min-height: 52px;
+  min-height: 58px;
   display: grid;
   grid-template-columns: 8px minmax(0, 1fr) auto;
   align-items: center;
@@ -464,18 +580,18 @@ h1 {
   border-bottom: 0;
 }
 
-.order-item>i {
+.order-item > i {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: var(--color-primary);
 }
 
-.order-item>i.is-purchase {
+.order-item > i.is-purchase {
   background: #d97706;
 }
 
-.order-item>span {
+.order-item > span {
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -501,34 +617,34 @@ h1 {
 }
 
 .quick-link {
-  min-height: 70px;
+  min-height: 76px;
   padding: 12px;
   display: flex;
   align-items: center;
   gap: 10px;
   border: 1px solid var(--border-color);
-  border-radius: 7px;
+  border-radius: 10px;
   color: inherit;
   text-decoration: none;
 }
 
 .quick-link:hover {
-  border-color: #a7b7ca;
+  border-color: #9db8c5;
   background: var(--page-background);
 }
 
-.quick-link>span {
+.quick-link > span {
   width: 32px;
   height: 32px;
   flex: 0 0 32px;
   display: grid;
   place-items: center;
-  border-radius: 7px;
+  border-radius: 9px;
   color: var(--color-primary);
   background: var(--color-primary-soft);
 }
 
-.quick-link>div {
+.quick-link > div {
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -557,7 +673,6 @@ h1 {
 }
 
 @media (max-width: 620px) {
-
   .metric-grid,
   .quick-links {
     grid-template-columns: 1fr;

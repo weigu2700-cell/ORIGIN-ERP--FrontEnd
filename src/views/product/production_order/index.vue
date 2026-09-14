@@ -79,7 +79,10 @@ const columns = ref<ProColumn<ProductionOrderVo>[]>([
 ])
 
 const statusMap: Record<number, { label: string; type: 'info' | 'success' | 'warning' | 'danger' }> = {
-  [ProductionOrderStatus.DRAFT]: { label: ProductionOrderStatus.labelOf(ProductionOrderStatus.DRAFT), type: 'info' },
+  [ProductionOrderStatus.DRAFT]: {
+    label: ProductionOrderStatus.labelOf(ProductionOrderStatus.DRAFT),
+    type: 'info',
+  },
   [ProductionOrderStatus.RELEASED]: {
     label: ProductionOrderStatus.labelOf(ProductionOrderStatus.RELEASED),
     type: 'success',
