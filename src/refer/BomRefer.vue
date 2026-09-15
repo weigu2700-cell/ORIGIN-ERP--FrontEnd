@@ -16,7 +16,7 @@ const emit = defineEmits<{
 
 const columns = [
   { prop: 'bomNo', label: 'BOM编号', width: 160 },
-  { prop: 'materialCode', label: '物料编码', width: 160 },
+  { prop: 'materialCode', label: '物料编码', width: 220 },
   { prop: 'materialName', label: '物料名称', minWidth: 160 },
   { prop: 'status', label: '状态', width: 80 },
 ]

@@ -100,7 +100,7 @@ watch(
     <section v-if="detail" class="document-section">
       <h3 class="document-section-title">入库明细</h3>
       <el-table :data="[detail]" border>
-        <el-table-column label="物料编码" prop="materialCode" width="150" />
+        <el-table-column label="物料编码" prop="materialCode" width="220" />
         <el-table-column label="物料名称" prop="materialName" min-width="190" />
         <el-table-column label="入库数量" width="115" align="right">
           <template #default>{{ formatDecimal.default(detail.inQuantity, 4) }}</template>

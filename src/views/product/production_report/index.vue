@@ -67,7 +67,7 @@ const columns: ProColumn<ProductionReport>[] = [
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '报工单号', prop: 'productionReportNo', minWidth: 180 },
   { label: '生产订单号', prop: 'productionOrderNo', minWidth: 180 },
-  { label: '物料编码', prop: 'materialCode', width: 140 },
+  { label: '物料编码', prop: 'materialCode', width: 220 },
   { label: '物料名称', prop: 'materialName', minWidth: 140 },
   { label: '报工数量', prop: 'reportQuantity', width: 110, align: 'right', slot: 'reportQuantity' },
   { label: '合格数量', prop: 'qualifiedQuantity', width: 110, align: 'right', slot: 'qualifiedQuantity' },

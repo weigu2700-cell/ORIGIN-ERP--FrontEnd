@@ -36,7 +36,7 @@ const loadData = async () => {
 const columns = ref<ProColumn<ProductionDemandVo>[]>([
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '需求单号', prop: 'demandNo', width: 180 },
-  { label: '物料编码', prop: 'materialCode', width: 140 },
+  { label: '物料编码', prop: 'materialCode', width: 220 },
   { label: '物料名称', prop: 'materialName', width: 160 },
   { label: '数量', prop: 'quantity', width: 100, slot: 'quantity' },
   { label: '来源类型', prop: 'sourceType', width: 120, slot: 'sourceType' },

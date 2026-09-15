@@ -12,7 +12,7 @@ const emit = defineEmits<{
 
 const columns = [
   { prop: 'productionOrderNo', label: '生产订单号', width: 180 },
-  { prop: 'materialCode', label: '物料编码', width: 130 },
+  { prop: 'materialCode', label: '物料编码', width: 220 },
   { prop: 'materialName', label: '物料名称', minWidth: 150 },
   { prop: 'plannedQuantity', label: '计划数量', width: 100 },
   { prop: 'status', label: '状态', width: 90 },

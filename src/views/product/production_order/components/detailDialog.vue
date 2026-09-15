@@ -110,7 +110,7 @@ watch(
       <section class="document-section">
         <h3 class="document-section-title">生产明细</h3>
         <el-table :data="[detail]" border>
-          <el-table-column label="物料编码" prop="materialCode" width="160" />
+          <el-table-column label="物料编码" prop="materialCode" width="220" />
           <el-table-column label="物料名称" prop="materialName" min-width="220" />
           <el-table-column label="计划数量" align="right" width="140">
             <template #default>{{ formatDecimal.default(detail.plannedQuantity, 4) }}</template>
@@ -122,7 +122,10 @@ watch(
             <template #default>
               {{
                 detail.plannedQuantity
-                  ? `${Math.min(100, (Number(detail.completedQuantity ?? 0) / Number(detail.plannedQuantity)) * 100).toFixed(1)}%`
+                  ? `${Math.min(
+                      100,
+                      (Number(detail.completedQuantity ?? 0) / Number(detail.plannedQuantity)) * 100,
+                    ).toFixed(1)}%`
                   : '-'
               }}
             </template>

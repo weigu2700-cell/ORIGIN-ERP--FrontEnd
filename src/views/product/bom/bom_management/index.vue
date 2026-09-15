@@ -56,7 +56,7 @@ const tableData = ref<PageResult<BomVo>>({
 const columns = ref<ProColumn<BomVo>[]>([
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: 'BOM编号', prop: 'bomNo', width: 200 },
-  { label: '物料编码', prop: 'materialCode', width: 200 },
+  { label: '物料编码', prop: 'materialCode', width: 220 },
   { label: '物料名称', prop: 'materialName', minWidth: 200 },
   { label: '备注', prop: 'remark', minWidth: 150 },
   { label: '创建时间', prop: 'createTime', width: 180 },
