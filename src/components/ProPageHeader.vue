@@ -7,18 +7,21 @@ export interface ProPageHeaderCard {
   tone?: 'primary' | 'info' | 'warning' | 'success' | 'danger'
 }
 
-const props = withDefaults(defineProps<{
-  title: string
-  description?: string
-  summary?: string
-  cards?: ProPageHeaderCard[]
-  modelValue?: string | number
-}>(), {
-  description: '',
-  summary: '',
-  cards: () => [],
-  modelValue: '',
-})
+const props = withDefaults(
+  defineProps<{
+    title: string
+    description?: string
+    summary?: string
+    cards?: ProPageHeaderCard[]
+    modelValue?: string | number
+  }>(),
+  {
+    description: '',
+    summary: '',
+    cards: () => [],
+    modelValue: '',
+  },
+)
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string | number): void
@@ -45,12 +48,20 @@ const selectCard = (value: string | number) => {
       </div>
     </div>
     <div v-if="cards.length" class="status-cards" role="group" :aria-label="`${title}快捷筛选`">
-      <button v-for="item in cards" :key="item.value" type="button" class="status-card"
+      <button
+        v-for="item in cards"
+        :key="item.value"
+        type="button"
+        class="status-card"
         :class="[`is-${item.tone ?? 'primary'}`, { 'is-active': modelValue === item.value }]"
         :aria-pressed="modelValue === item.value"
         :aria-label="`${item.label}，${item.count} ${item.hint ?? ''}，${modelValue === item.value ? '点击取消筛选' : '点击筛选'}`"
-        @click="selectCard(item.value)">
-        <span class="card-label"><i aria-hidden="true" />{{ item.label }}</span>
+        @click="selectCard(item.value)"
+      >
+        <span class="card-label">
+          <i aria-hidden="true" />
+          {{ item.label }}
+        </span>
         <span class="card-value">
           {{ typeof item.count === 'number' ? item.count.toLocaleString() : item.count }}
           <span v-if="item.hint">{{ item.hint }}</span>
@@ -70,16 +81,15 @@ const selectCard = (value: string | number) => {
 
 <style scoped>
 .page-header {
-  --page-header-background: #e2e8f0;
-  --page-header-card-background: rgb(255 255 255 / 42%);
-  --page-header-control-background: rgb(255 255 255 / 55%);
-  --page-header-border: #cbd5e1;
+  --page-header-background: color-mix(in srgb, var(--panel-background) 90%, var(--page-background));
+  --page-header-card-background: color-mix(in srgb, var(--panel-background) 42%, var(--page-background));
+  --page-header-control-background: color-mix(in srgb, var(--panel-background) 55%, var(--page-background));
   display: flex;
   flex-direction: column;
   gap: 12px;
   min-width: 0;
   padding: 14px 16px;
-  border: 1px solid var(--page-header-border);
+  border: 1px solid var(--border-color);
   border-radius: 7px;
   background: var(--page-header-background);
   box-shadow: 0 1px 2px rgb(15 23 42 / 5%);
@@ -110,13 +120,13 @@ p {
 .result-count {
   padding: 4px 8px;
   border-radius: 4px;
-  background: rgb(255 255 255 / 38%);
+  background: color-mix(in srgb, var(--panel-background) 38%, transparent);
   color: var(--text-secondary);
   font-size: 13px;
 }
 
 .result-count strong {
-  color: var(--el-text-color-primary, #303133);
+  color: var(--text-primary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -135,14 +145,16 @@ p {
   gap: 10px;
   min-height: 54px;
   padding: 9px 12px;
-  border: 1px solid rgb(148 163 184 / 38%);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   background: var(--page-header-card-background);
-  color: var(--el-text-color-primary, #303133);
+  color: var(--text-primary);
   font: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color .15s ease, background-color .15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .is-success {
@@ -169,6 +181,7 @@ p {
   align-items: center;
   gap: 8px;
   font-size: 13px;
+  color: var(--text-primary);
 }
 
 .card-label i {
@@ -186,10 +199,11 @@ p {
   font-size: 20px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
 }
 
 .card-value span {
-  color: var(--el-text-color-secondary, #909399);
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 400;
 }
@@ -235,7 +249,7 @@ p {
   flex-wrap: wrap;
   gap: 16px;
   padding-top: 10px;
-  border-top: 1px solid var(--page-header-border);
+  border-top: 1px solid var(--border-color);
 }
 
 .search-section {
@@ -245,7 +259,7 @@ p {
 .toolbar-section {
   flex: 0 0 auto;
   padding-left: 20px;
-  border-left: 1px solid #94a3b8;
+  border-left: 1px solid var(--border-color);
 }
 
 .search-section :deep(.pro-search),
@@ -276,18 +290,18 @@ p {
 .search-section :deep(.el-button),
 .toolbar-section :deep(.pro-toolbar-btn) {
   height: 32px;
-  border: 1px solid #b8c3cf;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   background: transparent;
-  color: #344054;
+  color: var(--text-primary);
   box-shadow: none;
 }
 
 .search-section :deep(.el-button:hover),
 .toolbar-section :deep(.pro-toolbar-btn:hover) {
-  border-color: #8493a3;
-  background: rgb(255 255 255 / 45%);
-  color: #1f2937;
+  border-color: var(--text-secondary);
+  background: color-mix(in srgb, var(--panel-background) 45%, transparent);
+  color: var(--text-primary);
 }
 
 .search-section :deep(.el-button--primary),
@@ -310,12 +324,5 @@ p {
 
 .is-primary {
   --status-color: var(--el-color-primary, #409eff);
-}
-
-:global(html.dark) .page-header {
-  --page-header-background: #292f38;
-  --page-header-card-background: rgb(255 255 255 / 4%);
-  --page-header-control-background: rgb(255 255 255 / 6%);
-  --page-header-border: #3f4854;
 }
 </style>
