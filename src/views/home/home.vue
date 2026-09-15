@@ -11,17 +11,14 @@ defineOptions({ name: 'BusinessDashboard' })
 const loading = ref(false)
 const loadError = ref(false)
 const overview = ref<DashboardOverview>({
-  metrics: {
-    pendingDemand: 0,
-    draftProduction: 0,
-    productionInProgress: 0,
-    draftPurchase: 0,
-    purchaseInTransit: 0,
-    salesToDeliver: 0,
-  },
-  productionStatus: [],
-  recentOrders: [],
-  failedRequests: 0,
+  pendingProductionDemandCount: 0,
+  productionOrderStatusCount: {},
+  draftPurchaseOrderCount: 0,
+  shippedPurchaseOrderCount: 0,
+  confirmedSalesOrderCount: 0,
+  recentProductionOrders: [],
+  recentPurchaseOrders: [],
+  recentSalesOrders: [],
 })
 
 const today = computed(() =>
@@ -33,10 +30,18 @@ const today = computed(() =>
   }).format(new Date()),
 )
 
+const statusLabels: Record<string, string> = {
+  '0': '草稿',
+  '1': '已下达',
+  '2': '生产中',
+  '3': '已完成',
+  '4': '已取消',
+}
+
 const metrics = computed(() => [
   {
     label: '待生产需求',
-    value: overview.value.metrics.pendingDemand,
+    value: overview.value.pendingProductionDemandCount,
     note: '等待安排生产',
     icon: DataAnalysis,
     tone: 'blue',
@@ -44,23 +49,23 @@ const metrics = computed(() => [
   },
   {
     label: '生产中订单',
-    value: overview.value.metrics.productionInProgress,
-    note: `另有 ${overview.value.metrics.draftProduction} 张草稿`,
+    value: overview.value.productionOrderStatusCount['2'] ?? 0,
+    note: `另有 ${overview.value.productionOrderStatusCount['0'] ?? 0} 张草稿`,
     icon: Box,
     tone: 'violet',
     path: '/product/productionOrder',
   },
   {
     label: '采购在途',
-    value: overview.value.metrics.purchaseInTransit,
-    note: `${overview.value.metrics.draftPurchase} 张待审批`,
+    value: overview.value.shippedPurchaseOrderCount,
+    note: `${overview.value.draftPurchaseOrderCount} 张待审批`,
     icon: Van,
     tone: 'orange',
     path: '/purchase/purchaseOrder',
   },
   {
     label: '销售待发货',
-    value: overview.value.metrics.salesToDeliver,
+    value: overview.value.confirmedSalesOrderCount,
     note: '已确认销售订单',
     icon: ShoppingCart,
     tone: 'green',
@@ -91,16 +96,23 @@ const taskOption = computed<EChartsCoreOption>(() => ({
       itemStyle: { borderRadius: [0, 4, 4, 0] },
       label: { show: true, position: 'right', color: '#475569' },
       data: [
-        overview.value.metrics.salesToDeliver,
-        overview.value.metrics.draftPurchase,
-        overview.value.metrics.purchaseInTransit,
-        overview.value.metrics.draftProduction,
-        overview.value.metrics.productionInProgress,
-        overview.value.metrics.pendingDemand,
+        overview.value.confirmedSalesOrderCount,
+        overview.value.draftPurchaseOrderCount,
+        overview.value.shippedPurchaseOrderCount,
+        overview.value.productionOrderStatusCount['0'] ?? 0,
+        overview.value.productionOrderStatusCount['2'] ?? 0,
+        overview.value.pendingProductionDemandCount,
       ],
     },
   ],
 }))
+
+const productionStatus = computed(() =>
+  Object.entries(overview.value.productionOrderStatusCount).map(([code, value]) => ({
+    name: statusLabels[code] ?? code,
+    value,
+  })),
+)
 
 const productionOption = computed<EChartsCoreOption>(() => ({
   color: ['#afc0c7', '#245b78', '#d99a2b', '#27845f', '#b85c58'],
@@ -113,16 +125,15 @@ const productionOption = computed<EChartsCoreOption>(() => ({
       center: ['50%', '43%'],
       itemStyle: { borderColor: '#fff', borderWidth: 2 },
       label: { formatter: '{b}\n{c}', color: '#49606d' },
-      data: overview.value.productionStatus,
+      data: productionStatus.value,
     },
   ],
 }))
 
-const productionEmpty = computed(() => overview.value.productionStatus.every((item) => item.value === 0))
+const productionEmpty = computed(() => productionStatus.value.every((item) => item.value === 0))
 
 const syncStatus = computed(() => {
   if (loadError.value) return '同步异常'
-  if (overview.value.failedRequests) return '部分同步异常'
   return '数据连接正常'
 })
 
@@ -158,7 +169,6 @@ const loadData = async () => {
   loadError.value = false
   try {
     overview.value = await getDashboardOverview()
-    loadError.value = overview.value.failedRequests === 11
   } catch {
     loadError.value = true
   } finally {
@@ -166,12 +176,43 @@ const loadData = async () => {
   }
 }
 
+const recentOrders = computed(() =>
+  [
+    ...(overview.value.recentProductionOrders ?? []).map((row) => ({
+      id: `production-${row.id}`,
+      title: row.productionOrderNo,
+      detail: `${row.materialName ?? '未知物料'} · 计划 ${row.plannedQuantity ?? 0}`,
+      time: row.plannedStartTime ?? '',
+      path: '/product/productionOrder',
+      tone: 'production',
+    })),
+    ...(overview.value.recentPurchaseOrders ?? []).map((row) => ({
+      id: `purchase-${row.id}`,
+      title: row.purchaseOrderNo,
+      detail: `${row.supplierName ?? '供应商待补充'} · ${row.materialName ?? '未知物料'}`,
+      time: row.orderDate ?? '',
+      path: '/purchase/purchaseOrder',
+      tone: 'purchase',
+    })),
+    ...(overview.value.recentSalesOrders ?? []).map((row) => ({
+      id: `sales-${row.id}`,
+      title: row.orderNo,
+      detail: `${row.customerName ?? '客户待补充'}`,
+      time: (row.orderDate as unknown as string) ?? '',
+      path: '/sales/salesOrder',
+      tone: 'sales',
+    })),
+  ]
+    .sort((a, b) => b.time.localeCompare(a.time))
+    .slice(0, 6),
+)
+
 onMounted(loadData)
 </script>
 
 <template>
   <div class="home-container" v-loading="loading">
-    <section class="welcome-panel" :class="{ 'is-warning': loadError || overview.failedRequests }">
+    <section class="welcome-panel" :class="{ 'is-warning': loadError }">
       <div>
         <p class="eyebrow">ORIGIN ERP / 业务工作台</p>
         <h1>今日业务概览</h1>
@@ -179,7 +220,7 @@ onMounted(loadData)
       </div>
       <div class="welcome-actions">
         <span class="sync-status">
-          <i :class="{ 'is-warning': loadError || overview.failedRequests }" />
+          <i :class="{ 'is-warning': loadError }" />
           {{ syncStatus }}
         </span>
         <el-button :icon="Refresh" :loading="loading" @click="loadData">刷新数据</el-button>
@@ -189,13 +230,6 @@ onMounted(loadData)
     <el-alert
       v-if="loadError"
       title="工作台数据暂时无法加载，请检查后端服务"
-      type="warning"
-      show-icon
-      :closable="false"
-    />
-    <el-alert
-      v-else-if="overview.failedRequests"
-      :title="`${overview.failedRequests} 项数据加载失败，其余数据已正常展示`"
       type="warning"
       show-icon
       :closable="false"
@@ -263,8 +297,8 @@ onMounted(loadData)
             </div>
           </div>
         </template>
-        <div v-if="overview.recentOrders.length" class="order-list">
-          <router-link v-for="item in overview.recentOrders" :key="item.id" :to="item.path" class="order-item">
+        <div v-if="recentOrders.length" class="order-list">
+          <router-link v-for="item in recentOrders" :key="item.id" :to="item.path" class="order-item">
             <i :class="`is-${item.tone}`" />
             <span>
               <strong>{{ item.title }}</strong>

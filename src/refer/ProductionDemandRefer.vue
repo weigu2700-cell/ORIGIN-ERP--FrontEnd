@@ -29,7 +29,7 @@ const columns = [
   { prop: 'status', label: '状态', width: 100 },
 ]
 
-const fetcher = (params: Record<string, unknown>) => getPageProductionDemand(params as ProductionDemandQuery)
+const fetcher = (params: Record<string, unknown>) => getPageProductionDemand(params as unknown as ProductionDemandQuery)
 </script>
 
 <template>
