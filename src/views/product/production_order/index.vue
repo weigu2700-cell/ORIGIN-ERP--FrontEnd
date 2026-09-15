@@ -67,7 +67,7 @@ const columns = ref<ProColumn<ProductionOrderVo>[]>([
   { label: '状态', prop: 'status', width: 100, slot: 'status' },
   { label: '生产订单号', prop: 'productionOrderNo', width: 180 },
   { label: '需求单号', prop: 'productionDemandNo', width: 180 },
-  { label: '物料编码', prop: 'materialCode', width: 200 },
+  { label: '物料编码', prop: 'materialCode', width: 220 },
   { label: '物料名称', prop: 'materialName', width: 180 },
   { label: '计划数量', prop: 'plannedQuantity', width: 100, slot: 'plannedQuantity' },
   { label: '完工数量', prop: 'completedQuantity', width: 100, slot: 'completedQuantity' },

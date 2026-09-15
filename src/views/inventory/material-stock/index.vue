@@ -1,14 +1,19 @@
 <script setup lang="ts">
-import Selector from "@/views/inventory/material-stock/components/selector.vue";
-import ProToolbar from "@/components/ProToolbar.vue";
-import ProTable, { type ProColumn } from "@/components/ProTable.vue"
+import Selector from '@/views/inventory/material-stock/components/selector.vue'
+import ProToolbar from '@/components/ProToolbar.vue'
+import ProTable, { type ProColumn } from '@/components/ProTable.vue'
 import { onMounted, ref, reactive } from 'vue'
-import { addMaterialStock, getPageMaterialStockList } from "@/api/inventory/materialStock.ts";
-import type { MaterialStockCreateRequest, MaterialStockListRequest, MaterialStockListResponse, MaterialStockVO } from "@/types/inventory/materialStock.ts";
-import SaveDialog from "@/views/inventory/material-stock/components/saveDialog.vue";
-import DetailDialog from "@/views/inventory/material-stock/components/detailDialog.vue";
-import { ElMessage } from "element-plus";
-import { formatDecimal } from "@/composables/useFormat";
+import { addMaterialStock, getPageMaterialStockList } from '@/api/inventory/materialStock.ts'
+import type {
+  MaterialStockCreateRequest,
+  MaterialStockListRequest,
+  MaterialStockListResponse,
+  MaterialStockVO,
+} from '@/types/inventory/materialStock.ts'
+import SaveDialog from '@/views/inventory/material-stock/components/saveDialog.vue'
+import DetailDialog from '@/views/inventory/material-stock/components/detailDialog.vue'
+import { ElMessage } from 'element-plus'
+import { formatDecimal } from '@/composables/useFormat'
 import PageHeader from '@/components/PageHeader.vue'
 
 // 注意：库存接口分页参数是 pageNum
@@ -29,7 +34,7 @@ const loadData = async () => {
 }
 
 const columns = ref<ProColumn<MaterialStockVO>[]>([
-  { label: '物料编码', prop: 'materialCode', width: 240 },
+  { label: '物料编码', prop: 'materialCode', width: 220 },
   { label: '物料名称', prop: 'materialName', minWidth: 160 },
   { label: '仓库', prop: 'warehouseName', minWidth: 140 },
   { label: '在库量', prop: 'onHand', width: 100, slot: 'onHand' },
@@ -89,16 +94,37 @@ const handleCancel = () => {
         <Selector :queryData="queryData" @query="handleQuery" @reset="handleReset" />
       </template>
       <template #toolbar>
-        <ProToolbar :show-edit="false" :show-delete="false" :show-export="false" @add="handleAdd"
-          @refresh="handleRefresh" />
+        <ProToolbar
+          :show-edit="false"
+          :show-delete="false"
+          :show-export="false"
+          @add="handleAdd"
+          @refresh="handleRefresh"
+        />
       </template>
     </PageHeader>
     <div class="table round">
-      <ProTable :data="tableData?.records ?? []" :columns="columns" :total="tableData?.total ?? 0"
-        :page="queryData.pageNum" :page-size="queryData.pageSize"
-        @update:page="(p: number) => { queryData.pageNum = p; loadData() }"
-        @update:pageSize="(s: number) => { queryData.pageSize = s; queryData.pageNum = 1; loadData() }"
-        @rowDblclick="handleRowDblclick">
+      <ProTable
+        :data="tableData?.records ?? []"
+        :columns="columns"
+        :total="tableData?.total ?? 0"
+        :page="queryData.pageNum"
+        :page-size="queryData.pageSize"
+        @update:page="
+          (p: number) => {
+            queryData.pageNum = p
+            loadData()
+          }
+        "
+        @update:pageSize="
+          (s: number) => {
+            queryData.pageSize = s
+            queryData.pageNum = 1
+            loadData()
+          }
+        "
+        @rowDblclick="handleRowDblclick"
+      >
         <template #onHand="{ row }">
           <span>{{ formatDecimal.default(row.onHand, 0) }}</span>
         </template>

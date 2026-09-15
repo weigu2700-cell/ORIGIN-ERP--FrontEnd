@@ -29,7 +29,7 @@ const tablePageSize = ref(10)
 const treeLoading = ref(false)
 
 const columns: ProColumn<BomExplosionVo>[] = [
-  { label: '物料编码', prop: 'materialCode', width: 240 },
+  { label: '物料编码', prop: 'materialCode', width: 220 },
   { label: '物料名称', prop: 'materialName', minWidth: 200 },
   { label: '需求数量', prop: 'quantity', width: 160 },
   { label: '层级', prop: 'level', width: 80 },

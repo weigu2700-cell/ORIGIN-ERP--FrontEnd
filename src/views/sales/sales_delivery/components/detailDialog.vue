@@ -82,7 +82,7 @@ watch(
       <h3 class="document-section-title">发货明细</h3>
       <el-table :data="detail.items ?? []" border>
         <el-table-column label="行号" prop="lineNo" width="70" align="center" />
-        <el-table-column label="物料编码" prop="materialCode" width="150" />
+        <el-table-column label="物料编码" prop="materialCode" width="220" />
         <el-table-column label="物料名称" prop="materialName" min-width="200" />
         <el-table-column label="出库仓库" prop="warehouseName" min-width="150" />
         <el-table-column label="发货数量" width="130" align="right">

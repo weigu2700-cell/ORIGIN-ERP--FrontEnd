@@ -74,7 +74,7 @@ const columns: ProColumn<PurchaseOrderVo>[] = [
   { label: '采购订单号', prop: 'purchaseOrderNo', minWidth: 180 },
   { label: '采购需求单号', prop: 'purchaseDemandNo', minWidth: 180 },
   { label: '供应商', prop: 'supplierName', minWidth: 150 },
-  { label: '物料编码', prop: 'materialCode', width: 140 },
+  { label: '物料编码', prop: 'materialCode', width: 220 },
   { label: '物料名称', prop: 'materialName', minWidth: 150 },
   { label: '计划数量', prop: 'plannedQuantity', width: 110, slot: 'plannedQuantity' },
   { label: '到货数量', prop: 'completeQuantity', width: 110, slot: 'completeQuantity' },

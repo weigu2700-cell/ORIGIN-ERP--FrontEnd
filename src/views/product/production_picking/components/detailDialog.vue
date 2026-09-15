@@ -64,7 +64,7 @@ const statusMeta = computed(
     <section v-if="row" class="document-section">
       <h3 class="document-section-title">领料明细</h3>
       <el-table :data="[row]" border>
-        <el-table-column label="物料编码" prop="materialCode" width="150" />
+        <el-table-column label="物料编码" prop="materialCode" width="220" />
         <el-table-column label="物料名称" prop="materialName" min-width="180" />
         <el-table-column label="领料仓库" min-width="150">
           <template #default>{{ row.warehouseName || '待指定' }}</template>

@@ -60,7 +60,7 @@ const columns: ProColumn<ProductionPicking>[] = [
   { label: '领料单号', prop: 'pickingNo', minWidth: 180 },
   { label: '生产订单号', prop: 'productionOrderNo', minWidth: 180 },
   { label: '采购需求单号', prop: 'purchaseDemandNo', minWidth: 180, slot: 'purchaseDemandNo' },
-  { label: '物料编码', prop: 'materialCode', width: 140 },
+  { label: '物料编码', prop: 'materialCode', width: 220 },
   { label: '物料名称', prop: 'materialName', minWidth: 160 },
   { label: '领料仓库', prop: 'warehouseName', minWidth: 140, slot: 'warehouseName' },
   {

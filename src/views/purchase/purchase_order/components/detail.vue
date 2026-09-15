@@ -105,7 +105,7 @@ watch(
     <section v-if="detail" class="document-section">
       <h3 class="document-section-title">采购明细</h3>
       <el-table :data="[detail]" border>
-        <el-table-column label="物料编码" prop="materialCode" width="155" />
+        <el-table-column label="物料编码" prop="materialCode" width="220" />
         <el-table-column label="物料名称" prop="materialName" min-width="200" />
         <el-table-column label="计划数量" width="115" align="right">
           <template #default>{{ formatDecimal.default(detail.plannedQuantity, 4) }}</template>
@@ -134,6 +134,7 @@ watch(
   font-size: 18px;
   font-weight: 650;
 }
+
 .summary-value small {
   color: var(--el-text-color-secondary);
 }

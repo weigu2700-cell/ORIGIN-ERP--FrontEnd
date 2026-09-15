@@ -63,7 +63,7 @@ const columns: ProColumn<FinishWarehousing>[] = [
   { label: '入库单号', prop: 'warehousingNo', minWidth: 180 },
   { label: '生产订单号', prop: 'productionOrderNo', minWidth: 180 },
   { label: '生产报工单号', prop: 'productionReportNo', minWidth: 180 },
-  { label: '物料编码', prop: 'materialCode', width: 140 },
+  { label: '物料编码', prop: 'materialCode', width: 220 },
   { label: '物料名称', prop: 'materialName', minWidth: 140 },
   { label: '入库仓库', prop: 'warehouseName', width: 140 },
   { label: '入库数量', prop: 'warehousingQuantity', width: 110, align: 'right', slot: 'quantity' },
@@ -144,7 +144,9 @@ onMounted(loadData)
       :model-value="queryData.status"
       @change="changeStatus"
     >
-      <template #search><Selector :query-data="queryData" @query="query" @reset="reset" /></template>
+      <template #search>
+        <Selector :query-data="queryData" @query="query" @reset="reset" />
+      </template>
       <template #toolbar>
         <ProToolbar
           :show-add="false"
@@ -203,6 +205,7 @@ onMounted(loadData)
   flex-direction: column;
   gap: 10px;
 }
+
 .table {
   flex: 1;
   min-height: 0;

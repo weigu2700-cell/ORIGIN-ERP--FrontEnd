@@ -24,7 +24,7 @@ const handleRowChange = (row: Record<string, any> | null) => {
 }
 
 const columns = [
-  { prop: 'code', label: '物料编码', width: 140 },
+  { prop: 'code', label: '物料编码', width: 220 },
   { prop: 'name', label: '物料名称', minWidth: 140 },
   { prop: 'spec', label: '规格', width: 120 },
   { prop: 'unit', label: '单位', width: 80 },
