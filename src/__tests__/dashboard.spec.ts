@@ -4,7 +4,7 @@ import { getDashboardOverview, type DashboardOverview } from '@/api/dashboard'
 
 vi.mock('@/utils/request', () => ({
   default: {
-    get: vi.fn(),
+    get: vi.fn<(path: string) => Promise<unknown>>(),
   },
 }))
 
