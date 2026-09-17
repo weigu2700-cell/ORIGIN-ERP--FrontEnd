@@ -8,6 +8,7 @@ import { usePermissionStore } from '@/stores/permission.ts'
 import router from '@/router'
 import { ElMessage } from 'element-plus'
 import { disconnectWebSocket } from '@/utils/websocket'
+import useNotificationStore from '@/stores/notification'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -31,6 +32,7 @@ export const useUserStore = defineStore('user', {
     },
     logout() {
       disconnectWebSocket()
+      useNotificationStore().reset()
       ElMessage.success('退出成功')
       removeToken()
       this.token = null

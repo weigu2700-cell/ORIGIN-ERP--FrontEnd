@@ -1,10 +1,19 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import Header from './components/header.vue'
 import Aside from './components/sidebar.vue'
 import Fold from './components/fold.vue'
 import useAppStore from '@/stores/app.ts'
+import useNotificationStore from '@/stores/notification'
 
 const appStore = useAppStore()
+const notificationStore = useNotificationStore()
+
+onMounted(() => {
+  void notificationStore.initialize().catch((error) => {
+    console.error('通知初始化失败：', error)
+  })
+})
 </script>
 
 <template>

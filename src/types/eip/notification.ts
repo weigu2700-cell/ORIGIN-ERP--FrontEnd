@@ -1,25 +1,24 @@
 import type { PageResult } from '@/types/common'
-import { NotificationType } from '@/constants/enumCode'
 
-export interface Notification {
+export interface NotificationItem {
   id: string
-  userId: string
-  type: (typeof NotificationType)[keyof typeof NotificationType]
+  userId?: string
+  type: number
   title: string
   content: string
-  businessId: number
-  businessNo: string
-  businessType: string
+  businessType?: string
+  businessId?: string
+  businessNo?: string
   isRead: boolean
-  readTime: Date
-  createTime: Date
-  updateTime: Date
+  readTime?: string
+  createTime: string
+  updateTime?: string
 }
 
-export type NotificationPageResult = PageResult<Notification>
+export type NotificationPageResult = PageResult<NotificationItem>
 
 export interface NotificationQuery {
   pageNum: number
   pageSize: number
-  isRead: boolean
+  isRead?: boolean | null
 }
