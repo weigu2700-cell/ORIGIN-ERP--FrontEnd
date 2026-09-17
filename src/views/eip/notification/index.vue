@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { Bell, Check, InfoFilled, Refresh, WarningFilled, Document, CircleCheck } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
 import ProPagination from '@/components/ProPagination.vue'
 import { NotificationType } from '@/constants/enumCode'
@@ -14,6 +15,7 @@ defineOptions({ name: 'NotificationCenter' })
 type NotificationFilter = boolean | null
 
 const notificationStore = useNotificationStore()
+const router = useRouter()
 const query = reactive<{ pageNum: number; pageSize: number; isRead: NotificationFilter }>({
   pageNum: 1,
   pageSize: 10,
@@ -152,6 +154,10 @@ const markAllRead = async () => {
 
 const retry = () => void loadPage()
 
+const viewDetail = (item: NotificationItem) => {
+  void router.push({ name: 'notification-detail', params: { id: item.id } })
+}
+
 watch(
   () => notificationStore.revision,
   () => {
@@ -274,6 +280,7 @@ onMounted(() => {
             <el-button v-if="!item.isRead" link type="primary" :loading="actionLoading" @click="markOneRead(item)">
               标记已读
             </el-button>
+            <el-button link type="primary" @click="viewDetail(item)">查看详情</el-button>
           </div>
         </article>
       </div>

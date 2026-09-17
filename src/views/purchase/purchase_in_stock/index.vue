@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
 import ProPageHeader, { type ProPageHeaderCard } from '@/components/ProPageHeader.vue'
 import ProToolbar from '@/components/ProToolbar.vue'
 import ProTable, { type ProColumn } from '@/components/ProTable.vue'
-import Selector from './components/selector.vue'
+import SearchDialog from './components/SearchDialog.vue'
 import DetailDialog from './components/detail.vue'
 import UploadDialog from './components/uploadDialog.vue'
 import { approvePurchaseInStock, getPagePurchaseInStock, uploadPurchaseInStock } from '@/api/purchase/purchaseInStock'
@@ -18,6 +19,7 @@ defineOptions({ name: 'PurchaseInStockPage' })
 const selectedId = ref<string>()
 const detailVisible = ref(false)
 const uploadVisible = ref(false)
+const searchVisible = ref(false)
 const tableData = ref<PageResult<PurchaseInStock>>({
   records: [],
   total: 0,
@@ -171,7 +173,17 @@ onMounted(loadData)
       @change="changeStatus"
     >
       <template #search>
-        <Selector :query-data="queryData" @search="search" @reset="reset" />
+        <div class="search-bar">
+          <el-button type="primary" @click="searchVisible = true">
+            <template #icon>
+              <el-icon>
+                <Search />
+              </el-icon>
+            </template>
+            高级查询
+          </el-button>
+          <span class="search-summary">{{ tableData.total.toLocaleString() }} 条记录</span>
+        </div>
       </template>
       <template #toolbar>
         <ProToolbar
@@ -226,6 +238,7 @@ onMounted(loadData)
   </div>
   <DetailDialog :visible="detailVisible" :record-id="selectedId" @cancel="detailVisible = false" />
   <UploadDialog :visible="uploadVisible" :row="selectedRow" @cancel="uploadVisible = false" @submit="submitUpload" />
+  <SearchDialog v-model:visible="searchVisible" :query-data="queryData" @search="search" @reset="reset" />
 </template>
 
 <style scoped>
@@ -241,5 +254,16 @@ onMounted(loadData)
   flex: 1;
   min-height: 0;
   overflow: auto;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.search-summary {
+  color: var(--text-secondary);
+  font-size: 13px;
 }
 </style>

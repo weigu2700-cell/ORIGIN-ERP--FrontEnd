@@ -7,13 +7,11 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import '@/styles/index.css'
 import App from './App.vue'
 import router from './router'
-import {setupRouterGuard} from './router/gurad'
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
-setupRouterGuard(router)
 app.use(ElementPlus)
 Object.entries(ElementPlusIconsVue).forEach(([key, component]) => {
   app.component(key, component)

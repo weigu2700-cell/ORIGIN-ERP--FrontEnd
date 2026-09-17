@@ -1,8 +1,12 @@
-import type { NotificationPageResult, NotificationQuery } from '@/types/eip/notification'
+import type { NotificationItem, NotificationPageResult, NotificationQuery } from '@/types/eip/notification'
 import service from '@/utils/request'
 
 export function getPageNotification(query: NotificationQuery) {
   return service.get<NotificationPageResult>('/sys/notification', { params: query })
+}
+
+export function getNotificationDetail(notificationId: string) {
+  return service.get<NotificationItem>(`/sys/notification/${notificationId}`)
 }
 
 export function getUnreadCount() {

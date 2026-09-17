@@ -6,7 +6,13 @@ useAppStore()
 </script>
 
 <template>
-  <router-view/>
+  <router-view />
 </template>
 
 <style scoped></style>
+
+<style>
+.el-dialog {
+  min-width: 480px;
+}
+</style>

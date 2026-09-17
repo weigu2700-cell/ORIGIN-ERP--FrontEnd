@@ -5,11 +5,13 @@ import Aside from './components/sidebar.vue'
 import Fold from './components/fold.vue'
 import useAppStore from '@/stores/app.ts'
 import useNotificationStore from '@/stores/notification'
+import { connectWebSocket } from '@/utils/websocket'
 
 const appStore = useAppStore()
 const notificationStore = useNotificationStore()
 
 onMounted(() => {
+  connectWebSocket()
   void notificationStore.initialize().catch((error) => {
     console.error('通知初始化失败：', error)
   })

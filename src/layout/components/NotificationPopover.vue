@@ -5,7 +5,6 @@ import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import useNotificationStore from '@/stores/notification'
 import { NotificationType } from '@/constants/enumCode'
-import type { NotificationItem } from '@/types/eip/notification'
 
 defineOptions({ name: 'NotificationPopover' })
 
@@ -45,18 +44,6 @@ const formatTime = (value?: string) => {
   }).format(date)
 }
 
-const markOneRead = async (item: NotificationItem) => {
-  if (item.isRead || actionLoading.value) return
-  try {
-    actionLoading.value = true
-    await notificationStore.markOneRead(item.id)
-  } catch {
-    ElMessage.error('通知状态更新失败，请稍后重试')
-  } finally {
-    actionLoading.value = false
-  }
-}
-
 const markAllRead = async () => {
   if (!notificationStore.hasUnread || actionLoading.value) return
   try {
@@ -71,7 +58,12 @@ const markAllRead = async () => {
 
 const viewAll = () => {
   visible.value = false
-  router.push({ name: 'notification-center' })
+  void router.push({ name: 'notification-center' })
+}
+
+const viewDetail = (notificationId: string) => {
+  visible.value = false
+  void router.push({ name: 'notification-detail', params: { id: notificationId } })
 }
 </script>
 
@@ -136,7 +128,7 @@ const viewAll = () => {
           class="notification-item"
           :class="{ 'is-unread': !item.isRead }"
           role="listitem"
-          @click="markOneRead(item)"
+          @click="viewDetail(item.id)"
         >
           <span class="notification-type-icon" :class="typeClass(item.type)" :title="typeLabel(item.type)">
             <el-icon><component :is="typeIcon(item.type)" /></el-icon>
