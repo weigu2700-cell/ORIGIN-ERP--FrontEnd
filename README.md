@@ -30,6 +30,7 @@ ORIGIN ERP Web 是原点 ERP 的桌面管理端。项目采用 Vue 3、TypeScrip
 - **状态流转可视化**：订单确认、审核、下达、开工、完工、取消、上架等操作随当前状态动态显示。
 - **高复用业务组件**：沉淀 `ProTable`、`ProSearch`、`ProToolbar`、`ProTree`、`ReferPicker` 和单据详情容器。
 - **类型安全**：接口、查询条件和业务实体集中建模；雪花 ID 全程按字符串处理，避免 JavaScript 精度损失。
+- **实时消息通知**：登录后建立 WebSocket 连接，Pinia 统一维护最近消息与未读数量，支持铃铛提醒、通知中心、独立详情页和已读操作。
 - **自动质量门禁**：ESLint、Oxlint、Prettier、Husky 和 lint-staged 在提交前自动检查并修复代码。
 - **一致的视觉系统**：支持深浅主题、品牌配色、响应式布局和制造业工作台。
 
@@ -45,6 +46,7 @@ ORIGIN ERP Web 是原点 ERP 的桌面管理端。项目采用 Vue 3、TypeScrip
 | BOM 管理 | BOM 新增、详情、启用/停用、多级结构与需求展开            |
 | 生产管理 | 生产需求、生产订单、下达/开工/完工/取消、生产领料        |
 | 采购管理 | 采购需求、采购订单、采购入库审核与上架                   |
+| 消息通知 | 实时推送、未读角标、通知中心、通知详情、单条/全部已读    |
 
 ## 技术栈
 
@@ -56,6 +58,7 @@ ORIGIN ERP Web 是原点 ERP 的桌面管理端。项目采用 Vue 3、TypeScrip
 | UI 组件    | Element Plus 2.14                         |
 | 路由与状态 | Vue Router 5、Pinia 4                     |
 | 网络请求   | Axios                                     |
+| 实时通信   | 浏览器原生 WebSocket                      |
 | 数据可视化 | ECharts                                   |
 | 工程质量   | ESLint、Oxlint、Prettier、vue-tsc、Vitest |
 | Git 工作流 | Husky、lint-staged                        |
@@ -86,13 +89,19 @@ npm run dev
 
 ```dotenv
 VITE_API_URL=http://localhost:8080
+# 可选。未配置时会基于 VITE_API_URL 自动生成 ws://localhost:8080/ws/notification
+VITE_WS_URL=ws://localhost:8080/ws/notification
 ```
 
 生产部署时在 `.env.production` 或部署平台中设置真实接口地址：
 
 ```dotenv
 VITE_API_URL=https://api.example.com
+# 前后端不在同一网关或 WebSocket 使用独立域名时配置
+VITE_WS_URL=wss://api.example.com/ws/notification
 ```
+
+`VITE_WS_URL` 是可选项。未配置时，客户端使用 `VITE_API_URL` 拼接 `/ws/notification`，并自动将 `http/https` 转换为 `ws/wss`。生产环境必须通过 HTTPS 页面连接 WSS，避免浏览器阻止混合内容。
 
 > `VITE_` 前缀变量会进入浏览器产物，请勿在其中保存密码、Token 或其他密钥。
 
@@ -121,7 +130,7 @@ src/
 ├── layout/       # 顶栏、侧边栏、面包屑和基础布局
 ├── refer/        # 客户、物料、仓库、订单等参照选择器
 ├── router/       # 静态路由、动态路由解析和守卫
-├── stores/       # 用户、权限与应用状态
+├── stores/       # 用户、权限、应用状态和通知状态
 ├── styles/       # 全局样式和主题变量
 ├── types/        # 接口 DTO、VO 与业务类型
 ├── utils/        # 请求、认证、存储和图标工具
@@ -132,6 +141,7 @@ src/
     ├── inventory/ # 库存管理
     ├── sales/     # 销售管理
     ├── purchase/  # 采购管理
+    ├── eip/       # 消息通知中心与通知详情
     └── product/   # BOM 与生产管理
 ```
 
@@ -171,6 +181,65 @@ ProPageHeader + ProSearch + ProToolbar + ProTable + ReferPicker
 
 订单详情统一使用 `BusinessDocumentDialog`，使销售、采购和生产单据拥有一致的信息层级与操作体验。
 
+### 消息通知与 WebSocket
+
+消息通知采用“REST 初始化与操作 + WebSocket 增量推送”的组合方式：
+
+```text
+进入 BasicLayout
+   ├── REST：并行加载未读数量与最近 6 条通知
+   └── WebSocket：连接 /ws/notification?token=<JWT>
+                         │
+                         ▼
+                  收到 NotificationItem
+                         │
+                         ▼
+              Pinia 去重、插入列表、累加未读数
+                         │
+             ┌───────────┴───────────┐
+             ▼                       ▼
+       Header 铃铛角标          Element Plus 桌面提醒
+```
+
+主要实现位置：
+
+| 文件                                            | 职责                                           |
+| ----------------------------------------------- | ---------------------------------------------- |
+| `src/utils/websocket.ts`                        | 建立单例连接、附加 JWT、解析推送并在退出时断开 |
+| `src/stores/notification.ts`                    | 管理最近通知、未读数、去重、单条已读和全部已读 |
+| `src/layout/components/NotificationPopover.vue` | Header 铃铛、未读角标和最近通知入口            |
+| `src/views/eip/notification/index.vue`          | 通知中心、已读筛选、分页和批量操作             |
+| `src/views/eip/notification/detail.vue`         | 按 ID 查询独立详情并提供“标记已读”操作         |
+| `src/api/eip/notification.ts`                   | 通知 REST API 封装                             |
+
+页面与接口：
+
+| 能力     | 前端地址/调用                        | 说明                                       |
+| -------- | ------------------------------------ | ------------------------------------------ |
+| 通知中心 | `/notifications`                     | 全部、未读、已读筛选与分页                 |
+| 通知详情 | `/notifications/:id`                 | 支持浏览器刷新和直接访问                   |
+| 未读数量 | `GET /sys/notification/unread/count` | 驱动铃铛右上角数量角标，超过 99 显示 `99+` |
+| 单条已读 | `PUT /sys/notification/{id}/readed`  | 成功后同步更新列表及未读数                 |
+| 全部已读 | `PUT /sys/notification/all/readed`   | 清空当前用户未读数                         |
+
+WebSocket 只负责实时增量通知，不替代数据库与 REST 接口。页面刷新后由 REST 恢复完整状态；退出登录时会关闭连接并清空用户通知状态。当前客户端未做自动重连，网络恢复后需重新进入登录态或刷新页面建立连接。
+
+### 消息通知测试
+
+通知模块包含页面、详情和 Pinia 状态测试，主要覆盖：
+
+- 全部、未读、已读筛选和分页参数；
+- 单条与全部已读后的状态同步；
+- WebSocket 消息去重、最近 6 条截断及未读数累加；
+- 雪花 ID 字符串透传；
+- 独立详情加载和详情页标记已读。
+
+可单独运行全部单元测试：
+
+```bash
+npm run test:unit -- --run
+```
+
 ## 开发规范
 
 - 使用 `<script setup lang="ts">` 和 Composition API。
@@ -179,6 +248,13 @@ ProPageHeader + ProSearch + ProToolbar + ProTable + ReferPicker
 - 状态操作必须同时校验当前选中记录和允许流转的业务状态。
 - 后端 `Long` 主键在前端统一使用字符串，不执行 `Number(id)` 转换。
 - 提交前至少执行 `npm run type-check` 和 `npm run build-only`。
+
+## 部署说明
+
+- SPA 服务器需要将未知前端路由回退到 `index.html`，否则直接访问 `/notifications/:id` 会返回 404。
+- 反向代理需要同时转发 REST 请求与 `/ws/notification`，并启用 WebSocket Upgrade/Connection 请求头。
+- 推荐让 REST 与 WebSocket 共用同一 HTTPS 域名；如使用独立地址，通过 `VITE_WS_URL` 指定完整 `wss://` URL。
+- `VITE_` 环境变量会写入浏览器构建产物，不得存放数据库密码、JWT 密钥或其他服务端凭据。
 
 ## 参与贡献
 
