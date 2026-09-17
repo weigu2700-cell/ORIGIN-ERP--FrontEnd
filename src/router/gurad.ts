@@ -5,6 +5,7 @@ import { usePermissionStore } from '@/stores/permission.ts'
 import { generateRoutes } from '@/router/routes.ts'
 import { recordSystemActivity } from '@/utils/systemActivity'
 import { useNavigationStore } from '@/stores/navigation'
+import { connectWebSocket } from '@/utils/websocket'
 
 export function setupRouterGuard(router: Router) {
   router.afterEach((to) => {
@@ -37,6 +38,7 @@ export function setupRouterGuard(router: Router) {
         return { name: 'login' }
       }
     }
+    connectWebSocket()
     if (!permissionStore.routesLoaded) {
       await permissionStore.menuLoad()
       const dynamicRoutes = generateRoutes(permissionStore.menuList)

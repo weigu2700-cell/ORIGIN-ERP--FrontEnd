@@ -116,3 +116,10 @@ export const TransactionType = defineEnum({ INBOUND: 1, RESERVE: 2, RELEASE: 3, 
   3: '释放预占',
   4: '出库',
 })
+export const NotificationType = defineEnum({ SYSTEM: 0, BUSINESS: 1, WARNING: 2, TASK: 3, CUSTOM: 4 } as const, {
+  0: '系统通知',
+  1: '业务通知',
+  2: '警告通知',
+  3: '任务通知',
+  4: '自定义通知',
+})
