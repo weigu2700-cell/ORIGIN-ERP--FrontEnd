@@ -188,6 +188,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/eip/notification/index.vue'),
         meta: { title: '消息通知' },
       },
+      {
+        path: 'notifications/:id',
+        name: 'notification-detail',
+        component: () => import('@/views/eip/notification/detail.vue'),
+        meta: { title: '通知详情' },
+      },
     ],
   },
   {
