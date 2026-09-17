@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 import {
   ArrowDown,
-  Bell,
   Check,
   FullScreen,
   Menu as MenuIcon,
@@ -17,6 +16,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user.ts'
 import useAppStore, { type ColorScheme } from '@/stores/app.ts'
 import Breadcrumb from '@/layout/components/breadcrumb.vue'
+import NotificationPopover from '@/layout/components/NotificationPopover.vue'
 import { usePermissionStore } from '@/stores/permission'
 import type { MenuItem, MenuSearchItem } from '@/types/system/menu'
 import { isClassIcon } from '@/utils/icon'
@@ -159,9 +159,7 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
       </el-tooltip>
       <div class="header-actions">
         <el-tooltip content="通知" placement="bottom">
-          <el-button class="header-icon-button" text circle aria-label="通知">
-            <el-icon><Bell /></el-icon>
-          </el-button>
+          <NotificationPopover />
         </el-tooltip>
         <el-tooltip content="刷新页面" placement="bottom">
           <el-button class="header-icon-button" text circle aria-label="刷新页面" @click="handleRefresh">

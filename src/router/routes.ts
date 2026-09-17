@@ -182,6 +182,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/profile/index.vue'),
         meta: { title: '个人中心' },
       },
+      {
+        path: 'notifications',
+        name: 'notification-center',
+        component: () => import('@/views/eip/notification/index.vue'),
+        meta: { title: '消息通知' },
+      },
     ],
   },
   {

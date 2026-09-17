@@ -6,13 +6,13 @@ export function getPageNotification(query: NotificationQuery) {
 }
 
 export function getUnreadCount() {
-  return service.get<number>('/sys/notification/unread-count')
+  return service.get<number | string>('/sys/notification/unread/count')
 }
 
 export function remarkRead(notificationId: string) {
-  return service.post<void>(`/sys/notification/${notificationId}/readed`)
+  return service.put<void>(`/sys/notification/${notificationId}/readed`)
 }
 
 export function remarkAllRead() {
-  return service.post<void>('/sys/notification/all/readed')
+  return service.put<void>('/sys/notification/all/readed')
 }
