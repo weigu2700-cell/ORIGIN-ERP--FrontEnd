@@ -52,7 +52,7 @@ describe('NotificationCenter', () => {
     vi.mocked(getPageNotification).mockResolvedValue(page())
   })
 
-  it('loads the first page and switches among all, unread and read filters', async () => {
+  it('加载首页并在全部、未读、已读筛选间切换', async () => {
     const wrapper = mount(NotificationCenter)
     await flushPromises()
 
@@ -69,7 +69,7 @@ describe('NotificationCenter', () => {
     expect(getPageNotification).toHaveBeenLastCalledWith({ pageNum: 1, pageSize: 10, isRead: true })
   })
 
-  it('changes page and page size through the local pagination query', async () => {
+  it('通过本地分页切换页码和每页条数', async () => {
     vi.mocked(getPageNotification).mockResolvedValue(page(records, 25))
     const wrapper = mount(NotificationCenter)
     await flushPromises()
@@ -84,7 +84,7 @@ describe('NotificationCenter', () => {
     expect(getPageNotification).toHaveBeenLastCalledWith({ pageNum: 1, pageSize: 20, isRead: null })
   })
 
-  it('marks one or all notifications read and refreshes the current page', async () => {
+  it('标记单条或全部通知为已读并刷新当前页', async () => {
     const wrapper = mount(NotificationCenter)
     await flushPromises()
     const initialCalls = vi.mocked(getPageNotification).mock.calls.length

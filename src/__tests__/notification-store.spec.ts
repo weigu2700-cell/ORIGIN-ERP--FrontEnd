@@ -36,7 +36,7 @@ describe('notification store', () => {
     vi.mocked(remarkAllRead).mockResolvedValue(undefined)
   })
 
-  it('deduplicates websocket messages and keeps only the six most recent items', () => {
+  it('去重 WebSocket 消息并仅保留最近六条', () => {
     const store = useNotificationStore()
 
     for (let index = 1; index <= 7; index += 1) {
@@ -50,7 +50,7 @@ describe('notification store', () => {
     expect(store.revision).toBe(7)
   })
 
-  it('updates the local unread count after marking a notification read', async () => {
+  it('标记通知已读后更新本地未读数', async () => {
     const store = useNotificationStore()
     store.receiveNotification(createNotification('9007199254740993'))
     store.unreadCount = 125
@@ -63,7 +63,7 @@ describe('notification store', () => {
     expect(store.unreadCount).toBe(124)
   })
 
-  it('clears user-specific notification state on reset', () => {
+  it('重置时清除用户通知状态', () => {
     const store = useNotificationStore()
     store.receiveNotification(createNotification('1'))
 

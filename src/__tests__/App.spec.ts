@@ -4,7 +4,7 @@ import { createPinia } from 'pinia'
 import App from '../App.vue'
 
 describe('App', () => {
-  it('renders the active route outlet', () => {
+  it('渲染当前路由出口', () => {
     const wrapper = mount(App, {
       global: {
         plugins: [createPinia()],
