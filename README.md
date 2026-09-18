@@ -50,20 +50,18 @@ ORIGIN ERP Web 是原点 ERP 的桌面管理端。项目采用 Vue 3、TypeScrip
 
 ## 项目截图
 
-> 将截图保存至 `screenshots/` 目录后替换下方图片路径。
-
 <div align="center">
-  <img src="./screenshots/device-management.png" alt="设备管理" width="90%" />
-  <p><em>设备管理 — 设备列表、状态筛选、批量操作与分页</em></p>
+  <img src="./screenshots/erp-home.png" alt="工作台" width="90%" />
+  <p><em>工作台 — 业务概览看板、用户信息展示与全局菜单搜索</em></p>
 
-  <img src="./screenshots/device-detail.png" alt="设备详情" width="90%" />
-  <p><em>设备详情 — 设备信息、扩展信息、产品信息与标签管理</em></p>
+  <img src="./screenshots/sales-order.png" alt="销售订单" width="90%" />
+  <p><em>销售订单 — 订单列表、新增/编辑、确认/取消与状态流转</em></p>
 
-  <img src="./screenshots/device-attributes.png" alt="设备属性" width="90%" />
-  <p><em>设备属性 — 实时温湿度数据展示与地理位置信息</em></p>
+  <img src="./screenshots/BOM.png" alt="BOM 管理" width="90%" />
+  <p><em>BOM 管理 — 多级树形结构、物料需求展开与启用/停用</em></p>
 
-  <img src="./screenshots/product-model.png" alt="物模型" width="90%" />
-  <p><em>物模型 — 功能点定义、数据类型、取值范围与读写权限配置</em></p>
+  <img src="./screenshots/notification.png" alt="消息通知" width="90%" />
+  <p><em>消息通知 — WebSocket 实时推送、未读角标与通知中心</em></p>
 </div>
 
 ## 技术栈
