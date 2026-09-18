@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import PageHeader from '../components/PageHeader.vue'
 
 describe('PageHeader', () => {
-  it('integrates title, search and toolbar content', () => {
+  it('集成标题、搜索和工具栏内容', () => {
     const wrapper = mount(PageHeader, {
       props: { title: '物料管理', description: '维护物料资料', summary: '共 12 条' },
       slots: {
@@ -19,7 +19,7 @@ describe('PageHeader', () => {
     expect(wrapper.get('.list-page-header__toolbar').text()).toBe('新增')
   })
 
-  it('does not render an empty controls row', () => {
+  it('不渲染空的控件行', () => {
     const wrapper = mount(PageHeader, { props: { title: '采购入库' } })
     expect(wrapper.find('.list-page-header__controls').exists()).toBe(false)
   })

@@ -41,7 +41,7 @@ describe('NotificationDetail', () => {
     vi.mocked(getNotificationDetail).mockResolvedValue({ ...notification })
   })
 
-  it('loads one notification by route id and renders its full content', async () => {
+  it('根据路由 ID 加载单条通知并渲染完整内容', async () => {
     const wrapper = mount(NotificationDetail)
     await flushPromises()
 
@@ -52,7 +52,7 @@ describe('NotificationDetail', () => {
     expect(wrapper.text()).toContain('未读')
   })
 
-  it('marks an unread notification as read from the detail page', async () => {
+  it('在详情页将未读通知标记为已读', async () => {
     const wrapper = mount(NotificationDetail)
     await flushPromises()
 

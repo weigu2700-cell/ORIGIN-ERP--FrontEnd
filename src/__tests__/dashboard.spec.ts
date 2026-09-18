@@ -44,7 +44,7 @@ const mockBackendResponse: DashboardOverview = {
 describe('getDashboardOverview', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('calls /system/dashboard and returns dashboard data', async () => {
+  it('调用 /system/dashboard 接口并返回仪表盘数据', async () => {
     vi.mocked(service.get).mockResolvedValue(mockBackendResponse)
 
     const result = await getDashboardOverview()

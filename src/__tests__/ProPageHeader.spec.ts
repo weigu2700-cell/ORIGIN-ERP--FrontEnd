@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import ProPageHeader from '../components/ProPageHeader.vue'
 
 describe('ProPageHeader', () => {
-  it('renders parent content and optional sections', () => {
+  it('渲染父级内容和可选区域', () => {
     const wrapper = mount(ProPageHeader, {
       props: { title: '采购订单', description: '采购进度', summary: '共 20 条' },
       slots: {
@@ -20,7 +20,7 @@ describe('ProPageHeader', () => {
     expect(wrapper.find('[role="group"]').exists()).toBe(false)
   })
 
-  it('emits controlled selection changes and clears an active filter', async () => {
+  it('触发受控选中变化并清除已激活筛选', async () => {
     const wrapper = mount(ProPageHeader, {
       props: {
         title: '订单',
@@ -39,7 +39,7 @@ describe('ProPageHeader', () => {
     expect(wrapper.get('button').attributes('aria-pressed')).toBe('false')
   })
 
-  it('omits unused slot sections', () => {
+  it('省略未使用的插槽区域', () => {
     const wrapper = mount(ProPageHeader, { props: { title: '物料' } })
     expect(wrapper.find('.header-actions').exists()).toBe(false)
     expect(wrapper.find('.search-section').exists()).toBe(false)
