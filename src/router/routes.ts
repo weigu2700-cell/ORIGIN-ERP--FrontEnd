@@ -110,7 +110,7 @@ function resolveViewComponent(rawPath?: string) {
     candidates.unshift('../views/home/home.vue')
   }
 
-  for (const candidate of [...new Set(candidates)]) {
+  for (const candidate of new Set(candidates)) {
     const component = module[candidate]
     if (component) return component
   }
@@ -183,16 +183,28 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '个人中心' },
       },
       {
-        path: 'notifications',
+        path: 'notification/list',
         name: 'notification-center',
-        component: () => import('@/views/eip/notification/index.vue'),
-        meta: { title: '消息通知' },
+        component: () => import('@/views/eip/notification/notificationList/index.vue'),
+        meta: { title: '我的通知' },
       },
       {
-        path: 'notifications/:id',
+        path: 'notification/detail/:id',
         name: 'notification-detail',
-        component: () => import('@/views/eip/notification/detail.vue'),
+        component: () => import('@/views/eip/notification/notificationDetail/detail.vue'),
         meta: { title: '通知详情' },
+      },
+      {
+        path: 'notification/template/create',
+        name: 'notification-template-create',
+        component: () => import('@/views/eip/notification/template/form.vue'),
+        meta: { title: '新建通知模板' },
+      },
+      {
+        path: 'notification/template/:id/edit',
+        name: 'notification-template-edit',
+        component: () => import('@/views/eip/notification/template/form.vue'),
+        meta: { title: '编辑通知模板' },
       },
     ],
   },

@@ -9,6 +9,7 @@ import { NotificationType } from '@/constants/enumCode'
 import { getPageNotification } from '@/api/eip/notification'
 import type { NotificationItem, NotificationPageResult, NotificationQuery } from '@/types/eip/notification'
 import useNotificationStore from '@/stores/notification'
+import { htmlToText } from '@/utils/sanitizeHtml'
 
 defineOptions({ name: 'NotificationCenter' })
 
@@ -266,7 +267,7 @@ onMounted(() => {
                 业务编号：{{ businessReference(item) }}
               </span>
             </div>
-            <p class="notification-content">{{ item.content || '暂无内容' }}</p>
+            <div class="notification-content">{{ htmlToText(item.content) || '暂无内容' }}</div>
           </div>
           <div class="notification-status">
             <span v-if="!item.isRead" class="unread-label">
@@ -533,10 +534,12 @@ onMounted(() => {
 
 .notification-content {
   margin: 9px 0 0;
+  overflow: hidden;
   color: var(--text-secondary);
   font-size: 13px;
   line-height: 1.65;
-  white-space: pre-wrap;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .notification-status {

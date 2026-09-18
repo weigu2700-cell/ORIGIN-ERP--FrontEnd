@@ -22,8 +22,13 @@ const router = useRouter()
 const appStore = useAppStore()
 const permissionStore = usePermissionStore()
 
+const filterVisibleMenus = (menus: MenuItem[]): MenuItem[] =>
+  menus
+    .filter((menu) => menu.visible !== 0)
+    .map((menu) => ({ ...menu, children: menu.children ? filterVisibleMenus(menu.children) : undefined }))
+
 const menuList = computed<MenuItem[]>(() => {
-  const menus = props.menus ?? permissionStore.menuList
+  const menus = filterVisibleMenus(props.menus ?? permissionStore.menuList)
   // 工作台是最常用的入口，固定在一级菜单第一位；其余菜单保留后端返回顺序。
   if (props.depth !== 0) return menus
   const isWorkbench = (menu: MenuItem) => {

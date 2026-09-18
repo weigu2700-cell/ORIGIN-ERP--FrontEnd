@@ -9,6 +9,7 @@ export interface MenuItem {
   path: string
   component: string
   icon?: string
+  visible?: number
   parentId?: string | null
   children?: MenuItem[]
 }
@@ -44,6 +45,7 @@ export interface MenuListVO {
   parentName: string | null
   component: string
   icon: string
+  permissionCode: string | null
   visible: number
   status: MenuStatus
 }
@@ -58,6 +60,7 @@ export interface MenuCreateRequest {
   path: string
   component: string
   icon: string | null
+  permissionCode: string | null
   parentId: string | null
   visible: number
   status: MenuStatus

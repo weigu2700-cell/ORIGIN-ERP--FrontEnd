@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { reactive } from 'vue'
-import NotificationCenter from '@/views/eip/notification/index.vue'
+import NotificationCenter from '@/views/eip/notification/notificationList/index.vue'
 import { getPageNotification } from '@/api/eip/notification'
 
 vi.mock('@/api/eip/notification', () => ({
-  getPageNotification: vi.fn(),
+  getPageNotification: vi.fn<(...args: unknown[]) => unknown>(),
 }))
 
 const notificationStore = reactive({
@@ -13,12 +13,12 @@ const notificationStore = reactive({
   unreadCount: 2,
   revision: 0,
   hasUnread: true,
-  markOneRead: vi.fn().mockResolvedValue(undefined),
-  markAllRead: vi.fn().mockResolvedValue(undefined),
+  markOneRead: vi.fn<(...args: unknown[]) => unknown>().mockResolvedValue(undefined),
+  markAllRead: vi.fn<(...args: unknown[]) => unknown>().mockResolvedValue(undefined),
 })
 
 vi.mock('@/stores/notification', () => ({
-  default: vi.fn(() => notificationStore),
+  default: vi.fn<() => typeof notificationStore>(() => notificationStore),
 }))
 
 const records = [

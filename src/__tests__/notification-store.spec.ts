@@ -5,10 +5,10 @@ import { getPageNotification, getUnreadCount, remarkAllRead, remarkRead } from '
 import type { NotificationItem } from '@/types/eip/notification'
 
 vi.mock('@/api/eip/notification', () => ({
-  getPageNotification: vi.fn(),
-  getUnreadCount: vi.fn(),
-  remarkRead: vi.fn(),
-  remarkAllRead: vi.fn(),
+  getPageNotification: vi.fn<(...args: unknown[]) => unknown>(),
+  getUnreadCount: vi.fn<(...args: unknown[]) => unknown>(),
+  remarkRead: vi.fn<(...args: unknown[]) => unknown>(),
+  remarkAllRead: vi.fn<(...args: unknown[]) => unknown>(),
 }))
 
 const createNotification = (id: string, isRead = false): NotificationItem => ({
