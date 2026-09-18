@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import ParentDeptSelector from "@/views/system/dept/components/parentDeptSelector.vue";
-import { CircleClose, Search } from "@element-plus/icons-vue";
-import type { DeptQuery } from "@/types/system/dept.ts";
-import ProSearch from "@/components/ProSearch.vue";
+import { reactive, ref } from 'vue'
+import ParentDeptSelector from '@/views/system/dept/components/parentDeptSelector.vue'
+import { CircleClose, Search } from '@element-plus/icons-vue'
+import type { DeptQuery } from '@/types/system/dept.ts'
+import ProSearch from '@/components/ProSearch.vue'
 
-let parentSelectorVisible = ref(false)
+const parentSelectorVisible = ref(false)
 
 type DeptQueryLocal = DeptQuery & {
   parentName: string | null
@@ -26,7 +26,7 @@ const emit = defineEmits<{
 }>()
 const statusOptions = [
   { label: '启用', value: 1 },
-  { label: '禁用', value: 0 }
+  { label: '禁用', value: 0 },
 ]
 
 const openParentSelector = () => {
@@ -38,7 +38,7 @@ const clearParent = () => {
   queryData.parentName = null
 }
 
-const handleParentSelect = (dept: { id: string, name: string }) => {
+const handleParentSelect = (dept: { id: string; name: string }) => {
   queryData.parentId = dept.id
   queryData.parentName = dept.name
   parentSelectorVisible.value = false
@@ -68,8 +68,13 @@ const handleReset = () => {
   <ProSearch class="dept-selector" @search="handleQuery" @reset="handleReset">
     <el-input v-model="queryData.name" placeholder="部门名称" clearable style="width: 160px; flex: 0 0 160px" />
     <el-input v-model="queryData.code" placeholder="部门编码" clearable style="width: 160px; flex: 0 0 160px" />
-    <el-input :model-value="queryData.parentName" readonly placeholder="点击选择上级部门" @click="openParentSelector"
-      style="width: 160px; flex: 0 0 160px">
+    <el-input
+      :model-value="queryData.parentName"
+      readonly
+      placeholder="点击选择上级部门"
+      @click="openParentSelector"
+      style="width: 160px; flex: 0 0 160px"
+    >
       <template #suffix>
         <el-icon v-if="queryData.parentName" class="field-icon" @click.stop="clearParent">
           <CircleClose />
@@ -88,7 +93,6 @@ const handleReset = () => {
 
 <style scoped>
 .dept-selector {
-
   .field-icon {
     cursor: pointer;
   }

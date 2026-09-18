@@ -18,6 +18,7 @@ const props = defineProps<{
   title?: string
   mode?: 'add' | 'edit'
   row?: EditRow | null
+  loading?: boolean
 }>()
 const emit = defineEmits<{
   (e: 'cancel'): void
@@ -35,6 +36,7 @@ const form = reactive<MenuSaveRequest>({
   path: '',
   component: '',
   icon: null,
+  permissionCode: null,
   parentId: null,
   visible: 1,
   status: EnableStatus.ENABLE,
@@ -69,6 +71,7 @@ const resetForm = () => {
   form.path = isEdit ? (props.row?.path ?? '') : ''
   form.component = isEdit ? (props.row?.component ?? '') : ''
   form.icon = isEdit ? (props.row?.icon ?? null) : null
+  form.permissionCode = isEdit ? (props.row?.permissionCode ?? null) : null
   form.parentId = isEdit ? (props.row?.parentId ?? null) : null
   form.visible = isEdit ? (props.row?.visible ?? 1) : 1
   form.status = isEdit ? (props.row?.status ?? EnableStatus.ENABLE) : EnableStatus.ENABLE
@@ -102,6 +105,7 @@ const handleCancel = () => {
     :visible="props.visible"
     :title="props.title ?? (props.mode === 'edit' ? '修改菜单' : '新增菜单')"
     width="500px"
+    :loading="props.loading"
     @cancel="handleCancel"
     @submit="handleSubmit"
   >
@@ -118,11 +122,16 @@ const handleCancel = () => {
       <el-form-item label="组件路径" prop="component">
         <el-input v-model="form.component" placeholder="请输入组件路径" clearable />
       </el-form-item>
+      <el-form-item label="关联权限" prop="permissionCode">
+        <el-input v-model="form.permissionCode" placeholder="例如 system:user:list；目录菜单可留空" clearable />
+      </el-form-item>
       <el-form-item label="图标" prop="icon">
         <el-select v-model="form.icon" placeholder="请选择图标（可搜索）" clearable filterable style="width: 100%">
           <el-option v-for="opt in iconOptions" :key="opt.name" :label="opt.name" :value="opt.name">
             <span class="icon-option">
-              <el-icon><component :is="opt.component" /></el-icon>
+              <el-icon>
+                <component :is="opt.component" />
+              </el-icon>
               <span>{{ opt.name }}</span>
             </span>
           </el-option>

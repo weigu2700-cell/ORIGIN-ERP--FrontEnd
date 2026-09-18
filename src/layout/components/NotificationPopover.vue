@@ -5,6 +5,7 @@ import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import useNotificationStore from '@/stores/notification'
 import { NotificationType } from '@/constants/enumCode'
+import { htmlToText } from '@/utils/sanitizeHtml'
 
 defineOptions({ name: 'NotificationPopover' })
 
@@ -77,16 +78,14 @@ const viewDetail = (notificationId: string) => {
     popper-class="notification-popover-popper"
   >
     <template #reference>
-      <el-badge
-        class="notification-badge"
-        :value="notificationStore.badgeText"
-        :hidden="!notificationStore.hasUnread"
-        :max="99"
-      >
+      <span class="notification-trigger">
         <el-button class="header-icon-button" text circle aria-label="通知" aria-haspopup="dialog">
           <el-icon><Bell /></el-icon>
         </el-button>
-      </el-badge>
+        <span v-if="notificationStore.hasUnread" class="notification-badge">
+          {{ notificationStore.badgeText }}
+        </span>
+      </span>
     </template>
 
     <section class="notification-panel" aria-label="通知中心">
@@ -138,7 +137,7 @@ const viewDetail = (notificationId: string) => {
               <span class="notification-item-title">{{ item.title || typeLabel(item.type) }}</span>
               <span class="notification-item-time">{{ formatTime(item.createTime) }}</span>
             </span>
-            <span class="notification-item-content">{{ item.content || '暂无内容' }}</span>
+            <span class="notification-item-content">{{ htmlToText(item.content) || '暂无内容' }}</span>
             <span class="notification-item-meta">{{ typeLabel(item.type) }}</span>
           </span>
           <span v-if="!item.isRead" class="notification-unread-dot" aria-label="未读" />
@@ -160,35 +159,44 @@ const viewDetail = (notificationId: string) => {
   max-width: calc(100vw - 32px);
 }
 
-.notification-badge {
+.notification-trigger {
   display: inline-flex;
+  position: relative;
   vertical-align: middle;
 }
 
-.notification-badge .header-icon-button {
+.header-icon-button {
   width: 34px;
   height: 34px;
   color: var(--text-secondary);
   font-size: 17px;
 }
 
-.notification-badge .header-icon-button:hover,
-.notification-badge .header-icon-button:focus-visible {
+.header-icon-button:hover,
+.header-icon-button:focus-visible {
   color: var(--el-color-primary);
   background: var(--color-primary-soft);
   outline: none;
 }
 
-.notification-badge :deep(.el-badge__content) {
-  top: 3px;
-  right: 3px;
+.notification-badge {
+  position: absolute;
+  z-index: 1;
+  top: -2px;
+  right: -5px;
   min-width: 17px;
   height: 17px;
   padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: 9px;
   border: 2px solid var(--panel-background);
+  background: var(--el-color-danger);
+  color: #fff;
+  text-align: center;
   line-height: 13px;
   font-size: 10px;
   font-weight: 700;
+  pointer-events: none;
 }
 
 .notification-panel {
@@ -337,14 +345,13 @@ const viewDetail = (notificationId: string) => {
 }
 
 .notification-item-content {
-  display: -webkit-box;
   margin-top: 3px;
   overflow: hidden;
   color: var(--text-secondary);
   font-size: 12px;
   line-height: 1.45;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .notification-item-meta {

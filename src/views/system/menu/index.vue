@@ -103,6 +103,7 @@ const openEditDialog = (row: MenuListVO) => {
     path: row.path,
     component: row.component,
     icon: row.icon ?? null,
+    permissionCode: row.permissionCode ?? null,
     parentId: row.parentId,
     parentName: row.parentName ?? '',
     visible: row.visible,
@@ -144,7 +145,10 @@ const handleCancel = () => {
   dialogVisible.value = false
 }
 
+const submitting = ref(false)
+
 const handleSubmit = async (form: MenuSaveRequest) => {
+  submitting.value = true
   try {
     if (dialogMode.value === 'edit' && form.id != null) {
       await updateMenu({
@@ -154,6 +158,7 @@ const handleSubmit = async (form: MenuSaveRequest) => {
         path: form.path,
         component: form.component ?? '',
         icon: form.icon ?? null,
+        permissionCode: form.permissionCode || '',
         parentId: form.parentId ?? null,
         visible: form.visible ?? 1,
         status: form.status,
@@ -166,6 +171,7 @@ const handleSubmit = async (form: MenuSaveRequest) => {
         path: form.path,
         component: form.component ?? '',
         icon: form.icon ?? null,
+        permissionCode: form.permissionCode || '',
         parentId: form.parentId ?? null,
         visible: form.visible ?? 1,
         status: form.status,
@@ -175,7 +181,9 @@ const handleSubmit = async (form: MenuSaveRequest) => {
     dialogVisible.value = false
     await handleQuery(queryData)
   } catch {
-    // 错误信息已由请求拦截器统一提示
+    ElMessage.error('操作失败，请稍后重试')
+  } finally {
+    submitting.value = false
   }
 }
 
@@ -263,6 +271,7 @@ onMounted(() => {
     :visible="dialogVisible"
     :mode="dialogMode"
     :row="editRow"
+    :loading="submitting"
     @submit="handleSubmit"
     @cancel="handleCancel"
   />

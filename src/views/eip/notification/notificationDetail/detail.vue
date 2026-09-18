@@ -7,6 +7,7 @@ import PageHeader from '@/components/PageHeader.vue'
 import { getNotificationDetail } from '@/api/eip/notification'
 import { NotificationType } from '@/constants/enumCode'
 import useNotificationStore from '@/stores/notification'
+import { sanitizeHtml } from '@/utils/sanitizeHtml'
 import type { NotificationItem } from '@/types/eip/notification'
 
 defineOptions({ name: 'NotificationDetail' })
@@ -151,7 +152,7 @@ onMounted(() => {
           </div>
         </header>
 
-        <div class="detail-content">{{ notification.content || '暂无内容' }}</div>
+        <div class="detail-content" v-html="sanitizeHtml(notification.content || '暂无内容')" />
 
         <dl class="detail-info">
           <div v-if="businessReference">

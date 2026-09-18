@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
-import NotificationDetail from '@/views/eip/notification/detail.vue'
+import NotificationDetail from '@/views/eip/notification/notificationDetail/detail.vue'
 import { getNotificationDetail } from '@/api/eip/notification'
 
-const back = vi.fn()
-const push = vi.fn()
-const markOneRead = vi.fn().mockResolvedValue(undefined)
+const back = vi.fn<(...args: unknown[]) => unknown>()
+const push = vi.fn<(...args: unknown[]) => unknown>()
+const markOneRead = vi.fn<(...args: unknown[]) => unknown>().mockResolvedValue(undefined)
 
 vi.mock('vue-router', () => ({
   useRoute: () => ({ params: { id: '9007199254740993' } }),
@@ -13,7 +13,7 @@ vi.mock('vue-router', () => ({
 }))
 
 vi.mock('@/api/eip/notification', () => ({
-  getNotificationDetail: vi.fn(),
+  getNotificationDetail: vi.fn<(...args: unknown[]) => unknown>(),
 }))
 
 vi.mock('@/stores/notification', () => ({
@@ -21,7 +21,7 @@ vi.mock('@/stores/notification', () => ({
 }))
 
 vi.mock('element-plus', () => ({
-  ElMessage: { success: vi.fn(), error: vi.fn() },
+  ElMessage: { success: vi.fn<(...args: unknown[]) => unknown>(), error: vi.fn<(...args: unknown[]) => unknown>() },
 }))
 
 const notification = {
