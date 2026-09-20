@@ -21,7 +21,11 @@ export function getConversationDetail(conversationId: string) {
 }
 
 export function archiveConversation(conversationId: string) {
-  return Service.put<AiConversationCreated>(`/ai/conversation/${conversationId}/archive`)
+  // 旧服务仍从请求体读取 ID；先编码成 JSON 字符串，避免 Axios 将雪花 ID 转成不安全的 Number。
+  return Service.put<AiConversationCreated>(
+    `/ai/conversation/${conversationId}/archive`,
+    JSON.stringify(conversationId),
+  )
 }
 
 export function sendMessage(request: AiRequest) {
