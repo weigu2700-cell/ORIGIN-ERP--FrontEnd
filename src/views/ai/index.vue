@@ -272,7 +272,7 @@ onBeforeUnmount(() => streamController?.abort())
     <aside class="sidebar round">
       <div class="sidebar-brand">
         <div>
-          <small>ORIGIN</small>
+          <small>ORIGIN AI</small>
           <strong>对话工作区</strong>
         </div>
       </div>
