@@ -9,7 +9,7 @@ vi.mock('@/api/ai/ai', () => ({
   archiveConversation: vi.fn(),
   getConversationList: vi.fn(),
   getMessageList: vi.fn(),
-  sendMessage: vi.fn(),
+  sendMessageStream: vi.fn(),
 }))
 
 vi.mock('element-plus', () => ({
@@ -47,5 +47,36 @@ describe('AI 会话归档', () => {
     expect(archiveConversation).toHaveBeenCalledWith(conversation.id)
     expect(wrapper.find('.conversation-group.archived-group').text()).toContain('库存查询')
     expect(wrapper.find('.conversation-group:not(.archived-group)').exists()).toBe(false)
+  })
+})
+
+describe('AI 会话定位', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    vi.mocked(getConversationList).mockResolvedValue([{ ...conversation }])
+    vi.mocked(getMessageList).mockResolvedValue([
+      {
+        id: 'message-1',
+        conversationId: conversation.id,
+        role: 'assistant',
+        content: '最新回复',
+        createTime: conversation.createTime,
+        updateTime: conversation.updateTime,
+        deleted: 0,
+      },
+    ])
+  })
+
+  it('进入页面时在消息渲染完成后滚到最新记录', async () => {
+    const wrapper = mount(AiWorkspace)
+    const scroll = wrapper.get('.message-scroll').element as HTMLElement
+    Object.defineProperty(scroll, 'scrollHeight', {
+      get: () => (scroll.querySelector('.message') ? 600 : 0),
+    })
+
+    await flushPromises()
+
+    expect(wrapper.get('.message').text()).toContain('最新回复')
+    expect(scroll.scrollTop).toBe(600)
   })
 })

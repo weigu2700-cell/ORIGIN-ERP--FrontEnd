@@ -92,18 +92,18 @@ function applyTheme(mode: ThemeMode, scheme: ColorScheme) {
   root.style.setProperty('--el-color-primary-light-9', palette.light9)
   root.style.setProperty('--el-color-primary-dark-2', palette.dark)
   // 侧栏保持中性深色，只让选中条使用主题色，避免整块菜单被染成高饱和色。
-  const menuSurface = mode === 'dark' ? '#0e2530' : '#18384b'
-  const menuHover = mode === 'dark' ? '#173844' : '#234b60'
+  const menuSurface = mode === 'dark' ? '#171717' : '#18384b'
+  const menuHover = mode === 'dark' ? '#27272a' : '#234b60'
   const menuSub = 'transparent'
   root.style.setProperty('--menu-surface', menuSurface)
-  root.style.setProperty('--menu-text', mode === 'dark' ? '#cbd5e1' : '#d8e0ea')
+  root.style.setProperty('--menu-text', mode === 'dark' ? '#d4d4d8' : '#d8e0ea')
   root.style.setProperty('--menu-hover', menuHover)
   root.style.setProperty('--menu-active', mode === 'dark' ? palette.dark : palette.primary)
   root.style.setProperty('--menu-hover-bg', mode === 'dark' ? 'rgb(255 255 255 / 6%)' : 'rgb(255 255 255 / 8%)')
   root.style.setProperty('--menu-active-bg', mode === 'dark' ? 'rgb(242 193 106 / 14%)' : 'rgb(242 193 106 / 12%)')
-  root.style.setProperty('--menu-sub', menuSub)
+  root.style.setProperty('--menu-sub', mode === 'dark' ? '#202123' : menuSub)
   root.style.setProperty('--menu-brand-text', mode === 'dark' ? '#f8fafc' : '#ffffff')
-  root.style.setProperty('--menu-brand-muted', mode === 'dark' ? '#94a3b8' : '#a8b3c4')
+  root.style.setProperty('--menu-brand-muted', mode === 'dark' ? '#a1a1aa' : '#a8b3c4')
 }
 
 const useAppStore = defineStore('app', () => {

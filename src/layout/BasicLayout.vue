@@ -175,7 +175,7 @@ onMounted(() => {
 .main {
   grid-area: main;
   position: relative;
-  padding: 20px 24px 24px;
+  padding: 15px 15px 15px;
   background-color: var(--page-background);
   width: 100%;
   height: 100%;

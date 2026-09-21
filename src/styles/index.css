@@ -43,24 +43,45 @@
 }
 
 html.dark {
-  --page-background: #102630;
-  --panel-background: #173844;
-  --border-color: #2a4b58;
-  --text-primary: #e1edf1;
-  --text-secondary: #a6b6bd;
-  --menu-surface: #0e2530;
-  --menu-text: #c8d8de;
-  --menu-hover: #173844;
+  /* Codex-like neutral dark layers: page, surfaces and controls rise in small steps. */
+  --page-background: #202123;
+  --panel-background: #171717;
+  --border-color: #3f3f46;
+  --text-primary: #ececec;
+  --text-secondary: #a1a1aa;
+  --menu-surface: #171717;
+  --menu-text: #d4d4d8;
+  --menu-hover: #27272a;
   --menu-active: #245b78;
   --menu-hover-bg: rgb(255 255 255 / 7%);
   --menu-active-bg: rgb(242 193 106 / 13%);
-  --menu-sub: #102c38;
-  --menu-brand-text: #f8fafc;
-  --menu-brand-muted: #94a3b8;
-  --button-hover: #1e4653;
-  --shadow-panel: 0 4px 18px rgb(0 0 0 / 20%);
-  --scrollbar-thumb: rgb(148 163 184 / 34%);
-  --scrollbar-thumb-hover: rgb(203 213 225 / 58%);
+  --menu-sub: #202123;
+  --menu-brand-text: #f4f4f5;
+  --menu-brand-muted: #a1a1aa;
+  --button-hover: #27272a;
+  --shadow-panel: 0 4px 18px rgb(0 0 0 / 24%);
+  --scrollbar-thumb: rgb(161 161 170 / 34%);
+  --scrollbar-thumb-hover: rgb(212 212 216 / 58%);
+
+  /* Element Plus dark tokens are declared here so custom pages and library
+     components share the same neutral surfaces. */
+  --el-bg-color: #202123;
+  --el-bg-color-page: #202123;
+  --el-bg-color-overlay: #27272a;
+  --el-fill-color: #27272a;
+  --el-fill-color-light: #242426;
+  --el-fill-color-lighter: #2a2a2d;
+  --el-fill-color-extra-light: #2f2f32;
+  --el-fill-color-dark: #1b1b1d;
+  --el-fill-color-darker: #151516;
+  --el-border-color: #3f3f46;
+  --el-border-color-light: #35353b;
+  --el-border-color-lighter: #2d2d32;
+  --el-border-color-extra-light: #29292d;
+  --el-text-color-primary: #ececec;
+  --el-text-color-regular: #d4d4d8;
+  --el-text-color-secondary: #a1a1aa;
+  --el-text-color-placeholder: #71717a;
 }
 
 html,
@@ -194,8 +215,8 @@ html.dark .el-select-dropdown {
 }
 
 html.dark .el-table th.el-table__cell {
-  background-color: #303134;
-  color: #bdc1c6;
+  background-color: #27272a;
+  color: #d4d4d8;
 }
 
 .center {

@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ArrowUp, ChatDotRound, CollectionTag, Plus, Refresh } from '@element-plus/icons-vue'
-import { addConversation, archiveConversation, getConversationList, getMessageList, sendMessage } from '@/api/ai/ai'
+import { ArrowUp, ChatDotRound, CollectionTag, Plus, Refresh, VideoPause } from '@element-plus/icons-vue'
+import {
+  addConversation,
+  archiveConversation,
+  getConversationList,
+  getMessageList,
+  sendMessageStream,
+} from '@/api/ai/ai'
 import type { AiConversationList, AiMessageResponse } from '@/types/ai/ai'
 import { renderAiMarkdown } from '@/utils/renderAiMarkdown'
 
@@ -20,6 +26,7 @@ const listError = ref(false)
 const messagesError = ref(false)
 const messageListRef = ref<HTMLElement>()
 let requestSequence = 0
+let streamController: AbortController | null = null
 
 const selected = computed(() => conversations.value.find((item) => item.id === selectedId.value))
 const activeConversations = computed(() => conversations.value.filter((item) => item.status === 0))
@@ -52,22 +59,28 @@ const loadMessages = async (id: string) => {
   const sequence = ++requestSequence
   messagesLoading.value = true
   messagesError.value = false
+  let loaded = false
 
   try {
     const result = await getMessageList(id)
     if (sequence === requestSequence && selectedId.value === id) {
       messages.value = result
-      await scrollBottom()
+      loaded = true
     }
   } catch {
     if (sequence === requestSequence && selectedId.value === id) messagesError.value = true
   } finally {
-    if (sequence === requestSequence) messagesLoading.value = false
+    if (sequence === requestSequence) {
+      messagesLoading.value = false
+      // 等消息替换加载态并完成 DOM 更新，再定位到最新一条。
+      if (loaded && selectedId.value === id) await scrollBottom()
+    }
   }
 }
 
 const selectConversation = (id: string) => {
   if (id === selectedId.value && !messagesError.value) return
+  stopStreaming()
   selectedId.value = id
   messages.value = []
   void loadMessages(id)
@@ -191,43 +204,72 @@ const handleSend = async () => {
     updateTime: now,
     deleted: 0,
   })
+
+  // 先插入空的助手消息，流式分片到达时直接追加到它的 content 上。
+  const assistantMessageId = `local-assistant-${Date.now()}`
+  messages.value.push({
+    id: assistantMessageId,
+    conversationId: id,
+    role: 'assistant',
+    content: '',
+    createTime: now,
+    updateTime: now,
+    deleted: 0,
+  })
   await scrollBottom()
 
   sending.value = true
   sendingConversationId.value = id
-  try {
-    const result = await sendMessage({ conversationId: id, message: content })
-    if (selectedId.value !== id) return
+  streamController = new AbortController()
 
-    const responseNow = new Date().toISOString()
-    messages.value.push({
-      id: `local-assistant-${Date.now()}`,
-      conversationId: id,
-      role: 'assistant',
-      content: result.content,
-      createTime: responseNow,
-      updateTime: responseNow,
-      deleted: 0,
-    })
-    await scrollBottom()
-    void loadConversations(false)
+  try {
+    await sendMessageStream(
+      { conversationId: id, message: content },
+      {
+        onChunk: (chunk) => {
+          if (selectedId.value !== id) return
+          const target = messages.value.find((message) => message.id === assistantMessageId)
+          if (!target) return
+          if (chunk.content) target.content += chunk.content
+          if (chunk.messageId) target.id = chunk.messageId
+          void scrollBottom()
+        },
+      },
+      streamController.signal,
+    )
+
+    if (selectedId.value === id) void loadConversations(false)
   } catch {
+    // 中断或失败时移除未完成的助手消息，并把输入内容还给用户。
     if (selectedId.value === id) {
-      draft.value = content
-      messages.value = messages.value.filter((message) => message.id !== localMessageId)
+      const target = messages.value.find((message) => message.id === assistantMessageId)
+      if (!target?.content) {
+        messages.value = messages.value.filter((message) => message.id !== assistantMessageId)
+        draft.value = content
+      }
     }
   } finally {
     sending.value = false
     sendingConversationId.value = ''
+    streamController = null
   }
 }
 
+/** 中断当前流式请求，已生成的内容保留在界面上。 */
+const stopStreaming = () => {
+  streamController?.abort()
+  streamController = null
+  sending.value = false
+  sendingConversationId.value = ''
+}
+
 onMounted(() => void loadConversations())
+onBeforeUnmount(() => streamController?.abort())
 </script>
 
 <template>
   <div class="ai-workspace round">
-    <aside class="sidebar">
+    <aside class="sidebar round">
       <div class="sidebar-brand">
         <div>
           <small>ORIGIN</small>
@@ -304,7 +346,7 @@ onMounted(() => void loadConversations())
         <div v-else-if="!listLoading && !conversations.length" class="state">还没有会话</div>
       </div>
     </aside>
-    <main class="chat-panel">
+    <main class="chat-panel round">
       <section ref="messageListRef" class="message-scroll">
         <div v-if="messagesLoading" class="loading-dots">
           <i />
@@ -322,12 +364,8 @@ onMounted(() => void loadConversations())
         <article v-for="message in messages" v-else :key="message.id" class="message" :class="message.role">
           <div class="bubble">
             <p v-if="message.role === 'user'">{{ message.content }}</p>
-            <div v-else class="markdown-body" v-html="renderAiMarkdown(message.content)" />
-          </div>
-        </article>
-        <article v-if="sending && sendingConversationId === selectedId" class="message assistant">
-          <div class="bubble">
-            <div class="typing">
+            <div v-else-if="message.content" class="markdown-body" v-html="renderAiMarkdown(message.content)" />
+            <div v-else class="typing">
               <i />
               <i />
               <i />
@@ -349,7 +387,18 @@ onMounted(() => void loadConversations())
           />
           <div>
             <span>{{ selectedIsArchived ? '已归档会话不可发送' : '' }}</span>
-            <el-button type="primary" circle :disabled="!canSend" aria-label="发送消息" @click="handleSend">
+            <el-button
+              v-if="sending && sendingConversationId === selectedId"
+              type="primary"
+              circle
+              aria-label="停止生成"
+              @click="stopStreaming"
+            >
+              <el-icon>
+                <VideoPause />
+              </el-icon>
+            </el-button>
+            <el-button v-else type="primary" circle :disabled="!canSend" aria-label="发送消息" @click="handleSend">
               <el-icon>
                 <ArrowUp />
               </el-icon>
@@ -366,20 +415,21 @@ onMounted(() => void loadConversations())
   --border: color-mix(in srgb, var(--el-border-color) 72%, transparent);
   --muted: var(--el-text-color-secondary);
   display: grid;
-  grid-template-columns: 252px minmax(0, 1fr);
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 15px;
   height: 100%;
   min-height: 560px;
   overflow: hidden;
   color: var(--el-text-color-primary);
-  background: var(--el-bg-color);
+  background: var(--page-background);
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
   padding: 22px 14px 14px;
-  background: color-mix(in srgb, var(--el-fill-color-light) 48%, var(--el-bg-color));
-  border-right: 1px solid var(--border);
+  border: 1px solid var(--border-color);
+  background: var(--panel-background);
 }
 
 .sidebar-brand {
@@ -528,6 +578,17 @@ onMounted(() => void loadConversations())
   background: var(--el-color-warning-light-9);
 }
 
+:global(html.dark) .new-button:hover,
+:global(html.dark) .conversation.active {
+  color: var(--el-color-primary-light-3);
+  background: color-mix(in srgb, var(--el-color-primary) 20%, var(--panel-background));
+}
+
+:global(html.dark) .archive-button:hover {
+  color: #e6b566;
+  background: color-mix(in srgb, #e6b566 16%, var(--panel-background));
+}
+
 .state {
   padding: 18px 8px;
   color: var(--muted);
@@ -548,7 +609,10 @@ onMounted(() => void loadConversations())
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   min-width: 0;
+  max-width: 100%;
   min-height: 0;
+  border: 1px solid var(--border-color);
+  background: var(--page-background);
 }
 
 .message-scroll {
@@ -594,7 +658,7 @@ onMounted(() => void loadConversations())
 .message {
   display: flex;
   width: 100%;
-  max-width: 760px;
+  max-width: 800px;
   margin: 0 auto 18px;
 }
 
@@ -603,7 +667,7 @@ onMounted(() => void loadConversations())
 }
 
 .bubble {
-  max-width: min(78%, 620px);
+  max-width: min(100%, 800px);
   padding: 10px 14px 11px;
   border: 1px solid color-mix(in srgb, var(--el-border-color) 52%, transparent);
   border-radius: 14px 14px 14px 4px;
