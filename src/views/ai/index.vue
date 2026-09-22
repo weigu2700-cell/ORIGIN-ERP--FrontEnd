@@ -228,17 +228,26 @@ const handleSend = async () => {
       {
         onChunk: (chunk) => {
           if (selectedId.value !== id) return
-          const target = messages.value.find((message) => message.id === assistantMessageId)
-          if (!target) return
-          if (chunk.content) target.content += chunk.content
-          if (chunk.messageId) target.id = chunk.messageId
-          void scrollBottom()
+
+          // 按后端返回的 type 决定前端动作。
+          switch (chunk.type) {
+            case '内容': {
+              const target = messages.value.find((message) => message.id === assistantMessageId)
+              if (!target) return
+              target.content += chunk.content
+              void scrollBottom()
+              break
+            }
+            case '标题': {
+              const conversation = conversations.value.find((item) => item.id === id)
+              if (conversation && chunk.content) conversation.title = chunk.content
+              break
+            }
+          }
         },
       },
       streamController.signal,
     )
-
-    if (selectedId.value === id) void loadConversations(false)
   } catch {
     // 中断或失败时移除未完成的助手消息，并把输入内容还给用户。
     if (selectedId.value === id) {
@@ -361,17 +370,19 @@ onBeforeUnmount(() => streamController?.abort())
         <div v-else-if="!messages.length" class="empty">
           <h1>今天想一起完成什么？</h1>
         </div>
-        <article v-for="message in messages" v-else :key="message.id" class="message" :class="message.role">
-          <div class="bubble">
-            <p v-if="message.role === 'user'">{{ message.content }}</p>
-            <div v-else-if="message.content" class="markdown-body" v-html="renderAiMarkdown(message.content)" />
-            <div v-else class="typing">
-              <i />
-              <i />
-              <i />
+        <template v-else>
+          <article v-for="message in messages" :key="message.id" class="message" :class="message.role">
+            <div class="bubble">
+              <p v-if="message.role === 'user'">{{ message.content }}</p>
+              <div v-else-if="message.content" class="markdown-body" v-html="renderAiMarkdown(message.content)" />
+              <div v-else class="typing">
+                <i />
+                <i />
+                <i />
+              </div>
             </div>
-          </div>
-        </article>
+          </article>
+        </template>
       </section>
       <footer class="composer-wrap">
         <div v-if="selectedIsArchived" class="archived-notice">这个会话已归档，仅供查看。请新建会话继续交流。</div>

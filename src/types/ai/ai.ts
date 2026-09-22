@@ -7,17 +7,18 @@ export interface AiAssistantResponse {
   content: string
 }
 
+/** 后端 SSE 分片类型，使用中文枚举值。 */
+export type AiStreamType = '内容' | '标题' | '错误'
+
 export interface AiStreamChunk {
-  content?: string
-  messageId?: string
-  conversationId?: string
-  done?: boolean
+  type: AiStreamType
+  content: string
 }
 
 /** 流式回调，由调用方决定如何渲染增量内容。 */
 export interface AiStreamHandlers {
   onChunk: (chunk: AiStreamChunk) => void
-  onComplete?: (chunk: AiStreamChunk) => void
+  onDone?: () => void
   onError?: (error: Error) => void
 }
 
