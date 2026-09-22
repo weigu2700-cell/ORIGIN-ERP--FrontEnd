@@ -7,8 +7,8 @@ export interface AiAssistantResponse {
   content: string
 }
 
-/** 后端 SSE 分片类型，使用中文枚举值。 */
-export type AiStreamType = '内容' | '标题' | '错误'
+/** 后端 SSE 分片类型。 */
+export type AiStreamType = 'CONTENT' | 'TITLE' | 'ERROR'
 
 export interface AiStreamChunk {
   type: AiStreamType
@@ -32,6 +32,13 @@ export interface AiMessageResponse {
   createTime: string
   updateTime: string
   deleted: number
+}
+
+type AiMessageStatus = 'streaming' | 'completed' | 'error' | 'cancelled'
+
+export interface AiMessageView extends AiMessageResponse {
+  status: AiMessageStatus
+  errorMessage?: string
 }
 
 export interface AiConversation {

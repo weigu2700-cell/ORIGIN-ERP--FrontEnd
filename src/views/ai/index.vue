@@ -9,11 +9,11 @@ import {
   getMessageList,
   sendMessageStream,
 } from '@/api/ai/ai'
-import type { AiConversationList, AiMessageResponse } from '@/types/ai/ai'
+import type { AiConversationList, AiMessageView } from '@/types/ai/ai'
 import { renderAiMarkdown } from '@/utils/renderAiMarkdown'
 
 const conversations = ref<AiConversationList>([])
-const messages = ref<AiMessageResponse[]>([])
+const messages = ref<AiMessageView[]>([])
 const selectedId = ref('')
 const draft = ref('')
 const listLoading = ref(false)
@@ -64,7 +64,8 @@ const loadMessages = async (id: string) => {
   try {
     const result = await getMessageList(id)
     if (sequence === requestSequence && selectedId.value === id) {
-      messages.value = result
+      // 历史消息均为已完成状态，补全视图层需要的 status 字段。
+      messages.value = result.map((message) => ({ ...message, status: 'completed' as const }))
       loaded = true
     }
   } catch {
@@ -203,6 +204,7 @@ const handleSend = async () => {
     createTime: now,
     updateTime: now,
     deleted: 0,
+    status: 'completed',
   })
 
   // 先插入空的助手消息，流式分片到达时直接追加到它的 content 上。
@@ -215,6 +217,7 @@ const handleSend = async () => {
     createTime: now,
     updateTime: now,
     deleted: 0,
+    status: 'streaming',
   })
   await scrollBottom()
 
@@ -231,16 +234,25 @@ const handleSend = async () => {
 
           // 按后端返回的 type 决定前端动作。
           switch (chunk.type) {
-            case '内容': {
+            case 'CONTENT': {
               const target = messages.value.find((message) => message.id === assistantMessageId)
               if (!target) return
               target.content += chunk.content
               void scrollBottom()
               break
             }
-            case '标题': {
+            case 'TITLE': {
+              // 标题由后端在流中下发，直接本地更新，无需再请求会话列表。
               const conversation = conversations.value.find((item) => item.id === id)
               if (conversation && chunk.content) conversation.title = chunk.content
+              break
+            }
+            case 'ERROR': {
+              const target = messages.value.find((message) => message.id === assistantMessageId)
+              if (!target) return
+              target.status = 'error'
+              target.errorMessage = chunk.content
+              void scrollBottom()
               break
             }
           }
@@ -248,13 +260,24 @@ const handleSend = async () => {
       },
       streamController.signal,
     )
-  } catch {
-    // 中断或失败时移除未完成的助手消息，并把输入内容还给用户。
+
+    // 流正常结束，标记助手消息为已完成。
+    const target = messages.value.find((message) => message.id === assistantMessageId)
+    if (target && target.status === 'streaming') target.status = 'completed'
+  } catch (error) {
+    // 中断或失败时保留已生成内容，并标记对应状态。
     if (selectedId.value === id) {
       const target = messages.value.find((message) => message.id === assistantMessageId)
-      if (!target?.content) {
+
+      if ((error as Error)?.name === 'AbortError') {
+        if (target) target.status = 'cancelled'
+      } else if (target && !target.content) {
+        // 没有任何内容时移除占位消息，并把输入内容还给用户。
         messages.value = messages.value.filter((message) => message.id !== assistantMessageId)
         draft.value = content
+      } else if (target) {
+        target.status = 'error'
+        target.errorMessage = (error as Error)?.message || '生成失败'
       }
     }
   } finally {
@@ -374,12 +397,21 @@ onBeforeUnmount(() => streamController?.abort())
           <article v-for="message in messages" :key="message.id" class="message" :class="message.role">
             <div class="bubble">
               <p v-if="message.role === 'user'">{{ message.content }}</p>
-              <div v-else-if="message.content" class="markdown-body" v-html="renderAiMarkdown(message.content)" />
-              <div v-else class="typing">
-                <i />
-                <i />
-                <i />
-              </div>
+              <template v-else>
+                <div v-if="message.content" class="markdown-body" v-html="renderAiMarkdown(message.content)" />
+
+                <div v-if="message.status === 'streaming' && !message.content" class="typing">
+                  <i />
+                  <i />
+                  <i />
+                </div>
+
+                <div v-if="message.status === 'error'" class="message-status error">
+                  {{ message.errorMessage }}
+                </div>
+
+                <div v-else-if="message.status === 'cancelled'" class="message-status">已停止生成</div>
+              </template>
             </div>
           </article>
         </template>
@@ -846,6 +878,17 @@ onBeforeUnmount(() => streamController?.abort())
 .loading-dots i:nth-child(3),
 .typing i:nth-child(3) {
   animation-delay: 0.3s;
+}
+
+.message-status {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--el-text-color-secondary);
+}
+
+.message-status.error {
+  color: var(--el-color-danger);
 }
 
 .composer-wrap {

@@ -109,15 +109,15 @@ export async function sendMessageStream(
       chunk = JSON.parse(payload) as AiStreamChunk
     } catch {
       // 非 JSON 分片按纯文本增量处理。
-      chunk = { type: '内容', content: payload }
+      chunk = { type: 'CONTENT', content: payload }
     }
 
     // 按后端返回的 type 决定前端动作：错误直接中断，其余交给调用方渲染。
     switch (chunk.type) {
-      case '错误':
+      case 'ERROR':
         fail(handlers, new Error(chunk.content || '发送消息失败'), '发送消息失败')
-      case '内容':
-      case '标题':
+      case 'CONTENT':
+      case 'TITLE':
         handlers.onChunk(chunk)
         break
       default:
