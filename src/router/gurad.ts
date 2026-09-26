@@ -37,15 +37,25 @@ export function setupRouterGuard(router: Router) {
         return { name: 'login' }
       }
     }
+
     if (!permissionStore.routesLoaded) {
-      await permissionStore.menuLoad()
+      try {
+        await permissionStore.menuLoad()
+      } catch (error) {
+        // 菜单加载失败时中止本次导航，避免卡在空白页；下次导航会重试。
+        console.error('菜单加载失败：', error)
+        return false
+      }
+
       const dynamicRoutes = generateRoutes(permissionStore.menuList)
       dynamicRoutes.forEach((route) => {
         // 静态路由（如工作台 /home）优先作为兜底，避免同名动态路由覆盖正确组件。
         if (route.name && router.hasRoute(route.name)) return
         router.addRoute('BasicLayout', route)
       })
-      return to.fullPath
+
+      // 动态路由注册完成后重新匹配当前地址，确保新路由生效。
+      return { path: to.path, query: to.query, hash: to.hash, replace: true }
     }
 
     return true

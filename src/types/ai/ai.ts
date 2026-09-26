@@ -8,7 +8,7 @@ export interface AiAssistantResponse {
 }
 
 /** 后端 SSE 分片类型。 */
-export type AiStreamType = 'CONTENT' | 'TITLE' | 'ERROR'
+export type AiStreamType = 'CONTENT' | 'TITLE' | 'ACTION' | 'ERROR'
 
 export interface AiStreamChunk {
   type: AiStreamType
@@ -20,6 +20,17 @@ export interface AiStreamHandlers {
   onChunk: (chunk: AiStreamChunk) => void
   onDone?: () => void
   onError?: (error: Error) => void
+}
+
+export type AiActionType = 'APPROVE_PURCHASE_ORDER'
+
+export interface AiPendingAction {
+  token: string
+  actionType: AiActionType
+  bizNo: string
+  title: string
+  description: string
+  expireTime: string
 }
 
 export type AiMessageRole = 'user' | 'assistant'

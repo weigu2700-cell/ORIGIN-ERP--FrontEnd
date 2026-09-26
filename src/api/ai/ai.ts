@@ -47,6 +47,11 @@ export function getMessageList(conversationId: string) {
   return Service.get<AiMessageResponse[]>(`/ai/message/${conversationId}`)
 }
 
+/** token 对应的业务参数保存在服务端，前端只提交用户确认。 */
+export function executePendingAction(token: string) {
+  return Service.post<void>(`/ai/action/${encodeURIComponent(token)}/execute`)
+}
+
 /** 流式发送，支持中断与重试。 */
 export async function sendMessageStream(
   request: AiRequest,
@@ -118,6 +123,7 @@ export async function sendMessageStream(
         fail(handlers, new Error(chunk.content || '发送消息失败'), '发送消息失败')
       case 'CONTENT':
       case 'TITLE':
+      case 'ACTION':
         handlers.onChunk(chunk)
         break
       default:

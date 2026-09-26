@@ -5,11 +5,12 @@ import { ArrowUp, ChatDotRound, CollectionTag, Plus, Refresh, VideoPause } from 
 import {
   addConversation,
   archiveConversation,
+  executePendingAction,
   getConversationList,
   getMessageList,
   sendMessageStream,
 } from '@/api/ai/ai'
-import type { AiConversationList, AiMessageView } from '@/types/ai/ai'
+import type { AiConversationList, AiMessageView, AiPendingAction } from '@/types/ai/ai'
 import { renderAiMarkdown } from '@/utils/renderAiMarkdown'
 
 const conversations = ref<AiConversationList>([])
@@ -27,6 +28,7 @@ const messagesError = ref(false)
 const messageListRef = ref<HTMLElement>()
 let requestSequence = 0
 let streamController: AbortController | null = null
+const executingActionTokens = new Set<string>()
 
 const selected = computed(() => conversations.value.find((item) => item.id === selectedId.value))
 const activeConversations = computed(() => conversations.value.filter((item) => item.status === 0))
@@ -64,7 +66,6 @@ const loadMessages = async (id: string) => {
   try {
     const result = await getMessageList(id)
     if (sequence === requestSequence && selectedId.value === id) {
-      // 历史消息均为已完成状态，补全视图层需要的 status 字段。
       messages.value = result.map((message) => ({ ...message, status: 'completed' as const }))
       loaded = true
     }
@@ -176,6 +177,40 @@ const createConversation = async (skipMessageLoad = false) => {
   }
 }
 
+const confirmPendingAction = async (content: string) => {
+  let action: AiPendingAction
+  try {
+    action = JSON.parse(content) as AiPendingAction
+    if (!action.token || !action.title || !action.description) throw new Error('invalid action')
+  } catch {
+    ElMessage.error('操作确认信息无效，请重新发起')
+    return
+  }
+
+  if (executingActionTokens.has(action.token)) return
+
+  try {
+    await ElMessageBox.confirm(action.description, action.title, {
+      type: 'warning',
+      confirmButtonText: '确认执行',
+      cancelButtonText: '暂不执行',
+      closeOnClickModal: false,
+    })
+  } catch {
+    return
+  }
+
+  executingActionTokens.add(action.token)
+  try {
+    await executePendingAction(action.token)
+    ElMessage.success(`${action.bizNo} 操作成功`)
+  } catch {
+    ElMessage.error('操作执行失败，请重新发起')
+  } finally {
+    executingActionTokens.delete(action.token)
+  }
+}
+
 const handleSend = async () => {
   const content = draft.value.trim()
   if (
@@ -245,6 +280,10 @@ const handleSend = async () => {
               // 标题由后端在流中下发，直接本地更新，无需再请求会话列表。
               const conversation = conversations.value.find((item) => item.id === id)
               if (conversation && chunk.content) conversation.title = chunk.content
+              break
+            }
+            case 'ACTION': {
+              void confirmPendingAction(chunk.content)
               break
             }
             case 'ERROR': {
