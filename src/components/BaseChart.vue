@@ -7,16 +7,19 @@ import { CanvasRenderer } from 'echarts/renderers'
 
 use([BarChart, PieChart, GridComponent, LegendComponent, TooltipComponent, CanvasRenderer])
 
-const props = withDefaults(defineProps<{
-  option: EChartsCoreOption
-  loading?: boolean
-  empty?: boolean
-  emptyText?: string
-}>(), {
-  loading: false,
-  empty: false,
-  emptyText: '暂无数据',
-})
+const props = withDefaults(
+  defineProps<{
+    option: EChartsCoreOption
+    loading?: boolean
+    empty?: boolean
+    emptyText?: string
+  }>(),
+  {
+    loading: false,
+    empty: false,
+    emptyText: '暂无数据',
+  },
+)
 
 const chartEl = ref<HTMLElement>()
 let chart: ECharts | undefined
@@ -31,10 +34,13 @@ const render = async () => {
 }
 
 watch(() => [props.option, props.empty] as const, render, { deep: true })
-watch(() => props.loading, loading => {
-  if (loading) chart?.showLoading('default')
-  else chart?.hideLoading()
-})
+watch(
+  () => props.loading,
+  (loading) => {
+    if (loading) chart?.showLoading('default')
+    else chart?.hideLoading()
+  },
+)
 
 onMounted(() => {
   render()
@@ -58,7 +64,20 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.base-chart { width: 100%; height: 100%; min-height: 260px; }
-.base-chart__canvas { width: 100%; height: 100%; min-height: inherit; }
-.base-chart :deep(.el-empty) { height: 100%; padding: 20px 0; }
+.base-chart {
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+}
+
+.base-chart__canvas {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+}
+
+.base-chart :deep(.el-empty) {
+  height: 100%;
+  padding: 20px 0;
+}
 </style>
