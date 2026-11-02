@@ -11,11 +11,9 @@ import type {
 import Service from '@/utils/request'
 import { getToken } from '@/utils/auth'
 
-/** 统一错误出口：回调并抛出，避免调用方遗漏处理。 */
-function fail(handlers: AiStreamHandlers, error: unknown, fallback: string): never {
-  const normalized = error instanceof Error ? error : new Error(fallback)
-  handlers.onError?.(normalized)
-  throw normalized
+/** 统一抛错；错误回调只在最外层调用一次。 */
+function fail(error: unknown, fallback: string): never {
+  throw error instanceof Error ? error : new Error(fallback)
 }
 
 export function getConversationList() {
@@ -58,25 +56,29 @@ export async function sendMessageStream(
   handlers: AiStreamHandlers,
   signal?: AbortSignal,
 ): Promise<void> {
-  const token = getToken()
-
-  let response: Response
   try {
-    response = await fetch(`${import.meta.env.VITE_API_URL}/ai/assistant/chat/stream`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-      body: JSON.stringify(request),
-      signal,
-    })
+    await readMessageStream(request, handlers, signal)
   } catch (error) {
-    // 主动中断（AbortError）交由调用方处理，其余网络错误统一回调。
     if ((error as Error)?.name === 'AbortError') throw error
-    fail(handlers, error, '流式请求失败')
+    const normalized = error instanceof Error ? error : new Error('流式请求失败')
+    handlers.onError?.(normalized)
+    throw normalized
   }
+}
+
+async function readMessageStream(request: AiRequest, handlers: AiStreamHandlers, signal?: AbortSignal): Promise<void> {
+  const token = getToken()
+  const baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+  const response = await fetch(`${baseUrl}/ai/assistant/chat/stream`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'text/event-stream',
+      Authorization: token ? `Bearer ${token}` : '',
+    },
+    body: JSON.stringify(request),
+    signal,
+  })
 
   if (response.status !== 200) {
     const text = await response.text()
@@ -89,72 +91,89 @@ export async function sendMessageStream(
         message = text.trim() || message
       }
     }
-    fail(handlers, new Error(message), message)
+    fail(new Error(message), message)
   }
 
   const reader = response.body?.getReader()
-  if (!reader) fail(handlers, null, '流式响应失败')
+  if (!reader) fail(null, '流式响应失败')
 
   const decoder = new TextDecoder()
-  let buffer = ''
+  let line = ''
+  let dataLines: string[] = []
+  let previousWasCR = false
+  let finished = false
+  let reachedEnd = false
 
-  /** 解析单条 SSE 事件，兼容 `data:` 前缀与纯 JSON 行。 */
-  const handleEvent = (raw: string) => {
-    const payload = raw
-      .split('\n')
-      .filter((line) => line.startsWith('data:'))
-      .map((line) => line.slice(5).trim())
-      .join('')
-      .trim()
-
-    if (!payload || payload === '[DONE]') return
-
+  const dispatch = () => {
+    if (!dataLines.length || finished) return
+    const payload = dataLines.join('\n').trim()
+    dataLines = []
+    if (!payload) return
+    if (payload === '[DONE]') {
+      finished = true
+      return
+    }
     let chunk: AiStreamChunk
     try {
       chunk = JSON.parse(payload) as AiStreamChunk
     } catch {
-      // 非 JSON 分片按纯文本增量处理。
       chunk = { type: 'CONTENT', content: payload }
     }
-
-    // 按后端返回的 type 决定前端动作：错误直接中断，其余交给调用方渲染。
     switch (chunk.type) {
       case 'ERROR':
-        fail(handlers, new Error(chunk.content || '发送消息失败'), '发送消息失败')
+        fail(new Error(chunk.content || '发送消息失败'), '发送消息失败')
       case 'CONTENT':
       case 'TITLE':
       case 'ACTION':
         handlers.onChunk(chunk)
         break
       default:
-        fail(handlers, new Error(`未知流类型 ${(chunk as AiStreamChunk).type}`), '未知流类型')
+        fail(new Error(`未知流类型 ${chunk.type}`), '未知流类型')
+    }
+  }
+
+  const consumeLine = () => {
+    if (!line) dispatch()
+    else if (line.startsWith('data:')) dataLines.push(line.slice(5).replace(/^ /, ''))
+    line = ''
+  }
+
+  // 按行解析，兼容 LF、CRLF、CR 及换行符被网络分片切开的情况。
+  const consume = (text: string) => {
+    for (const char of text) {
+      if (finished) break
+      if (previousWasCR) {
+        previousWasCR = false
+        if (char === '\n') continue
+      }
+      if (char === '\r' || char === '\n') {
+        consumeLine()
+        previousWasCR = char === '\r'
+      } else line += char
     }
   }
 
   try {
-    while (true) {
+    while (!finished) {
       const { done, value } = await reader.read()
-      if (done) break
-
-      buffer += decoder.decode(value, { stream: true })
-
-      // SSE 事件以空行分隔，逐条消费已完整到达的事件。
-      let separatorIndex = buffer.indexOf('\n\n')
-      while (separatorIndex !== -1) {
-        handleEvent(buffer.slice(0, separatorIndex))
-        buffer = buffer.slice(separatorIndex + 2)
-        separatorIndex = buffer.indexOf('\n\n')
+      if (done) {
+        reachedEnd = true
+        consume(decoder.decode())
+        if (line) consumeLine()
+        dispatch()
+        break
       }
+      consume(decoder.decode(value, { stream: true }))
     }
-
-    // 处理结尾可能残留的未以空行结束的事件。
-    if (buffer.trim()) handleEvent(buffer)
-
     handlers.onDone?.()
-  } catch (error) {
-    if ((error as Error)?.name === 'AbortError') throw error
-    fail(handlers, error, '流式响应读取失败')
   } finally {
-    reader.releaseLock()
+    // ERROR/[DONE] 提前结束时同时取消底层响应，释放服务端生成任务。
+    try {
+      if (!reachedEnd) await reader.cancel()
+    } catch {
+      // 清理失败不覆盖原始错误。
+    } finally {
+      reader.releaseLock()
+    }
   }
 }

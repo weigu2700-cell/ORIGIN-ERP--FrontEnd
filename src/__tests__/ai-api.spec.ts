@@ -59,3 +59,100 @@ describe('sendMessageStream', () => {
     expect(onChunk).toHaveBeenCalledWith({ type: 'ACTION', content: JSON.stringify(action) })
   })
 })
+
+it('逐字节分片也能解析 CRLF 和多行 data，保留中文 UTF-8 内容', async () => {
+  const bytes = new TextEncoder().encode(
+    ': heartbeat\r\ndata: {"type":"CONTENT",\r\ndata: "content":"中文回复"}\r\n\r\ndata: {"type":"TITLE","content":"库存"}\r\n\r\n',
+  )
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue(
+      new Response(
+        new ReadableStream({
+          start(controller) {
+            for (const byte of bytes) controller.enqueue(new Uint8Array([byte]))
+            controller.close()
+          },
+        }),
+      ),
+    ),
+  )
+  const onChunk = vi.fn()
+  const onDone = vi.fn()
+  await sendMessageStream({ conversationId: '1', message: '查询' }, { onChunk, onDone })
+  expect(onChunk.mock.calls.map(([chunk]) => chunk)).toEqual([
+    { type: 'CONTENT', content: '中文回复' },
+    { type: 'TITLE', content: '库存' },
+  ])
+  expect(onDone).toHaveBeenCalledTimes(1)
+})
+
+it('ERROR 只回调一次并取消响应，不执行完成回调', async () => {
+  const cancel = vi.fn()
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue(
+      new Response(
+        new ReadableStream({
+          start(controller) {
+            controller.enqueue(new TextEncoder().encode('data: {"type":"ERROR","content":"模型不可用"}\n\n'))
+          },
+          cancel,
+        }),
+      ),
+    ),
+  )
+  const onError = vi.fn()
+  const onDone = vi.fn()
+  await expect(
+    sendMessageStream(
+      { conversationId: '1', message: '你好' },
+      {
+        onChunk: vi.fn(),
+        onError,
+        onDone,
+      },
+    ),
+  ).rejects.toThrow('模型不可用')
+  expect(onError).toHaveBeenCalledTimes(1)
+  expect(onDone).not.toHaveBeenCalled()
+  expect(cancel).toHaveBeenCalledTimes(1)
+})
+
+it('[DONE] 之后不再处理事件并取消仍打开的响应', async () => {
+  const cancel = vi.fn()
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue(
+      new Response(
+        new ReadableStream({
+          start(controller) {
+            controller.enqueue(
+              new TextEncoder().encode('data: [DONE]\r\n\r\ndata: {"type":"CONTENT","content":"不应出现"}\r\n\r\n'),
+            )
+          },
+          cancel,
+        }),
+      ),
+    ),
+  )
+  const onChunk = vi.fn()
+  await sendMessageStream({ conversationId: '1', message: '你好' }, { onChunk })
+  expect(onChunk).not.toHaveBeenCalled()
+  expect(cancel).toHaveBeenCalledTimes(1)
+})
+
+it('用户中断不触发通用错误回调', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new DOMException('stopped', 'AbortError')))
+  const onError = vi.fn()
+  await expect(
+    sendMessageStream(
+      { conversationId: '1', message: '你好' },
+      {
+        onChunk: vi.fn(),
+        onError,
+      },
+    ),
+  ).rejects.toMatchObject({ name: 'AbortError' })
+  expect(onError).not.toHaveBeenCalled()
+})

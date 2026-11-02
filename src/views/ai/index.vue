@@ -28,6 +28,8 @@ const messagesError = ref(false)
 const messageListRef = ref<HTMLElement>()
 let requestSequence = 0
 let streamController: AbortController | null = null
+let streamingMessageId = ''
+let localMessageSequence = 0
 const executingActionTokens = new Set<string>()
 
 const selected = computed(() => conversations.value.find((item) => item.id === selectedId.value))
@@ -149,6 +151,7 @@ const loadConversations = async (selectFirst = true) => {
 
 const createConversation = async (skipMessageLoad = false) => {
   if (creating.value) return
+  stopStreaming()
   creating.value = true
 
   try {
@@ -228,9 +231,15 @@ const handleSend = async () => {
   const id = selectedId.value
   if (!id) return
 
+  // 在任何 await 前占用发送状态，旧请求只能结束自己的控制器。
+  const controller = new AbortController()
+  streamController = controller
+  sending.value = true
+  sendingConversationId.value = id
+  const localSequence = ++localMessageSequence
   draft.value = ''
   const now = new Date().toISOString()
-  const localMessageId = `local-user-${Date.now()}`
+  const localMessageId = `local-user-${Date.now()}-${localSequence}`
   messages.value.push({
     id: localMessageId,
     conversationId: id,
@@ -243,7 +252,7 @@ const handleSend = async () => {
   })
 
   // 先插入空的助手消息，流式分片到达时直接追加到它的 content 上。
-  const assistantMessageId = `local-assistant-${Date.now()}`
+  const assistantMessageId = `local-assistant-${Date.now()}-${localSequence}`
   messages.value.push({
     id: assistantMessageId,
     conversationId: id,
@@ -254,18 +263,16 @@ const handleSend = async () => {
     deleted: 0,
     status: 'streaming',
   })
-  await scrollBottom()
-
-  sending.value = true
-  sendingConversationId.value = id
-  streamController = new AbortController()
+  streamingMessageId = assistantMessageId
 
   try {
+    await scrollBottom()
+    if (controller.signal.aborted) return
     await sendMessageStream(
       { conversationId: id, message: content },
       {
         onChunk: (chunk) => {
-          if (selectedId.value !== id) return
+          if (selectedId.value !== id || streamController !== controller || controller.signal.aborted) return
 
           // 按后端返回的 type 决定前端动作。
           switch (chunk.type) {
@@ -297,15 +304,16 @@ const handleSend = async () => {
           }
         },
       },
-      streamController.signal,
+      controller.signal,
     )
 
+    if (streamController !== controller) return
     // 流正常结束，标记助手消息为已完成。
     const target = messages.value.find((message) => message.id === assistantMessageId)
     if (target && target.status === 'streaming') target.status = 'completed'
   } catch (error) {
     // 中断或失败时保留已生成内容，并标记对应状态。
-    if (selectedId.value === id) {
+    if (selectedId.value === id && streamController === controller) {
       const target = messages.value.find((message) => message.id === assistantMessageId)
 
       if ((error as Error)?.name === 'AbortError') {
@@ -320,22 +328,28 @@ const handleSend = async () => {
       }
     }
   } finally {
-    sending.value = false
-    sendingConversationId.value = ''
-    streamController = null
+    if (streamController === controller) {
+      sending.value = false
+      sendingConversationId.value = ''
+      streamingMessageId = ''
+      streamController = null
+    }
   }
 }
 
 /** 中断当前流式请求，已生成的内容保留在界面上。 */
 const stopStreaming = () => {
   streamController?.abort()
+  const target = messages.value.find((message) => message.id === streamingMessageId)
+  if (target?.status === 'streaming') target.status = 'cancelled'
+  streamingMessageId = ''
   streamController = null
   sending.value = false
   sendingConversationId.value = ''
 }
 
 onMounted(() => void loadConversations())
-onBeforeUnmount(() => streamController?.abort())
+onBeforeUnmount(stopStreaming)
 </script>
 
 <template>
