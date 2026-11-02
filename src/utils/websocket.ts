@@ -2,12 +2,39 @@ import useNotificationStore from '@/stores/notification'
 import type { NotificationItem } from '@/types/eip/notification'
 import { getToken } from '@/utils/auth'
 import { ElNotification } from 'element-plus'
+import { h, ref, type Ref } from 'vue'
 
 let socket: WebSocket | null = null
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null
 let reconnectDelay = 1000
 let manualClose = true
 let lifecycleBound = false
+let notificationToast: { count: Ref<number>; close: () => void } | null = null
+
+const showNotificationToast = (notification: NotificationItem) => {
+  // 一次下达可能按 BOM 产生多条不同的待办；逐条入库计数，共用一个实时提示。
+  if (notificationToast) {
+    notificationToast.count.value += 1
+    return
+  }
+
+  const toast = { count: ref(1), close: () => {} }
+  notificationToast = toast
+  toast.close = ElNotification({
+    title: '新通知',
+    type: 'info',
+    message: () =>
+      h(
+        'span',
+        toast.count.value === 1
+          ? notification.title || '收到一条新通知'
+          : `收到 ${toast.count.value} 条新通知，请在通知中心查看`,
+      ),
+    onClose: () => {
+      if (notificationToast === toast) notificationToast = null
+    },
+  }).close
+}
 
 const clearReconnectTimer = () => {
   if (reconnectTimer !== null) clearTimeout(reconnectTimer)
@@ -90,10 +117,7 @@ export function connectWebSocket() {
       const notificationStore = useNotificationStore()
       if (!notificationStore.receiveNotification(notification)) return
 
-      ElNotification({
-        title: notification.title || '通知',
-        type: 'info',
-      })
+      showNotificationToast(notification)
     } catch (error) {
       console.error('WebSocket 消息解析失败：', error)
     }
@@ -113,6 +137,9 @@ export function connectWebSocket() {
 
 export function disconnectWebSocket() {
   manualClose = true
+  const currentToast = notificationToast
+  notificationToast = null
+  currentToast?.close()
   clearReconnectTimer()
   reconnectDelay = 1000
   unbindLifecycle()
