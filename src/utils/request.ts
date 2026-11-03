@@ -18,7 +18,8 @@ type ScopedConfig = InternalAxiosRequestConfig & {
   releaseSession?: () => void
 }
 const http = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  // 生产环境使用同源接口时，从站点根目录发请求，避免相对路径叠加当前页面路径。
+  baseURL: import.meta.env.VITE_API_URL || '/',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 })

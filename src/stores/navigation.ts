@@ -13,10 +13,12 @@ const readHistory = (): NavigationHistoryItem[] => {
   try {
     const value: unknown = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? '[]')
     if (!Array.isArray(value)) return []
-    return value.filter(
-      (item): item is NavigationHistoryItem =>
-        !!item && typeof item === 'object' && typeof item.path === 'string' && typeof item.title === 'string',
-    )
+    return value
+      .filter(
+        (item): item is NavigationHistoryItem =>
+          !!item && typeof item === 'object' && typeof item.path === 'string' && typeof item.title === 'string',
+      )
+      .slice(-MAX_HISTORY)
   } catch {
     return []
   }

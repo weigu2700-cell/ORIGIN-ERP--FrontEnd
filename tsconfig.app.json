@@ -8,7 +8,9 @@
 
     // Path mapping for cleaner imports.
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      // 该依赖的 exports 未声明 types，显式指向它自带的类型文件。
+      "@wangeditor/editor-for-vue": ["./node_modules/@wangeditor/editor-for-vue/dist/src/index.d.ts"]
     },
 
     // `vue-tsc --build` produces a .tsbuildinfo file for incremental types-checking.
