@@ -2,6 +2,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { imApi } from '@/api/im'
 import { createChatSocket } from '@/utils/chatSocket'
+import { uuid } from '@/utils/uuid'
 import { useUserStore } from '@/stores/user'
 import {
   isLocalMessage,
@@ -34,7 +35,8 @@ export interface ImError extends Error {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 async function sha256Hex(file: File) {
-  if (!crypto.subtle) return '0'.repeat(64)
+  // crypto.subtle 同样只在安全上下文可用；拿不到真实校验值就不能上传，不能用假值糊弄服务端。
+  if (!crypto.subtle) throw new Error('当前页面地址不是安全上下文（需要 HTTPS 或 localhost），无法上传文件')
   const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer())
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
@@ -334,7 +336,7 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   // —— 发送 ——
-  const localId = () => `local-${crypto.randomUUID()}`
+  const localId = () => `local-${uuid()}`
 
   const patchLocal = (id: string, key: string, patch: Partial<LocalMessage>) => {
     const row = (timelines.value[id] ?? []).find((m) => isLocalMessage(m) && m.id === key) as LocalMessage | undefined
@@ -351,7 +353,7 @@ export const useChatStore = defineStore('chat', () => {
       seq: null,
       conversationId: id,
       senderId: myId.value,
-      clientMessageId: crypto.randomUUID(),
+      clientMessageId: uuid(),
       type: 'TEXT',
       text: null,
       file: null,
@@ -435,7 +437,7 @@ export const useChatStore = defineStore('chat', () => {
     uploadAborts.set(local.id, controller)
     try {
       const reservation = await imApi.reserveUpload({
-        clientUploadId: crypto.randomUUID(),
+        clientUploadId: uuid(),
         conversationId: id,
         name: file.name,
         size: file.size,
@@ -500,7 +502,7 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   async function createGroup(name: string, memberIds: string[]) {
-    const conv = await imApi.createGroup({ clientRequestId: crypto.randomUUID(), name, memberIds })
+    const conv = await imApi.createGroup({ clientRequestId: uuid(), name, memberIds })
     upsert(conv)
     await open(conv.id)
     return conv.id

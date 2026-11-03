@@ -1,4 +1,5 @@
 import { getToken } from '@/utils/auth'
+import { uuid } from '@/utils/uuid'
 import type { ConnectionState, ImApi, ImEvent } from '@/types/im'
 
 const CLIENT_ID_KEY = 'origin-erp:im-client-id'
@@ -7,7 +8,7 @@ const CLIENT_ID_KEY = 'origin-erp:im-client-id'
 export function getClientId() {
   let id = window.localStorage.getItem(CLIENT_ID_KEY)
   if (!id) {
-    id = crypto.randomUUID()
+    id = uuid()
     window.localStorage.setItem(CLIENT_ID_KEY, id)
   }
   return id
@@ -91,7 +92,7 @@ export function createChatSocket(api: ImApi, handlers: ChatSocketHandlers) {
           handlers.onState('online')
           handlers.onReady(String(frame.latestEventSeq ?? '0'))
           heartbeat = setInterval(() => {
-            if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'PING', nonce: crypto.randomUUID() }))
+            if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'PING', nonce: uuid() }))
           }, ticket.heartbeatSeconds * 1000)
           return
         }

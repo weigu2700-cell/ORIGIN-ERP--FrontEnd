@@ -103,7 +103,12 @@ watch(
 
 async function send(text: string) {
   if (!conv.value) return
-  await chat.sendText(conv.value.id, text)
+  try {
+    await chat.sendText(conv.value.id, text)
+  } catch (error) {
+    // 发送前的本地错误（例如浏览器不支持的 API）也要让用户看到，而不是静默丢失输入。
+    ElMessage.error(errorText(error))
+  }
 }
 
 async function sendFiles(files: File[]) {
