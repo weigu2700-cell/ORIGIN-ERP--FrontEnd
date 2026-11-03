@@ -124,7 +124,9 @@ const useNotificationStore = defineStore('notification', () => {
 
   async function markOneRead(notificationId: string) {
     const id = String(notificationId)
+    const version = sessionVersion
     await remarkRead(id)
+    if (version !== sessionVersion) return
     const current = notificationList.value.find((item) => item.id === id)
     let changed = false
     notificationList.value = notificationList.value.map((item) => {
@@ -136,7 +138,9 @@ const useNotificationStore = defineStore('notification', () => {
   }
 
   async function markAllRead() {
+    const version = sessionVersion
     await remarkAllRead()
+    if (version !== sessionVersion) return
     notificationList.value = notificationList.value.map((item) => ({ ...item, isRead: true }))
     unreadCount.value = 0
   }

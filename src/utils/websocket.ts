@@ -104,14 +104,14 @@ export function connectWebSocket() {
   socket = currentSocket
 
   currentSocket.onopen = () => {
-    if (socket !== currentSocket || manualClose) return
+    if (socket !== currentSocket || manualClose || getToken() !== token) return
     reconnectDelay = 1000
     console.log('WebSocket 连接成功')
     syncNotifications()
   }
 
   currentSocket.onmessage = (event) => {
-    if (socket !== currentSocket || manualClose || !getToken()) return
+    if (socket !== currentSocket || manualClose || getToken() !== token) return
     try {
       const notification = JSON.parse(event.data) as NotificationItem
       const notificationStore = useNotificationStore()

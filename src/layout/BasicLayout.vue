@@ -1,21 +1,33 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { watch, onBeforeUnmount } from 'vue'
 import Header from './components/header.vue'
 import Aside from './components/sidebar.vue'
 import Fold from './components/fold.vue'
 import useAppStore from '@/stores/app.ts'
 import useNotificationStore from '@/stores/notification'
-import { connectWebSocket } from '@/utils/websocket'
+import { connectWebSocket, disconnectWebSocket } from '@/utils/websocket'
 
+import { useUserStore } from '@/stores/user'
+import OrganizationUnavailable from '@/components/OrganizationUnavailable.vue'
+const userStore = useUserStore()
 const appStore = useAppStore()
 const notificationStore = useNotificationStore()
 
-onMounted(() => {
-  connectWebSocket()
-  void notificationStore.initialize().catch((error) => {
-    console.error('通知初始化失败：', error)
-  })
-})
+watch(
+  () => [userStore.businessAvailable, userStore.token, userStore.sessionLoaded] as const,
+  ([available, token, loaded]) => {
+    if (!available || !token || !loaded) {
+      disconnectWebSocket()
+      return
+    }
+    connectWebSocket()
+    void notificationStore.initialize().catch((error) => {
+      console.error('通知初始化失败：', error)
+    })
+  },
+  { immediate: true },
+)
+onBeforeUnmount(disconnectWebSocket)
 </script>
 
 <template>
@@ -35,13 +47,16 @@ onMounted(() => {
         <span>业务导航</span>
         <span class="sidebar-caption-line" />
       </div>
-      <Aside />
+      <Aside v-if="userStore.businessAvailable" />
+      <div v-else class="sidebar-caption">组织主页</div>
       <Fold />
     </el-aside>
     <el-main class="main">
-      <router-view v-slot="{ Component, route }">
+      <div v-if="!userStore.sessionLoaded" role="status">正在加载组织…</div>
+      <OrganizationUnavailable v-else-if="!userStore.businessAvailable" />
+      <router-view v-else v-slot="{ Component, route }">
         <transition name="route-page">
-          <div :key="route.fullPath" class="route-page">
+          <div :key="`${userStore.token}:${route.fullPath}`" class="route-page">
             <component :is="Component" />
           </div>
         </transition>
@@ -64,15 +79,17 @@ onMounted(() => {
 }
 
 .basic-layout {
-  grid-template-columns: var(--aside-width) 1fr;
+  /* 避免页头的内容最小宽度反过来撑大网格。 */
+  grid-template-columns: var(--aside-width) minmax(0, 1fr);
 }
 
 .basic-layout-collapse {
-  grid-template-columns: var(--aside-collapse-width) 1fr;
+  grid-template-columns: var(--aside-collapse-width) minmax(0, 1fr);
 }
 
 .header {
   grid-area: header;
+  min-width: 0;
   background-color: var(--panel-background);
   border-bottom: 1px solid var(--border-color);
   width: 100%;

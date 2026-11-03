@@ -9,7 +9,7 @@ import type {
   AiStreamHandlers,
 } from '@/types/ai/ai'
 import Service from '@/utils/request'
-import { getToken } from '@/utils/auth'
+import { getToken, captureSession, assertSession, isSessionCurrent, registerSessionAbort } from '@/utils/auth'
 
 /** 统一抛错；错误回调只在最外层调用一次。 */
 function fail(error: unknown, fallback: string): never {
@@ -56,13 +56,35 @@ export async function sendMessageStream(
   handlers: AiStreamHandlers,
   signal?: AbortSignal,
 ): Promise<void> {
+  const snapshot = captureSession()
+  const controller = new AbortController()
+  const cancel = () => controller.abort()
+  if (signal?.aborted) cancel()
+  signal?.addEventListener('abort', cancel)
+  const release = registerSessionAbort(cancel)
   try {
-    await readMessageStream(request, handlers, signal)
+    await readMessageStream(
+      request,
+      {
+        onChunk: (chunk) => {
+          assertSession(snapshot)
+          handlers.onChunk(chunk)
+        },
+        onDone: () => {
+          assertSession(snapshot)
+          handlers.onDone?.()
+        },
+      },
+      controller.signal,
+    )
   } catch (error) {
-    if ((error as Error)?.name === 'AbortError') throw error
+    if (!isSessionCurrent(snapshot) || controller.signal.aborted || (error as Error)?.name === 'AbortError') throw error
     const normalized = error instanceof Error ? error : new Error('流式请求失败')
     handlers.onError?.(normalized)
     throw normalized
+  } finally {
+    release()
+    signal?.removeEventListener('abort', cancel)
   }
 }
 

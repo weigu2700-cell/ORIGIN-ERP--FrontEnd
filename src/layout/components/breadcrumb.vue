@@ -7,7 +7,7 @@ const route = useRoute()
 const router = useRouter()
 const navigationStore = useNavigationStore()
 
-const breadcrumbList = computed(() => navigationStore.history)
+const breadcrumbList = computed(() => navigationStore.history.slice(-3))
 
 const isCurrent = (path: string) => path === route.fullPath
 
@@ -23,6 +23,7 @@ const navigateTo = (path: string) => {
       <el-breadcrumb-item v-for="item in breadcrumbList" :key="item.path">
         <button
           class="breadcrumb-link"
+          :title="item.title"
           :class="{ 'is-current': isCurrent(item.path) }"
           type="button"
           @click="navigateTo(item.path)"
@@ -40,8 +41,49 @@ const navigateTo = (path: string) => {
   align-items: center;
   gap: 12px;
   min-width: 0;
+  flex: 1 1 0;
+  overflow: hidden;
 }
 
+.navigation-breadcrumb :deep(.el-breadcrumb) {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  line-height: normal;
+}
+.navigation-breadcrumb :deep(.el-breadcrumb__item) {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  float: none;
+}
+.navigation-breadcrumb :deep(.el-breadcrumb__inner) {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* 优先保留当前页面，较早的访问记录先收缩。 */
+.navigation-breadcrumb :deep(.el-breadcrumb__item:last-child) {
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+.navigation-breadcrumb :deep(.el-breadcrumb__separator) {
+  flex: 0 0 auto;
+  margin: 0 8px;
+}
+@media (max-width: 1440px) {
+  .history-label {
+    display: none;
+  }
+}
+@media (max-width: 1100px) {
+  .navigation-breadcrumb :deep(.el-breadcrumb__item:not(:last-child)) {
+    display: none;
+  }
+}
 .history-label {
   flex: 0 0 auto;
   color: var(--text-secondary);
@@ -49,6 +91,8 @@ const navigateTo = (path: string) => {
 }
 
 .breadcrumb-link {
+  display: block;
+  min-width: 0;
   max-width: 128px;
   overflow: hidden;
   padding: 0;

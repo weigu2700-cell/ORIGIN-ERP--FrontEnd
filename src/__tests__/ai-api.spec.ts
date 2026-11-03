@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { sendMessageStream } from '@/api/ai/ai'
 
-vi.mock('@/utils/auth', () => ({
-  getToken: vi.fn(() => 'test-token'),
+vi.mock('@/utils/auth', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/utils/auth')>()),
+  getToken: vi.fn<() => string>(() => 'test-token'),
 }))
 
 describe('sendMessageStream', () => {
@@ -13,27 +14,27 @@ describe('sendMessageStream', () => {
   it('将非 200 响应体中的后端消息传给调用方并抛出异常', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(
+      vi.fn<() => Promise<Response>>().mockResolvedValue(
         new Response(JSON.stringify({ code: 404, msg: '对话不存在' }), {
           status: 404,
           headers: { 'Content-Type': 'application/json' },
         }),
       ),
     )
-    const onError = vi.fn()
+    const onError = vi.fn<() => void>()
 
     await expect(
-      sendMessageStream({ conversationId: '1', message: '你好' }, { onChunk: vi.fn(), onError }),
+      sendMessageStream({ conversationId: '1', message: '你好' }, { onChunk: vi.fn<() => void>(), onError }),
     ).rejects.toThrow('对话不存在')
     expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: '对话不存在' }))
   })
 
   it('200 响应没有 body 时回调并抛出流式响应错误', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 200 })))
-    const onError = vi.fn()
+    vi.stubGlobal('fetch', vi.fn<() => Promise<Response>>().mockResolvedValue(new Response(null, { status: 200 })))
+    const onError = vi.fn<() => void>()
 
     await expect(
-      sendMessageStream({ conversationId: '1', message: '你好' }, { onChunk: vi.fn(), onError }),
+      sendMessageStream({ conversationId: '1', message: '你好' }, { onChunk: vi.fn<() => void>(), onError }),
     ).rejects.toThrow('流式响应失败')
     expect(onError).toHaveBeenCalledWith(expect.objectContaining({ message: '流式响应失败' }))
   })
@@ -50,9 +51,11 @@ describe('sendMessageStream', () => {
     const event = `data: ${JSON.stringify({ type: 'ACTION', content: JSON.stringify(action) })}\n\n`
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(new Response(event, { status: 200, headers: { 'Content-Type': 'text/event-stream' } })),
+      vi
+        .fn<() => Promise<Response>>()
+        .mockResolvedValue(new Response(event, { status: 200, headers: { 'Content-Type': 'text/event-stream' } })),
     )
-    const onChunk = vi.fn()
+    const onChunk = vi.fn<() => void>()
 
     await sendMessageStream({ conversationId: '1', message: '审批订单' }, { onChunk })
 
@@ -66,7 +69,7 @@ it('逐字节分片也能解析 CRLF 和多行 data，保留中文 UTF-8 内容'
   )
   vi.stubGlobal(
     'fetch',
-    vi.fn().mockResolvedValue(
+    vi.fn<() => Promise<Response>>().mockResolvedValue(
       new Response(
         new ReadableStream({
           start(controller) {
@@ -77,8 +80,8 @@ it('逐字节分片也能解析 CRLF 和多行 data，保留中文 UTF-8 内容'
       ),
     ),
   )
-  const onChunk = vi.fn()
-  const onDone = vi.fn()
+  const onChunk = vi.fn<(chunk: unknown) => void>()
+  const onDone = vi.fn<() => void>()
   await sendMessageStream({ conversationId: '1', message: '查询' }, { onChunk, onDone })
   expect(onChunk.mock.calls.map(([chunk]) => chunk)).toEqual([
     { type: 'CONTENT', content: '中文回复' },
@@ -88,10 +91,10 @@ it('逐字节分片也能解析 CRLF 和多行 data，保留中文 UTF-8 内容'
 })
 
 it('ERROR 只回调一次并取消响应，不执行完成回调', async () => {
-  const cancel = vi.fn()
+  const cancel = vi.fn<() => void>()
   vi.stubGlobal(
     'fetch',
-    vi.fn().mockResolvedValue(
+    vi.fn<() => Promise<Response>>().mockResolvedValue(
       new Response(
         new ReadableStream({
           start(controller) {
@@ -102,13 +105,13 @@ it('ERROR 只回调一次并取消响应，不执行完成回调', async () => {
       ),
     ),
   )
-  const onError = vi.fn()
-  const onDone = vi.fn()
+  const onError = vi.fn<() => void>()
+  const onDone = vi.fn<() => void>()
   await expect(
     sendMessageStream(
       { conversationId: '1', message: '你好' },
       {
-        onChunk: vi.fn(),
+        onChunk: vi.fn<() => void>(),
         onError,
         onDone,
       },
@@ -120,10 +123,10 @@ it('ERROR 只回调一次并取消响应，不执行完成回调', async () => {
 })
 
 it('[DONE] 之后不再处理事件并取消仍打开的响应', async () => {
-  const cancel = vi.fn()
+  const cancel = vi.fn<() => void>()
   vi.stubGlobal(
     'fetch',
-    vi.fn().mockResolvedValue(
+    vi.fn<() => Promise<Response>>().mockResolvedValue(
       new Response(
         new ReadableStream({
           start(controller) {
@@ -136,20 +139,20 @@ it('[DONE] 之后不再处理事件并取消仍打开的响应', async () => {
       ),
     ),
   )
-  const onChunk = vi.fn()
+  const onChunk = vi.fn<() => void>()
   await sendMessageStream({ conversationId: '1', message: '你好' }, { onChunk })
   expect(onChunk).not.toHaveBeenCalled()
   expect(cancel).toHaveBeenCalledTimes(1)
 })
 
 it('用户中断不触发通用错误回调', async () => {
-  vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new DOMException('stopped', 'AbortError')))
-  const onError = vi.fn()
+  vi.stubGlobal('fetch', vi.fn<() => Promise<never>>().mockRejectedValue(new DOMException('stopped', 'AbortError')))
+  const onError = vi.fn<() => void>()
   await expect(
     sendMessageStream(
       { conversationId: '1', message: '你好' },
       {
-        onChunk: vi.fn(),
+        onChunk: vi.fn<() => void>(),
         onError,
       },
     ),

@@ -15,6 +15,7 @@ import { ClickOutside as vClickOutside, ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user.ts'
 import useAppStore, { type ColorScheme } from '@/stores/app.ts'
+import OrganizationSwitcher from '@/components/OrganizationSwitcher.vue'
 import Breadcrumb from '@/layout/components/breadcrumb.vue'
 import NotificationPopover from '@/layout/components/NotificationPopover.vue'
 import { usePermissionStore } from '@/stores/permission'
@@ -96,6 +97,7 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
 <template>
   <div class="header-container">
     <div class="left">
+      <OrganizationSwitcher />
       <Breadcrumb />
     </div>
     <div class="right">
@@ -185,7 +187,7 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="profile">个人中心</el-dropdown-item>
+            <el-dropdown-item v-if="userStore.businessAvailable" command="profile">个人中心</el-dropdown-item>
             <el-dropdown-item command="clear-cache">清除缓存</el-dropdown-item>
             <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
           </el-dropdown-menu>
@@ -232,8 +234,22 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    line-height: normal;
+  }
 
   .right {
+    flex: 0 0 auto;
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -425,5 +441,27 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
   color: var(--text-secondary);
   font-size: 12px;
   line-height: 1.7;
+}
+@media (max-width: 1440px) {
+  .header-container .right .header-search {
+    width: 180px;
+  }
+}
+@media (max-width: 1200px) {
+  .header-container .right .header-search {
+    display: none;
+  }
+  .header-container .right {
+    gap: 8px;
+  }
+}
+@media (max-width: 960px) {
+  .header-container .right .name {
+    display: none;
+  }
+  .header-container .right .header-icon-button[aria-label='全屏'],
+  .header-container .right .header-icon-button[aria-label='刷新页面'] {
+    display: none;
+  }
 }
 </style>

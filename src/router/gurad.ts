@@ -1,5 +1,6 @@
+import { installDynamicRoutes } from '@/router/dynamicRegistry'
 import type { Router } from 'vue-router'
-import { getToken } from '@/utils/auth.ts'
+import { getToken, captureSession, isSessionCurrent } from '@/utils/auth.ts'
 import { useUserStore } from '@/stores/user.ts'
 import { usePermissionStore } from '@/stores/permission.ts'
 import { generateRoutes } from '@/router/routes.ts'
@@ -15,6 +16,7 @@ export function setupRouterGuard(router: Router) {
   })
 
   router.beforeEach(async (to) => {
+    const snapshot = captureSession()
     const token = getToken()
     const useStore = useUserStore()
     const permissionStore = usePermissionStore()
@@ -26,16 +28,20 @@ export function setupRouterGuard(router: Router) {
       return true
     }
 
-    if (to.name === 'login') {
-      return { name: 'home' }
-    }
+    if (to.name === 'login') return useStore.sessionLoaded ? { name: 'home' } : true
 
-    if (!useStore.userInfo.id) {
-      const ok = await useStore.getUserInfo()
-      if (!ok) {
-        useStore.logout()
-        return { name: 'login' }
+    if (!useStore.sessionLoaded) {
+      try {
+        await useStore.getUserInfo()
+      } catch {
+        return isSessionCurrent(snapshot) ? { name: 'login' } : false
       }
+    }
+    if (!isSessionCurrent(snapshot)) return false
+    if (!useStore.businessAvailable) {
+      permissionStore.menuList = []
+      permissionStore.routesLoaded = true
+      return to.name === 'home' ? true : { name: 'home' }
     }
 
     if (!permissionStore.routesLoaded) {
@@ -48,11 +54,8 @@ export function setupRouterGuard(router: Router) {
       }
 
       const dynamicRoutes = generateRoutes(permissionStore.menuList)
-      dynamicRoutes.forEach((route) => {
-        // 静态路由（如工作台 /home）优先作为兜底，避免同名动态路由覆盖正确组件。
-        if (route.name && router.hasRoute(route.name)) return
-        router.addRoute('BasicLayout', route)
-      })
+      if (!isSessionCurrent(snapshot)) return false
+      installDynamicRoutes(router, dynamicRoutes)
 
       // 动态路由注册完成后重新匹配当前地址，确保新路由生效。
       return { path: to.path, query: to.query, hash: to.hash, replace: true }

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user.ts'
 import { User, Lock } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance } from 'element-plus'
-import useTrigger from '@/composables/useTrigger'
+import OrganizationPicker from '@/components/OrganizationPicker.vue'
+import { useOrganizationStore } from '@/stores/organization'
+import { getToken } from '@/utils/auth'
 
 defineOptions({ name: 'LoginPage' })
 
@@ -18,24 +20,37 @@ const rules = reactive({
   password: [{ required: true, message: '请输入密码', trigger: ['change'] }],
 })
 
-const handleLogin = useTrigger.throttle(() => {
-  formRef.value?.validate(async (valid) => {
-    if (!valid) return
+const organizations = useOrganizationStore()
+const errorMessage = ref('')
+onMounted(async () => {
+  await organizations.initialize()
+  if (getToken() && !userStore.sessionLoaded) {
     try {
-      loading.value = true
-      await userStore.login(form)
-      if (userStore.token) {
-        ElMessage.success('登录成功')
-        await userStore.getUserInfo()
-        router.push({ name: 'home' })
-      } else {
-        ElMessage.error('登录失败')
-      }
-    } finally {
-      loading.value = false
+      await userStore.getUserInfo()
+      await router.replace({ name: 'home' })
+    } catch {
+      errorMessage.value = '暂时无法验证会话，可重试或重新登录'
     }
-  })
-}, 500)
+  }
+})
+async function handleLogin() {
+  if (loading.value) return
+  loading.value = true
+  errorMessage.value = ''
+  try {
+    if (!(await formRef.value?.validate().catch(() => false))) return
+    if (!organizations.configuration) throw new Error('请先重试加载组织信息')
+    const organization = await organizations.verify()
+    await userStore.login({ ...form, tenantCode: organization.code })
+    ElMessage.success('登录成功')
+    await router.replace({ name: 'home' })
+  } catch (error) {
+    if ((error as Error).name !== 'AbortError')
+      errorMessage.value = error instanceof Error ? error.message : '登录失败，请重试'
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
@@ -63,12 +78,25 @@ const handleLogin = useTrigger.throttle(() => {
 
         <div class="login-title">
           <h1>欢迎登录</h1>
-          <p>请输入账号和密码进入系统</p>
+          <p>选择组织，使用该组织的账号登录</p>
         </div>
 
         <el-form ref="formRef" :model="form" :rules="rules" @submit.prevent="handleLogin">
+          <OrganizationPicker
+            :disabled="loading"
+            @change="
+              form.password = ''
+              errorMessage = ''
+            "
+          />
           <el-form-item prop="username">
-            <el-input v-model="form.username" placeholder="用户名" autocomplete="username">
+            <el-input
+              v-model="form.username"
+              aria-label="用户名"
+              :disabled="loading"
+              placeholder="用户名"
+              autocomplete="username"
+            >
               <template #prefix>
                 <el-icon>
                   <User />
@@ -79,6 +107,8 @@ const handleLogin = useTrigger.throttle(() => {
           <el-form-item prop="password">
             <el-input
               v-model="form.password"
+              aria-label="密码"
+              :disabled="loading"
               type="password"
               placeholder="密码"
               show-password
@@ -92,7 +122,16 @@ const handleLogin = useTrigger.throttle(() => {
               </template>
             </el-input>
           </el-form-item>
-          <el-button class="submit-button" type="primary" native-type="submit" :loading="loading">登录</el-button>
+          <p v-if="errorMessage" role="alert" class="login-error">{{ errorMessage }}</p>
+          <el-button
+            :disabled="organizations.initializing || !organizations.configuration || organizations.loading"
+            class="submit-button"
+            type="primary"
+            native-type="submit"
+            :loading="loading"
+          >
+            登录
+          </el-button>
         </el-form>
 
         <p class="login-help">账号问题请联系系统管理员</p>
@@ -258,6 +297,12 @@ const handleLogin = useTrigger.throttle(() => {
 .submit-button:focus {
   border-color: #183f55;
   background: #183f55;
+}
+
+.login-error {
+  color: #b63737;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .login-help {
