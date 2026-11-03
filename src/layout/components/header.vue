@@ -18,6 +18,7 @@ import useAppStore, { type ColorScheme } from '@/stores/app.ts'
 import OrganizationSwitcher from '@/components/OrganizationSwitcher.vue'
 import Breadcrumb from '@/layout/components/breadcrumb.vue'
 import NotificationPopover from '@/layout/components/NotificationPopover.vue'
+import MessageEntry from '@/layout/components/MessageEntry.vue'
 import { usePermissionStore } from '@/stores/permission'
 import type { MenuItem, MenuSearchItem } from '@/types/system/menu'
 import { isClassIcon } from '@/utils/icon'
@@ -160,6 +161,9 @@ const handleUserMenuCommand = (command: 'profile' | 'clear-cache' | 'logout') =>
         </el-button>
       </el-tooltip>
       <div class="header-actions">
+        <el-tooltip content="消息" placement="bottom">
+          <MessageEntry />
+        </el-tooltip>
         <el-tooltip content="通知" placement="bottom">
           <NotificationPopover />
         </el-tooltip>

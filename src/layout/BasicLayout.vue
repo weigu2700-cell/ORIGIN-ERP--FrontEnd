@@ -5,6 +5,7 @@ import Aside from './components/sidebar.vue'
 import Fold from './components/fold.vue'
 import useAppStore from '@/stores/app.ts'
 import useNotificationStore from '@/stores/notification'
+import { useChatStore } from '@/stores/chat'
 import { connectWebSocket, disconnectWebSocket } from '@/utils/websocket'
 
 import { useUserStore } from '@/stores/user'
@@ -12,22 +13,28 @@ import OrganizationUnavailable from '@/components/OrganizationUnavailable.vue'
 const userStore = useUserStore()
 const appStore = useAppStore()
 const notificationStore = useNotificationStore()
+const chatStore = useChatStore()
 
 watch(
   () => [userStore.businessAvailable, userStore.token, userStore.sessionLoaded] as const,
   ([available, token, loaded]) => {
     if (!available || !token || !loaded) {
       disconnectWebSocket()
+      chatStore.reset()
       return
     }
     connectWebSocket()
+    if (!chatStore.ready && !chatStore.disabledReason) void chatStore.bootstrap()
     void notificationStore.initialize().catch((error) => {
       console.error('通知初始化失败：', error)
     })
   },
   { immediate: true },
 )
-onBeforeUnmount(disconnectWebSocket)
+onBeforeUnmount(() => {
+  disconnectWebSocket()
+  chatStore.reset()
+})
 </script>
 
 <template>

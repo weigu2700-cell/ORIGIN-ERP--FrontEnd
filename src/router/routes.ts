@@ -183,6 +183,13 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '个人中心' },
       },
       {
+        // 消息是 BasicLayout 下的一级路由，不依赖菜单配置；通讯录位于消息页内部。
+        path: 'message/:conversationId?',
+        name: 'message',
+        component: () => import('@/views/message/index.vue'),
+        meta: { title: '消息' },
+      },
+      {
         path: 'notification/list',
         name: 'notification-center',
         component: () => import('@/views/eip/notification/notificationList/index.vue'),

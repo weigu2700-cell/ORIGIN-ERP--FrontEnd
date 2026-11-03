@@ -20,6 +20,7 @@ import router from '@/router'
 import { clearDynamicRoutes } from '@/router/dynamicRegistry'
 import { disconnectWebSocket } from '@/utils/websocket'
 import useNotificationStore from '@/stores/notification'
+import { useChatStore } from '@/stores/chat'
 import { ElMessage } from 'element-plus'
 
 export const useUserStore = defineStore('user', () => {
@@ -40,6 +41,7 @@ export const useUserStore = defineStore('user', () => {
     businessAvailable.value = true
     disconnectWebSocket()
     notifications.reset()
+    useChatStore().reset()
     permissions.$reset()
     clearDynamicRoutes()
     localStorage.removeItem('origin-erp:navigation-history')
