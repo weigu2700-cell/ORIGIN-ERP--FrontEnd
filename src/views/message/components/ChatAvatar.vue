@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Bell, UserFilled } from '@element-plus/icons-vue'
+import { Bell } from '@element-plus/icons-vue'
 import { avatarColor, initials } from '../utils'
 
 const props = withDefaults(
@@ -27,7 +27,11 @@ const style = computed(() => ({
 
 <template>
   <span class="chat-avatar" :style="style" :aria-label="name">
-    <el-icon v-if="kind === 'group'"><UserFilled /></el-icon>
+    <svg v-if="kind === 'group'" class="group-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="9" cy="9" r="3.2" />
+      <path d="M3 19a6 6 0 0 1 12 0" />
+      <path d="M16 6.2a3.2 3.2 0 0 1 0 5.6M18 14a6 6 0 0 1 3 5" />
+    </svg>
     <el-icon v-else-if="kind === 'system'"><Bell /></el-icon>
     <template v-else>{{ initials(name) }}</template>
   </span>
@@ -40,5 +44,14 @@ const style = computed(() => ({
   flex: none;
   color: #fff;
   font-weight: 700;
+}
+.group-icon {
+  width: 55%;
+  height: 55%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 </style>
