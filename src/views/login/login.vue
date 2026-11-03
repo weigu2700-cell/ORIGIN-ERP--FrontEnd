@@ -22,6 +22,12 @@ const rules = reactive({
 
 const organizations = useOrganizationStore()
 const errorMessage = ref('')
+
+// 切换组织后清空密码和上一次的错误提示。
+const handleOrganizationChange = () => {
+  form.password = ''
+  errorMessage.value = ''
+}
 onMounted(async () => {
   await organizations.initialize()
   if (getToken() && !userStore.sessionLoaded) {
@@ -82,13 +88,7 @@ async function handleLogin() {
         </div>
 
         <el-form ref="formRef" :model="form" :rules="rules" @submit.prevent="handleLogin">
-          <OrganizationPicker
-            :disabled="loading"
-            @change="
-              form.password = ''
-              errorMessage = ''
-            "
-          />
+          <OrganizationPicker :disabled="loading" @change="handleOrganizationChange" />
           <el-form-item prop="username">
             <el-input
               v-model="form.username"

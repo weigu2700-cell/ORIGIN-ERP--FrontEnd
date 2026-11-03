@@ -98,11 +98,7 @@ VITE_API_URL=http://localhost:8080
 npm run dev
 ```
 
-聊天（页头「消息」入口，路由 `/message`）依赖后端聊天模块的 `/im/*` 与 `/ws/chat`。后端聊天接口上线前，可用内存 Mock 联调界面：
-
-```bash
-VITE_IM_MOCK=1 npm run dev
-```
+聊天（页头「消息」入口，路由 `/message`）依赖后端聊天模块的 `/im/*` 与 `/ws/chat`；后端需设置 `IM_ENABLED=true`，并把页面地址写入 `IM_WEB_ORIGIN`（例如 `http://localhost:5173`），否则实时推送的 WebSocket 握手会被来源校验拒绝。
 
 打开终端输出的地址，通常为 <http://localhost:5173>。`VITE_` 变量会写入浏览器产物，只保存服务地址等公开配置。
 

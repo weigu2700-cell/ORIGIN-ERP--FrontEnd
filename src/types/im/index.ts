@@ -11,7 +11,11 @@ export interface ImConfig {
   maxFileBytes: number
   maxGroupMembers: number
   textMaxChars: number
+  textMaxUtf8Bytes: number
+  maxAttachmentsPerMessage: number
   allowedExtensions: string[]
+  syncRetentionDays: number
+  maxConnectionsPerUser: number
   [key: string]: unknown
 }
 
@@ -229,6 +233,7 @@ export interface ImApi {
     onProgress: (percent: number) => void,
     signal?: AbortSignal,
   ): Promise<void>
+  renewUpload(uploadId: string): Promise<UploadReservation>
   completeUpload(uploadId: string): Promise<UploadStatus>
   uploadStatus(uploadId: string): Promise<UploadStatus>
   cancelUpload(uploadId: string): Promise<UploadStatus>

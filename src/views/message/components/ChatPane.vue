@@ -36,6 +36,11 @@ const banner = computed(() => {
       type: 'error' as const,
       text: '网络已断开，新消息将在恢复连接后自动补拉；发送中的消息会标记失败，可重试。',
     }
+  if (chat.degraded && chat.connection !== 'online')
+    return {
+      type: 'warning' as const,
+      text: '实时连接暂时无法建立，消息每 30 秒自动刷新。若一直如此，请确认后端已允许当前页面地址（IM_WEB_ORIGIN）。',
+    }
   if (chat.connection === 'reconnecting' || chat.connection === 'connecting')
     return { type: 'warning' as const, text: '正在重新连接…已发送的内容不会丢失。' }
   return null

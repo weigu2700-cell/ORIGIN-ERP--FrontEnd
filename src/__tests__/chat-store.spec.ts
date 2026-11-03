@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 
 vi.mock('@/api/im', async () => {
-  const mock = await vi.importActual<typeof import('@/api/im/mock')>('@/api/im/mock')
-  return { imApi: mock.createMockImApi(0), imMockEnabled: true, mockUserId: mock.MOCK_ME }
+  const mock = await vi.importActual<typeof import('./support/imMock')>('./support/imMock')
+  return { imApi: mock.createMockImApi(0) }
 })
 vi.mock('@/stores/user', () => ({ useUserStore: () => ({ userInfo: { id: '80001' } }) }))
 

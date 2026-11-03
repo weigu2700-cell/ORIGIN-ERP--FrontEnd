@@ -12,7 +12,7 @@ import type {
 } from '@/types/im'
 
 /**
- * 内存 Mock：在后端聊天接口上线前用于联调界面（VITE_IM_MOCK=1）。
+ * 测试用内存聊天后端（仅供自动化测试使用，应用代码只走真实接口）。
  * 行为刻意贴近 api.md：seq/eventSeq 为字符串、幂等 clientMessageId、expectedVersion 冲突、
  * 解散后只读、文件上传 → 安全检查 → 通过/拦截。
  */
@@ -269,6 +269,10 @@ export function createMockImApi(delay = 120): ImApi {
         maxFileBytes: 50_000_000,
         maxGroupMembers: 200,
         textMaxChars: 4000,
+        textMaxUtf8Bytes: 16384,
+        maxAttachmentsPerMessage: 1,
+        syncRetentionDays: 7,
+        maxConnectionsPerUser: 5,
         allowedExtensions: ['jpg', 'jpeg', 'png', 'webp', 'pdf', 'docx', 'xlsx', 'pptx', 'txt', 'csv', 'zip'],
       }),
     contacts: ({ keyword, limit = 100 }) => {
@@ -472,6 +476,16 @@ export function createMockImApi(delay = 120): ImApi {
       onProgress(100)
       void reservation
     },
+    renewUpload: (uploadId) =>
+      wait({
+        uploadId,
+        method: 'PUT',
+        uploadUrl: `mock://upload/${uploadId}`,
+        requiredHeaders: {},
+        expiresAt: iso(-5),
+        reservationExpiresAt: iso(-1440),
+        maxFileBytes: 50_000_000,
+      }),
     completeUpload: (uploadId) => {
       const up = uploads.get(uploadId)
       if (!up) return fail(404, 'RESOURCE_NOT_FOUND', '上传不存在')

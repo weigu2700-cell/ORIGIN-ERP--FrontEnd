@@ -68,6 +68,7 @@ watch(
   border-radius: 12px;
   overflow: hidden;
 }
+
 .message-page.with-info {
   grid-template-columns: 320px minmax(0, 1fr) 300px;
 }

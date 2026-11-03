@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { imApi, imMockEnabled, mockUserId } from '@/api/im'
+import { imApi } from '@/api/im'
 import { createChatSocket } from '@/utils/chatSocket'
 import { useUserStore } from '@/stores/user'
 import {
@@ -57,6 +57,9 @@ export const useChatStore = defineStore('chat', () => {
   const disabledReason = ref<string | null>(null)
   const snapshotUnread = ref(0)
   const revokedNotice = ref<string | null>(null)
+  /** 实时连接长时间未建立：已改为定时 REST 补拉，界面提示原因而不是一直显示“重新连接”。 */
+  const degraded = ref(false)
+  let fallbackTimer: ReturnType<typeof setInterval> | null = null
 
   let cursor = '0'
   let session = 0
@@ -67,7 +70,7 @@ export const useChatStore = defineStore('chat', () => {
   const buffer = new Map<string, ImEvent>()
   const uploadAborts = new Map<string, AbortController>()
 
-  const myId = computed(() => (imMockEnabled ? mockUserId : (useUserStore().userInfo.id ?? '')))
+  const myId = computed(() => useUserStore().userInfo.id ?? '')
   const list = computed(() =>
     Object.values(conversations.value).sort(
       (a, b) =>
@@ -152,15 +155,28 @@ export const useChatStore = defineStore('chat', () => {
       return
     }
     socket = createChatSocket(imApi, {
-      onState: (state) => mine === session && (connection.value = state),
+      onState: (state) => {
+        if (mine !== session) return
+        connection.value = state
+        if (state === 'online') degraded.value = false
+      },
       onReady: () => mine === session && void sync(),
       onEvent: (event) => mine === session && applyEvent(event),
       onTerminated: () => undefined,
     })
     socket.start()
+    // 前台每 30 秒检查：WebSocket 没连上时仍用 REST 补拉事件，保证消息最终可见。
+    fallbackTimer = setInterval(() => {
+      if (mine !== session || connection.value === 'online') return
+      degraded.value = true
+      void sync()
+    }, 30_000)
   }
 
   function stopRealtime() {
+    if (fallbackTimer) clearInterval(fallbackTimer)
+    fallbackTimer = null
+    degraded.value = false
     unsubscribe?.()
     unsubscribe = null
     socket?.stop()
@@ -438,7 +454,7 @@ export const useChatStore = defineStore('chat', () => {
       let status = await imApi.uploadStatus(reservation.uploadId)
       for (const wait of [2000, 5000, 10_000, 10_000, 10_000, 10_000]) {
         if (status.status !== 'VERIFYING' && status.status !== 'INITIATED') break
-        await sleep(imMockEnabled ? 700 : wait)
+        await sleep(wait)
         if (controller.signal.aborted) return
         status = await imApi.uploadStatus(reservation.uploadId)
       }
@@ -567,6 +583,7 @@ export const useChatStore = defineStore('chat', () => {
   }
 
   return {
+    degraded,
     conversations,
     timelines,
     hasOlder,

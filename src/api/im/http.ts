@@ -60,6 +60,7 @@ export const httpImApi: ImApi = {
     })
   },
   completeUpload: (uploadId) => service.post<UploadStatus>(`/im/uploads/${uploadId}/complete`),
+  renewUpload: (uploadId) => service.post<UploadReservation>(`/im/uploads/${uploadId}/renew`),
   uploadStatus: (uploadId) => service.get<UploadStatus>(`/im/uploads/${uploadId}`),
   cancelUpload: (uploadId) => service.del<UploadStatus>(`/im/uploads/${uploadId}`),
   downloadFile: (fileId) =>
