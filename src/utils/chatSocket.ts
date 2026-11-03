@@ -78,7 +78,11 @@ export function createChatSocket(api: ImApi, handlers: ChatSocketHandlers) {
         if (watchdog) clearTimeout(watchdog)
         watchdog = setTimeout(() => ws.close(), ticket.idleTimeoutSeconds * 1000)
       }
-      ws.onopen = () => arm()
+      let opened = false
+      ws.onopen = () => {
+        opened = true
+        arm()
+      }
       ws.onmessage = (message) => {
         arm()
         let frame: Record<string, unknown>
@@ -104,6 +108,13 @@ export function createChatSocket(api: ImApi, handlers: ChatSocketHandlers) {
         clearTimers()
         socket = null
         if (stopped) return
+        if (!opened) {
+          // 浏览器不会暴露握手被拒的原因；最常见的是页面来源不在后端 IM_WEB_ORIGIN 允许列表里。
+          console.warn(
+            `聊天 WebSocket 握手失败。当前页面来源 ${window.location.origin} 需要在后端 IM_WEB_ORIGIN（allowed-origins）中；` +
+              '另外票据每分钟最多申请 5 次，频繁刷新页面也会被限流。',
+          )
+        }
         if (STOP_CODES.has(event.code)) {
           handlers.onState('offline')
           handlers.onTerminated(event.code)
